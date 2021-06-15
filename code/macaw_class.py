@@ -23,7 +23,7 @@ from functools import partial
 
 
 class Macaw:
-    __version__ = 'alpha_9td'
+    __version__ = 'alpha_9te'
     __author__ = 'Vincent Blay'
     
     def __init__(self, smiles, Nlndmk = 50, fptype = "Morgan2", metric = "Tanimoto", 
@@ -130,7 +130,6 @@ class Macaw:
         self.__refD = []
         self.__LndS = []
         self.__refps = []
-        
         
         
         if len(lndmk_idx) == 0:
@@ -362,8 +361,35 @@ class Macaw:
         LndS = self.__LndS
         
         qsmiles = list(qsmiles)
-        # If qsmiles is not provided, will embed self._smiles
-        D, bad_idx = self.__query_dist(qsmiles)
+        
+        # if qsmiles were not provided, then we will compute the distance
+        # between self.__mols and the landmarks
+        if len(qsmiles) == 0:
+            mols = self.__mols
+            bad_idx = self.__bad_idx
+            lndmk_idx = self._lndmk_idx
+            
+            mols_no_lndmks = np.delete(mols, lndmk_idx)
+            
+            # In this case we do not need to recompute the distances between
+            # landmarks because we already have them in self.__refD
+            qfps = self.__fps_maker(mols_no_lndmks) 
+            D = self.__fps_distance(qfps)
+                    
+            # Now we can insert the rows in D corresponding to the landmarks 
+            D_lndmks = self.__refD
+            i=0
+            for row_idx in lndmk_idx:
+                D = np.insert(D, row_idx, D_lndmks[i,:], axis=0)
+                i += 1
+            
+            
+        else:
+            mols, bad_idx = self._smiles_to_mols(qsmiles, bad_idx=True)
+        
+            # We compute the fingerprints and distances for the query smiles
+            qfps = self.__fps_maker(mols)
+            D = self.__fps_distance(qfps)
 
      
         if method == "mds":
@@ -384,12 +410,12 @@ class Macaw:
             X = LndS.transform(D)
             
         
-        
         # Finally, we insert nan rows in the bad_idx positions if there were any     
         for i in bad_idx:
             X = np.insert(X, i, np.nan, axis=0)
         
         return X
+    
 
     
     # Helper functions
@@ -409,22 +435,6 @@ class Macaw:
         else:
             return mols   
    
-    
-    def __query_dist(self, smiles):
-        
-        # if query smiles were not provided, then we will compute the distance
-        # between self.__mols and the landmarks
-        if len(smiles) == 0:
-            mols = self.__mols
-            bad_idx = self.__bad_idx
-        else:
-            mols, bad_idx = self._smiles_to_mols(smiles, bad_idx=True)
-        
-        # We compute the fingerprints for the query smiles
-        qfps = self.__fps_maker(mols)      
-        
-        D = self.__fps_distance(qfps)
-        return D, bad_idx
     
     
     def __fps_maker(self, mols):

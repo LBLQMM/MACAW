@@ -435,23 +435,6 @@ class Macaw:
             return mols   
    
     
-    def __query_dist(self, smiles):
-        
-        # if query smiles were not provided, then we will compute the distance
-        # between self.__mols and the landmarks
-        if len(smiles) == 0:
-            mols = self.__mols
-            bad_idx = self.__bad_idx
-        else:
-            mols, bad_idx = self._smiles_to_mols(smiles, bad_idx=True)
-        
-        # We compute the fingerprints for the query smiles
-        qfps = self.__fps_maker(mols)      
-        
-        D = self.__fps_distance(qfps)
-        return D, bad_idx
-    
-
     def __fps_maker(self, mols):
         fptype = self._fptype
 

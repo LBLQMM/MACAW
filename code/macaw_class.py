@@ -107,20 +107,20 @@ class Macaw:
             print(f"Not enough molecules provided. Nlndmk has been set to {len(self.__mols)}")
             Nlndmk = len(self.__mols)
         self._Nlndmk = Nlndmk
-        self._fptype = fptype.lower()
-        self._metric = metric.lower()
+        self._fptype = fptype.lower().replace(" ","")
+        self._metric = metric.lower().replace(" ","")
         if len(Y) == len(smiles):
             mask = np.ones(len(Y), bool)
             mask[self.__bad_idx] = False
             self._Y = Y[mask]
         else:
             if len(Y) != 0:
-                print("Warning: Y and smiles must have the same length. Y has been set to [].")
+                raise IOError("Error: inputs Y and smiles must have the same length.")
             self._Y = []
         self._Yset = Yset
         self._edim = edim
         if method.lower() not in ["mds","isomap"]:
-            print(f"Warning: Invalid method {method}. Method has been set to mds.")
+            raise IOError(f"Error: Invalid method {method}. Methods available are mds and isomap.")
             method = "mds"
         self._method = method.lower()
         self._lndmk_idx = lndmk_idx
@@ -159,7 +159,7 @@ class Macaw:
         # We take into account if there were any bad_indices in the original
         # dataset provided
         
-        lndmk_idx = np.array(lndmk_idx)
+        lndmk_idx = np.sort(lndmk_idx)
         bad_idx = self.__bad_idx
         
         
@@ -185,13 +185,13 @@ class Macaw:
         self.__safe_lndmk_embed()
 
     def set_fptype(self, fptype):
-        self._fptype = fptype.lower()
+        self._fptype = fptype.lower().replace(" ","")
         self.__refps_update()
         self.__refD_update()
         self.__safe_lndmk_embed()
 
     def set_metric(self, metric):
-        self._metric = metric.lower()
+        self._metric = metric.lower().replace(" ","")
         #self.__refps_update()
         self.__refD_update()
         self.__safe_lndmk_embed()
@@ -415,7 +415,6 @@ class Macaw:
             X = np.insert(X, i, np.nan, axis=0)
         
         return X
-    
 
     
     # Helper functions
@@ -436,47 +435,69 @@ class Macaw:
             return mols   
    
     
+    def __query_dist(self, smiles):
+        
+        # if query smiles were not provided, then we will compute the distance
+        # between self.__mols and the landmarks
+        if len(smiles) == 0:
+            mols = self.__mols
+            bad_idx = self.__bad_idx
+        else:
+            mols, bad_idx = self._smiles_to_mols(smiles, bad_idx=True)
+        
+        # We compute the fingerprints for the query smiles
+        qfps = self.__fps_maker(mols)      
+        
+        D = self.__fps_distance(qfps)
+        return D, bad_idx
     
-    def __fps_maker(self, mols):
-        fptype = self._fptype          
-        if fptype == "morgan2":
-            f = partial(AllChem.GetMorganFingerprintAsBitVect, radius=2, nBits=1024)
-        elif fptype == "morgan3":
-            f = partial(AllChem.GetMorganFingerprintAsBitVect, radius=3, nBits=1024)
-        elif fptype == "rdk5":
-            f = partial(Chem.RDKFingerprint, minPath=1, maxPath=5, fpSize=1024)
-        elif fptype == "rdk7":
-            f = partial(Chem.RDKFingerprint, minPath=1, maxPath=7, fpSize=2048) # default fp settings: minPath = 1, maxPath = 7, fpSize = 2048
-        elif fptype == "featmorgan2":
-            f = partial(AllChem.GetMorganFingerprintAsBitVect, radius=2, useFeatures=True, useChirality=True, nBits=2048)
-        elif fptype == "featmorgan3":
-            f = partial(AllChem.GetMorganFingerprintAsBitVect, radius=3, useFeatures=True, useChirality=True, nBits=2048)
-        elif fptype == "maccs":
-            f = rdMolDescriptors.GetMACCSKeysFingerprint
-        elif fptype == "avalon":
-            f = pyAvalonTools.GetAvalonFP
-        elif fptype == "atompairs":
-            f = rdMolDescriptors.GetHashedAtomPairFingerprintAsBitVect
-        elif fptype == "torsion":
-            f = rdMolDescriptors.GetHashedTopologicalTorsionFingerprintAsBitVect
-        elif fptype == "pattern":
-            f = partial(Chem.PatternFingerprint, fpSize=4096)
-        elif fptype == "secfp":
-            secfp_encoder = rdMHFPFingerprint.MHFPEncoder(0, 0)
-            f = partial(secfp_encoder.EncodeSECFPMol)
-        elif fptype == "layered":
-            f = LayeredFingerprint
-        elif fptype == "daylight":
-            f = FingerprintMols.FingerprintMol
-        else: # default "morgan2"
-            print(f"Warning: Invalid fingeprint type {fptype}. fptype has been set to Morgan2.")
-            self._fptype = "morgan2"
-            f = partial(AllChem.GetMorganFingerprintAsBitVect, radius=2, nBits=1024)
 
-        fps = [f(mol) for mol in mols]
+    def __fps_maker(self, mols):
+        fptype = self._fptype
+
+        switcher = {"morgan2" : partial(AllChem.GetMorganFingerprintAsBitVect, radius=2, nBits=1024),
+                    "morgan3" : partial(AllChem.GetMorganFingerprintAsBitVect, radius=3, nBits=1024),
+                    "rdk5" : partial(Chem.RDKFingerprint, minPath=1, maxPath=5, fpSize=1024),
+                    "rdk7" : partial(Chem.RDKFingerprint, minPath=1, maxPath=7, fpSize=2048), 
+                    "featmorgan2" : partial(AllChem.GetMorganFingerprintAsBitVect, radius=2, useFeatures=True, useChirality=True, nBits=2048),
+                    "featmorgan3" : partial(AllChem.GetMorganFingerprintAsBitVect, radius=3, useFeatures=True, useChirality=True, nBits=2048),
+                    "maccs" : rdMolDescriptors.GetMACCSKeysFingerprint,
+                    "avalon" : pyAvalonTools.GetAvalonFP,
+                    "atompairs" : rdMolDescriptors.GetHashedAtomPairFingerprintAsBitVect,
+                    "torsion" : rdMolDescriptors.GetHashedTopologicalTorsionFingerprintAsBitVect,
+                    "pattern" : partial(Chem.PatternFingerprint, fpSize=4096),
+                    "secfp" : partial(rdMHFPFingerprint.MHFPEncoder(0, 0).EncodeSECFPMol),
+                    "layered" : LayeredFingerprint
+                    }
+        
+        fptypes = fptype.split("+")
+        
+        if len(fptypes)>1:
+            def F(mol, fptypes):
+                n = 0
+                keys = []
+                for fptype_i in fptypes:
+                    f = switcher[fptype_i]
+                    fpi = f(mol)
+                    for i in fpi.GetOnBits():
+                        keys.append(i+n)
+                    
+                    n += fpi.GetNumBits()
+                
+                fp = Chem.DataStructs.ExplicitBitVect(n)
+                for i in keys:
+                    fp[i]=1
+                
+                return fp
+            
+            fps = [F(mol, fptypes) for mol in mols]
+            
+        else: # len(fptypes)==1
+            f = switcher[fptypes[0]]
+            fps = [f(mol) for mol in mols]
      
         return fps
-
+    
 
     def __fps_distance(self, fps1 = []):
         metric = self.__metric_to_class()

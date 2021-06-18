@@ -14,7 +14,6 @@ from rdkit.Avalon import pyAvalonTools
 from rdkit.Chem import rdMolDescriptors
 from rdkit.Chem import rdMHFPFingerprint
 from rdkit.Chem.rdmolops import LayeredFingerprint
-from rdkit.Chem.Fingerprints import FingerprintMols
 from operator import itemgetter
 from sklearn.manifold import Isomap
 from sklearn.svm import SVR, SVC
@@ -23,7 +22,7 @@ from functools import partial
 
 
 class Macaw:
-    __version__ = 'alpha_9te'
+    __version__ = 'alpha_9tf'
     __author__ = 'Vincent Blay'
     
     def __init__(self, smiles, Nlndmk = 50, fptype = "Morgan2", metric = "Tanimoto", 
@@ -197,9 +196,9 @@ class Macaw:
         self.__safe_lndmk_embed()
         
     def set_Y(self, Y):
+        Y = np.array(Y)
         long = len(self.__mols)+len(self.__bad_idx)
         if len(Y) == long:
-            Y = np.array(Y)
             mask = np.ones(len(Y), bool)
             mask[self.__bad_idx] = False
             self._Y = Y[mask]
@@ -432,9 +431,9 @@ class Macaw:
         if bad_idx:
             return mols, bad_ind
         else:
-            return mols   
-   
+            return mols
     
+
     def __fps_maker(self, mols):
         fptype = self._fptype
 
@@ -600,7 +599,7 @@ def Macaw_optimus(smiles, y, fast=True, method="regression", C=20., verbose=Fals
 
             if "Y" in kwargs:
                 Y_copy = kwargs["Y"].copy()
-                kwargs["Y"] = kwargs["Y"][idx]
+                kwargs["Y"] = np.array(kwargs["Y"])[idx]
 
         else:
             idx = range(leny)

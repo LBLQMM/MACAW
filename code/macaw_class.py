@@ -14,7 +14,6 @@ from rdkit.Avalon import pyAvalonTools
 from rdkit.Chem import rdMolDescriptors
 from rdkit.Chem import rdMHFPFingerprint
 from rdkit.Chem.rdmolops import LayeredFingerprint
-from operator import itemgetter
 from sklearn.manifold import Isomap
 from sklearn.svm import SVR, SVC
 from sklearn.model_selection import cross_val_score
@@ -272,7 +271,7 @@ class Macaw:
     def __refps_update(self):
         mols = self.__mols
         lndmk_idx = self._lndmk_idx
-        remols = list(itemgetter(*lndmk_idx)(mols))
+        remols = [mols[i] for i in lndmk_idx] # Equivalent to list(itemgetter(*lndmk_idx)(mols))
         refps = self.__fps_maker(remols)   
         self.__refps = refps
         
@@ -472,11 +471,11 @@ class Macaw:
                 
                 return fp
             
-            fps = [F(mol, fptypes) for mol in mols]
+            fps = list(map(F, mols)) # Equivalent to fps = [F(mol, fptypes) for mol in mols]
             
         else: # len(fptypes)==1
             f = switcher[fptypes[0]]
-            fps = [f(mol) for mol in mols]
+            fps = list(map(f, mols)) # Equivalent to fps = [f(mol) for mol in mols]
      
         return fps
     
@@ -612,7 +611,7 @@ def Macaw_optimus(smiles, y, fast=True, method="regression", C=20., verbose=Fals
         
         idx = range(leny)
    
-    smiles_subset = list(itemgetter(*idx)(smiles))
+    smiles_subset = [smiles[i] for i in idx] # Equivalent to list(itemgetter(*idx)(smiles))
     mcw = Macaw(smiles_subset,**kwargs)   
     
     if method == "regression":
@@ -665,7 +664,8 @@ def smiles_clean(smiles, idx=False):
             ind.append(i) 
         else:
             print(f'Warning: Skipping invalid SMILES in position {i}: {smiles[i]}')
-    clean_smiles = list(itemgetter(*ind)(smiles))
+    
+    clean_smiles = [smiles[i] for i in ind] # Equivalent to clean_smiles = list(itemgetter(*ind)(smiles))
     if idx:
         return clean_smiles, ind
     else:

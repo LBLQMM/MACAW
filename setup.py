@@ -31,7 +31,7 @@ setup(
           'pandas',
           'matplotlib',
           'scikit-learn >= 0.24.1',
-          'scipy >= 1.6.2',
+          'scipy >= 1.6.1',
           'selfies >= 1.0.4',
           ],
       )

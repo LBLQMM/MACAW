@@ -11,7 +11,13 @@ Details about the different algorithms can be read in the [Macaw publication](ht
 
 ## Installation
 
-1. Macaw requires rdkit to run. Instructions to install rdkit using conda can be found [here](https://www.rdkit.org/docs/Install.html).
+1. Macaw requires rdkit to run, which can be installed using [conda](https://anaconda.org/conda-forge/rdkit):
+
+```bash
+conda install -c conda-forge rdkit
+```
+
+Alternative methods to install rdkit can be found [here](https://www.rdkit.org/docs/Install.html).
 
 2. Run the following command to install Macaw:
 

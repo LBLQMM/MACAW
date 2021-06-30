@@ -8,6 +8,7 @@ function.
 @author: Vincent
 """
 
+
 import numpy as np
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem, MolFromSmiles
@@ -24,7 +25,6 @@ from functools import partial
 class Macaw:
     __version__ = 'alpha_9tf'
     __author__ = 'Vincent Blay'
-
     def __init__(
         self,
         smiles,

@@ -1,17 +1,19 @@
 # Macaw
 
-Macaw (**m**olecular **a**utoen**c**oding **a**uto-**w**orkaround) is a tool that featurizes molecules by mapping them onto a low-dimensional, continuous numeric space. Their coordinates are molecular features that can be used as inputs in mathematical and machine-learning models.
+Macaw (**m**olecular **a**utoen**c**oding **a**uto-**w**orkaround) is a cheminformatic tool that featurizes molecules by mapping them onto a low-dimensional, continuous numeric space. Their coordinates are molecular features that can be used as inputs in mathematical and machine-learning models.
 
 Macaw features can be used as a drop-in replacement for conventional molecular descriptors. Macaw features are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
 
 The Macaw package also contains original algorithms to generate molecular libraries and to evolve molecular libraries *in silico* to satisfy a desired property specification (inverse design problem).
 
-Macaw combines ideas of molecular fingeprinting, landmark dimensionality reduction, probability, evolutionary algorithms, and robust molecular representation. Details about the different algorithms can be read in the [Macaw publication](https://choosealicense.com/licenses/mit/).
+Details about the different algorithms can be read in the [Macaw publication](https://github.com/LBLQMM/macaw).
 
 
 ## Installation
 
-Run the following command to install:
+1. Macaw requires rdkit to run. Instructions to install rdkit using conda can be found [here](https://www.rdkit.org/docs/Install.html).
+
+2. Run the following command to install Macaw:
 
 ```bash
 pip install macaw
@@ -49,9 +51,7 @@ mcw = Macaw(smiles, Nldnmk=60, fptype="rdk5", metric="Sokal", edim=13, Y=Y_vals)
 The function `Macaw_optimus` automatically explores a variety of fingeprint type (`fptype`) and similarity metric (`metric`) combinations and returns a recommended embedder:
 
 ```python
-
-mcw = Macaw_optimus(smiles, y,=Y_vals, method="regression", verbose=True)
-
+mcw = Macaw_optimus(smiles, y,=Y_vals, verbose=True)
 ```
 
 ### Molecule generation

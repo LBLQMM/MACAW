@@ -3,9 +3,11 @@ from setuptools import setup
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
+exec(open('macaw/version.py').read())
+
 setup(
       name='macaw',
-      version='0.0.3',
+      version=__version__,
       url='https://github.com/LBLQMM/macaw',
       author='Vincent Blay',
       author_email='vblayroger@lbl.gov',
@@ -27,9 +29,7 @@ setup(
         'Natural Language :: English'
           ],
       install_requires=[
-          'numpy',
-          'pandas',
-          'matplotlib',
+          'numpy >= 1.7.0',
           'scikit-learn >= 0.24.1',
           'scipy >= 1.6.1',
           'selfies >= 1.0.4',

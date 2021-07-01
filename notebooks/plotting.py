@@ -19,8 +19,10 @@ from sklearn.metrics import auc
 def parity_plot(
     x,
     y,
-    x_test=[],
-    y_test=[],
+    x_test=None,
+    y_test=None,
+    y_train_std=None,
+    y_test_std=None,
     xlabel='True value',
     ylabel='Predicted',
     title=None,
@@ -33,7 +35,7 @@ def parity_plot(
     plt.figure(figsize=(5.5, 5.0))
 
     # Find the boundaries of X and Y values
-    if len(x_test) > 0:
+    if x_test is not None:
         x_test = np.array(x_test)
         y_test = np.array(y_test)
         min1 = min(x.min(), y.min(), x_test.min(), y_test.min())
@@ -54,10 +56,10 @@ def parity_plot(
     ax.plot([0, 1], [0, 1], 'k-', lw=0.5, transform=ax.transAxes)
 
     # Plot the data
-    plt.scatter(x=x, y=y, c='blue', s=10)
+    plt.errorbar(x=x, y=y, yerr=y_train_std, color='blue', fmt='.', elinewidth=.5)
 
-    if len(x_test) > 0:
-        plt.scatter(x=x_test, y=y_test, c='red', s=10)
+    if x_test is not None:
+        plt.errorbar(x=x_test, y=y_test, yerr=y_test_std, color='red', fmt='.', elinewidth=.5)
         text1 = f"$R^2_{{train}} = {r2_score(x,y):0.2f}$"
         text2 = f"$R^2_{{test}} = {r2_score(x_test,y_test):0.2f}$"
 

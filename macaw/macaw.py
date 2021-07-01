@@ -646,7 +646,7 @@ def Macaw_optimus(
     if 'Y' not in kwargs:
         kwargs['Y'] = y.copy()
     else:
-        if len(kwargs['Y'] != leny):
+        if len(smiles) != len(kwargs['Y']):
             raise IOError(f"len(smiles) = {leny} does not match len(Y) = {len(kwargs['Y'])}")
     
     if problem == 'auto':

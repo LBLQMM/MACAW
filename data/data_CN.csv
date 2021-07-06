@@ -1,0 +1,546 @@
+ID,Name,PubChem,CN,Smiles,Source
+1,caryophyllene,5322111,29,C/C/1=C/CCC(=C)C2CC(C2CC1)(C)C,FeatureCreature
+2,methyl sorbate,5323650,6,C/C=C/C=C/C(=O)OC,FeatureCreature
+3,biphenyl,7095,21,C1=CC=C(C=C1)C2=CC=CC=C2,FeatureCreature
+4,diphenylmethane,7580,11,C1=CC=C(C=C1)CC2=CC=CC=C2,FeatureCreature
+5,"1,2-diphenylethane",7647,1,C1=CC=C(C=C1)CCC2=CC=CC=C2,FeatureCreature
+6,2-phenyl ethanol,6054,8,C1=CC=C(C=C1)CCO,FeatureCreature
+7,naphthalene,931,22,C1=CC=C2C=CC=CC2=C1,FeatureCreature
+8,benzene,241,14.3,C1=CC=CC=C1,FeatureCreature
+9,2-furfuryl alcohol,7361,10.8,C1=COC(=C1)CO,FeatureCreature
+10,Furan,8029,7,C1=COC=C1,FeatureCreature
+11,"2,5 dihydrofuran",15570,15.6,C1C=CCO1,FeatureCreature
+12,2-tetrahydrofurfuryl alcohol,7360,17.9,C1CC(OC1)CO,FeatureCreature
+13,cyclopentanone,8452,9,C1CCC(=O)C1,FeatureCreature
+14,cyclohexanone,7967,10,C1CCC(=O)CC1,FeatureCreature
+15,bicyclohexyl,,51,C1CCC(CC1)C1CCCCC1,Saldana
+16,bicyclohexyl,7094,50.2,C1CCC(CC1)C2CCCCC2,FeatureCreature
+17,tetralin,8404,8.9,C1CCC2=CC=CC=C2C1,FeatureCreature
+18,Perhydro-phenanthrene,21971,38.8,C1CCC2C(C1)CCC3C2CCCC3,FeatureCreature
+19,cis-decalin,7044,40.5,C1CCC2CCCCC2C1,FeatureCreature
+20,cyclohexene,8079,57,C1CCC=CC1,FeatureCreature
+21,cyclopentane,9253,6.1,C1CCCC1,FeatureCreature
+22,cyclohexane,8078,15.05,C1CCCCC1,FeatureCreature
+23,cyclooctane,9266,22.3,C1CCCCCCC1,FeatureCreature
+24,tetrahydrofuran,8028,21.9,C1CCOC1,FeatureCreature
+25,cis-decalin,,38.1,C1CC[C@@H]2CCCC[C@@H]2C1,Saldana
+26,trans-decalin,,35.9,C1CC[C@@H]2CCCC[C@H]2C1,Saldana
+27,tetralin,,13,C1CCc2ccccc2C1,Saldana
+28,"2,3 dihydrofuran",70934,20,C1COC=C1,FeatureCreature
+29,"2,2,6,6,8,8-hexamethyl-4-methylene-nonane",,4.5,C=C(CC(C)(C)C)CC(C)(C)CC(C)(C)C,Saldana
+30,4-vinyl-1-cyclohexene,7499,40,C=CC1CCC=CC1,FeatureCreature
+31,ethenylcyclohexane,,38,C=CC1CCCCC1,Saldana
+32,"1,9-Decadiene",15439,41,C=CCCCCCCC=C,FeatureCreature
+33,"2,4,4-trimethyl-1-pentene",7868,10,CC(=C)CC(C)(C)C,FeatureCreature
+34,farnesene,5281516,22,CC(=CCC/C(=C/C/C=C(\C)/C=C)/C)C,FeatureCreature
+35,farnesol,445070,24,CC(=CCC/C(=C/CC/C(=C/CO)/C)/C)C,FeatureCreature
+36,geraniol,637566,22,CC(=CCC/C(=C/CO)/C)C,FeatureCreature
+37,Ocimene,18756,28,CC(=CCC=C(C)C=C)C,FeatureCreature
+38,Linalool,6549,20,CC(=CCCC(C)(C=C)O)C,FeatureCreature
+39,glycerol triethanoate,,0,CC(=O)OC(COC(=O)C)COC(=O)C,Saldana
+40,glycerol triacetate,5541,5,CC(=O)OCC(COC(=O)C)OC(=O)C,FeatureCreature
+41,"2-(1,1-dimethylethyl)-naphthalene",17889,3,CC(C)(C)C1=CC2=CC=CC=C2C=C1,FeatureCreature
+42,tert-butyl benzene,7366,0,CC(C)(C)C1=CC=CC=C1,FeatureCreature
+43,tert-butyldecalin,141340,24,CC(C)(C)C1CCCC2C1CCCC2,FeatureCreature
+44,tert-butyldecalin,,24,CC(C)(C)C1CCCC2CCCCC12,Saldana
+45,tert-butyltetralin,,17,CC(C)(C)C1CCCc2ccccc12,Saldana
+46,t-butanol,6386,17,CC(C)(C)O,FeatureCreature
+47,2-tert-butylnaphthalene,,3,CC(C)(C)c1ccc2ccccc2c1,Saldana
+48,tert-butylbenzene,,-1,CC(C)(C)c1ccccc1,Saldana
+49,"2,4-dimethyl-3-pentanone (DIK)",11271,14,CC(C)C(=O)C(C)C,FeatureCreature
+50,"2,2,3-trimethylbutane",10044,12.9,CC(C)C(C)(C)C,FeatureCreature
+51,"1,3,5-triisopropylbenzene",12860,2.8,CC(C)C1=CC(=CC(=C1)C(C)C)C(C)C,FeatureCreature
+52,m-diisopropylbenzene,7450,-3,CC(C)C1=CC(=CC=C1)C(C)C,FeatureCreature
+53,isopropyl benzene,7406,7,CC(C)C1=CC=CC=C1,FeatureCreature
+54,"1,3,5-triisopropyl cyclohexane",4583934,25.3,CC(C)C1CC(CC(C1)C(C)C)C(C)C,FeatureCreature
+55,"2,2,4-trimethylpentane",10907,18.04,CC(C)CC(C)(C)C,FeatureCreature
+56,"2,4-dimethylpentane",7907,28.7,CC(C)CC(C)C,FeatureCreature
+57,"2,2,5-trimethylhexane",19041,24,CC(C)CCC(C)(C)C,FeatureCreature
+58,"2,2,6,6,8,8-hexamethyl-4-methylene-nonane",56846471,5,CC(C)CCC(C)CCC(C)CC=C(C)C,FeatureCreature
+59,"2,9-dimethyl-5,6-diisoamyldecane",,48,CC(C)CCC(CCC(C)C)C(CCC(C)C)CCC(C)C,Saldana
+60,"2,6-dimethylhept-1-ene",,51,CC(C)CCCC(=C)C,Saldana
+61,"2,6-dimethylheptene",14069,51,CC(C)CCCC(C)C,FeatureCreature
+62,"3,7-dimethyl-1-octanol",7792,29.3,CC(C)CCCC(C)CCO,FeatureCreature
+63,isopentanol,31260,18.4,CC(C)CCO,FeatureCreature
+64,diisoamylether,10989,96.3,CC(C)CCOCCC(C)C,FeatureCreature
+65,isobutanol,6560,8.5,CC(C)CO,FeatureCreature
+66,diisobutylether,12346,59.7,CC(C)COCC(C)C,FeatureCreature
+67,"1,3-di(propan-2-yl)benzene",,-8,CC(C)c1cccc(c1)C(C)C,Saldana
+68,isopropylbenzene,,15,CC(C)c1ccccc1,Saldana
+69,"2,2,4,6,6-pentamethylheptane",26058,9,CC(CC(C)(C)C)CC(C)(C)C,FeatureCreature
+70,"2,2,4,4,6,8,8-heptamethylnonane",20414,14.65,CC(CC(C)(C)C)CC(C)(C)CC(C)(C)C,FeatureCreature
+71,dot-citronellol,8842,25.6,CC(CCC=C(C)C)CCO,FeatureCreature
+72,tripropylene glycol monomethyl ether,25054,81.3,CC(CO)OCC(C)OCC(C)OC,FeatureCreature
+73,1-methoxy-2 propanol,7900,19,CC(COC)O,FeatureCreature
+74,linolenic acid,5280934,20,CC/C=C\C/C=C\C/C=C\CCCCCCCC(=O)O,FeatureCreature
+75,methyl linolenate,5319706,37,CC/C=C\C/C=C\C/C=C\CCCCCCCC(=O)OC,FeatureCreature
+76,"2,3-bis[[(9Z,12Z,15Z)-octadeca-9,12,15-trienoyl]oxy]propyl",,23,CC/C=C\C/C=C\C/C=C\CCCCCCCC(=O)OC(COC(=O)CCCCCCC/C=C\C/C=C\C/C=C\CC)COC(=O)CCCCCCC/C=C\C/C=C\C/C=C\CC,Saldana
+77,ethyl linolenate,5367460,27,CC/C=C\C/C=C\C/C=C\CCCCCCCC(=O)OCC,FeatureCreature
+78,trilinolenin,5462874,23,CC/C=C\C/C=C\C/C=C\CCCCCCCC(=O)OCC(OC(=O)CCCCCCC/C=C\C/C=C\C/C=C\CC)COC(=O)CCCCCCC/C=C\C/C=C\C/C=C\CC,FeatureCreature
+79,linolenyl alcohol,6436081,41,CC/C=C\C/C=C\C/C=C\CCCCCCCCO,FeatureCreature
+80,dot-pinene,14896,22,CC1(C2CCC(=C)C1C2)C,FeatureCreature
+81,"1,2,4,5-tetramethylbenzene",10263,1,CC1=C(C(=C(C=C1)C)C)C,FeatureCreature
+82,"1,2,4-trimethylbenzene",7247,8.9,CC1=CC(=C(C=C1)C)C,FeatureCreature
+83,4-methyl guaiacol,7144,20,CC1=CC(=C(C=C1)O)OC,FeatureCreature
+84,"1,3,5-trimethylbenzene",7947,8,CC1=CC(=CC(=C1)C)C,FeatureCreature
+85,"1,3-dimethylbenzene",7929,-1,CC1=CC(=CC=C1)C,FeatureCreature
+86,bisabolene,3033866,32.2,CC1=CC/C(=C(/C)\CCC=C(C)C)/CC1,FeatureCreature
+87,"2,6-dimethylnaphthalene",11387,-7,CC1=CC2=C(C=C1)C=C(C=C2)C,FeatureCreature
+88,2-methylnaphthalene,7055,6,CC1=CC2=CC=CC=C2C=C1,FeatureCreature
+89,"1,4-dimethylbenzene",7809,-4,CC1=CC=C(C=C1)C,FeatureCreature
+90,1-methyl-4-isopropylbenzene,7463,4,CC1=CC=C(C=C1)C(C)C,FeatureCreature
+91,4-methyl anisole,7731,7.4,CC1=CC=C(C=C1)OC,FeatureCreature
+92,"2,5 dimethyl furan",12266,11,CC1=CC=C(O1)C,FeatureCreature
+93,1-methylnaphthalene,7002,0,CC1=CC=CC2=CC=CC=C12,FeatureCreature
+94,toluene,1140,-0.6,CC1=CC=CC=C1,FeatureCreature
+95,"1,2-dimethylbenzene",7237,8.3,CC1=CC=CC=C1C,FeatureCreature
+96,2-methyl furan,10797,8.9,CC1=CC=CO1,FeatureCreature
+97,.-pinene,6654,25,CC1=CCC2CC1C2(C)C,FeatureCreature
+98,"1,3,5-trimethylcyclohexane",,30.5,CC1CC(C)CC(C)C1,Saldana
+99,"1,3,5-trimethylcyclohexane",35364,30.5,CC1CC(CC(C1)C)C,FeatureCreature
+100,4-methyl-1-cyclohexene,11572,52,CC1CCC=CC1,FeatureCreature
+101,methylcyclopentane,7296,17.2,CC1CCCC1,FeatureCreature
+102,methylcyclohexane,7962,23.3,CC1CCCCC1,FeatureCreature
+103,2-methyl tetrahydrofuran,7301,22,CC1CCCO1,FeatureCreature
+104,rose oxide,27866,30,CC1CCOC(C1)C=C(C)C,FeatureCreature
+105,n-propane,6334,-20,CCC,FeatureCreature
+106,"3,12-diethyltetradeca-3,11-diene",,26,CCC(=CCCCCCCC=C(CC)CC)CC,Saldana
+107,3-pentanone (DEK),7288,10,CCC(=O)CC,FeatureCreature
+108,"2,2-dimethylbutane",6403,24.4,CCC(C)(C)C,FeatureCreature
+109,"2,3-dimethylpentane",11260,22,CCC(C)C(C)C,FeatureCreature
+110,sec-butylbenzene,8680,6,CCC(C)C1=CC=CC=C1,FeatureCreature
+111,sec-butyldecalin,145244,34,CCC(C)C1CCCC2C1CCCC2,FeatureCreature
+112,3-methylpentane,7282,30,CCC(C)CC,FeatureCreature
+113,"2,6-dimethyloctane",16319,51.7,CCC(C)CCCC(C)C,FeatureCreature
+114,"farnesane (2,6,10-trimethyldodecane)",19773,58.55,CCC(C)CCCC(C)CCCC(C)C,FeatureCreature
+115,2-butanol,6568,8.5,CCC(C)O,FeatureCreature
+116,3-ethylpentane,12048,34.1,CCC(CC)CC,FeatureCreature
+117,4-ethyl guaiacol,62465,20,CCC1=CC(=C(C=C1)O)OC,FeatureCreature
+118,"1,3-diethylbenzene",8864,5,CCC1=CC(=CC=C1)CC,FeatureCreature
+119,ethyl benzene,7500,4,CCC1=CC=CC=C1,FeatureCreature
+120,2-ethyl furan,18554,10.2,CCC1=CC=CO1,FeatureCreature
+121,ethylcyclohexane,15504,35.8,CCC1CCCCC1,FeatureCreature
+122,2-ethyl tetrahydrofuran,102538,28,CCC1CCCO1,FeatureCreature
+123,n-butane,,22,CCCC,Saldana
+124,methyl butanoate,12180,6.4,CCCC(=O)OC,FeatureCreature
+125,"2,3-di(butanoyloxy)propyl butanoate",,6.7,CCCC(=O)OC(COC(=O)CCC)COC(=O)CCC,Saldana
+126,tributyrin,6050,-5,CCCC(=O)OCC(COC(=O)CCC)OC(=O)CCC,FeatureCreature
+127,4-methyl-4-decalylheptane,,21,CCCC(C)(CCC)C1CCCC2CCCCC12,Saldana
+128,4-methyl-4-(beta-naphthyl)heptane,,9,CCCC(C)(CCC)c1ccc2ccccc2c1,Saldana
+129,2-methylpentane,7892,34.5,CCCC(C)C,FeatureCreature
+130,"4,5-diethyloctane",519254,20,CCCC(CC)C(CC)CCC,FeatureCreature
+131,4-heptanol,11513,21,CCCC(CCC)O,FeatureCreature
+132,diethoxybutane,77225,97,CCCC(OCC)OCC,FeatureCreature
+133,(2E)-hept-2-ene,,44,CCCC/C=C/C,Saldana
+134,trans-3-octene,638228,34,CCCC/C=C/CC,FeatureCreature
+135,cis-2-heptene,643836,44,CCCC/C=C\C,FeatureCreature
+136,cis-3-octene,5362722,38.1,CCCC/C=C\CC,FeatureCreature
+137,4-propylguaiacol,17739,18,CCCC1=CC(=C(C=C1)O)OC,FeatureCreature
+138,n-propyltetralin,297000,8,CCCC1=CC2=C(CCCC2)C=C1,FeatureCreature
+139,4-propylphenol,12580,9,CCCC1=CC=C(C=C1)O,FeatureCreature
+140,4-propylanisole,7702,7,CCCC1=CC=C(C=C1)OC,FeatureCreature
+141,n-propylbenzene,7668,16,CCCC1=CC=CC=C1,FeatureCreature
+142,n-propyldecalin,145229,45,CCCC1CCCC2C1CCCC2,FeatureCreature
+143,propyldecalin,,35,CCCC1CCCC2CCCCC12,Saldana
+144,propylcyclohexane,,52,CCCC1CCCCC1,Saldana
+145,propyltetralin,,8,CCCC1CCCc2ccccc12,Saldana
+146,n-pentane,8003,30,CCCCC,FeatureCreature
+147,methyl pentanoate,12206,13.3,CCCCC(=O)OC,FeatureCreature
+148,ethyl pentanoate,10882,18.6,CCCCC(=O)OCC,FeatureCreature
+149,propyl pentanoate,67328,20.7,CCCCC(=O)OCCC,FeatureCreature
+150,butyl pentanoate,61137,23.5,CCCCC(=O)OCCCC,FeatureCreature
+151,2-methyl-2-(beta-naphthyl)hexane,,10,CCCCC(C)(C)c1ccc2ccccc2c1,Saldana
+152,2-methylhexane,11582,43.5,CCCCC(C)C,FeatureCreature
+153,2-ethyl-1-hexanol,7720,23.4,CCCCC(CC)CO,FeatureCreature
+154,dioctyl sebacate,31218,70,CCCCC(CC)COC(=O)CCCCCCCCC(=O)OCC(CC)CCCC,FeatureCreature
+155,"5,6-dibutyldecane",529909,30,CCCCC(CCCC)C(CCCC)CCCC,FeatureCreature
+156,5-butylnonane,300476,53,CCCCC(CCCC)CCCC,FeatureCreature
+157,(2E)-oct-2-ene,,43,CCCCC/C=C/C,Saldana
+158,methyl linolelaidate,5362793,43,CCCCC/C=C/C/C=C/CCCCCCCC(=O)OC,FeatureCreature
+159,(2Z)-oct-2-ene,,43,CCCCC/C=C\C,Saldana
+160,methyl-5(Z)8(z)11(Z)14(Z)-eicosatetraenoate,6421258,29.6,CCCCC/C=C\C/C=C\C/C=C\C/C=C\CCCC(=O)OC,FeatureCreature
+161,methyl gamma-linolenate,6439889,29.2,CCCCC/C=C\C/C=C\C/C=C\CCCCC(=O)OC,FeatureCreature
+162,linoleic acid,5280450,31,CCCCC/C=C\C/C=C\CCCCCCCC(=O)O,FeatureCreature
+163,methyl linoleate,5284421,41.05,CCCCC/C=C\C/C=C\CCCCCCCC(=O)OC,FeatureCreature
+164,"2,3-bis[[(9Z,12Z)-octadeca-9,12-dienoyl]oxy]propyl",,32,CCCCC/C=C\C/C=C\CCCCCCCC(=O)OC(COC(=O)CCCCCCC/C=C\C/C=C\CCCCC)COC(=O)CCCCCCC/C=C\C/C=C\CCCCC,Saldana
+165,ethyl linoleate,5282184,44.4,CCCCC/C=C\C/C=C\CCCCCCCC(=O)OCC,FeatureCreature
+166,trilinolein,5322095,32,CCCCC/C=C\C/C=C\CCCCCCCC(=O)OCC(OC(=O)CCCCCCC/C=C\C/C=C\CCCCC)COC(=O)CCCCCCC/C=C\C/C=C\CCCCC,FeatureCreature
+167,"propyl (9Z,12Z)-octadeca-9,12-dienoate",,42.3,CCCCC/C=C\C/C=C\CCCCCCCC(=O)OCCC,Saldana
+168,"butyl (9Z,12Z)-octadeca-9,12-dienoate",,47.55,CCCCC/C=C\C/C=C\CCCCCCCC(=O)OCCCC,Saldana
+169,linoleyl alcohol,5365682,44,CCCCC/C=C\C/C=C\CCCCCCCCO,FeatureCreature
+170,1-butylnaphthalene,15414,6,CCCCC1=CC=CC2=CC=CC=C21,FeatureCreature
+171,n-butylbenzene,7705,12,CCCCC1=CC=CC=C1,FeatureCreature
+172,2-butyl furan,20534,13.1,CCCCC1=CC=CO1,FeatureCreature
+173,n-butyldecalin,145243,31,CCCCC1CCCC2C1CCCC2,FeatureCreature
+174,butyldecalin,,31,CCCCC1CCCC2CCCCC12,Saldana
+175,n-butylcyclohexane,15506,47.8,CCCCC1CCCCC1,FeatureCreature
+176,2-butyl tetrahydrofuran,13861,45.5,CCCCC1CCCO1,FeatureCreature
+177,butyltetralin,,18,CCCCC1CCCc2ccccc12,Saldana
+178,1-hexene,11597,25.8,CCCCC=C,FeatureCreature
+179,n-hexane,8058,48.95,CCCCCC,FeatureCreature
+180,1-heptyne,12350,22,CCCCCC#C,FeatureCreature
+181,2-heptanone,8051,30,CCCCCC(=O)C,FeatureCreature
+182,3-octanone,246728,36,CCCCCC(=O)CC,FeatureCreature
+183,4-nonanone,78236,43,CCCCCC(=O)CCC,FeatureCreature
+184,6-undecanone,13561,49,CCCCCC(=O)CCCCC,FeatureCreature
+185,methyl caproate,7824,23.9,CCCCCC(=O)OC,FeatureCreature
+186,Ethyl hexanoate,31265,28,CCCCCC(=O)OCC,FeatureCreature
+187,Butyl hexanoate,12294,31,CCCCCC(=O)OCCCC,FeatureCreature
+188,2-methylheptane,11594,49.8,CCCCCC(C)C,FeatureCreature
+189,2-heptanol,10976,25,CCCCCC(C)O,FeatureCreature
+190,3-octanol,11527,25.1,CCCCCC(CC)O,FeatureCreature
+191,4-nonanol,22217,28,CCCCCC(CCC)O,FeatureCreature
+192,octan-3-ol,,25.1,CCCCCC(O)CC,Saldana
+193,"(6Z)-2,6,7-trimethyltridec-2,6-diene",,24,CCCCCC/C(=C(/C)\CCC=C(C)C)/C,Saldana
+194,"2,6,7-trimethyl-2,6-tridecadiene",102247765,24,CCCCCC/C(=C(\C)/CCC=C(C)C)/C,FeatureCreature
+195,methyl palmitoleate,643801,51,CCCCCC/C=C\CCCCCCCC(=O)OC,FeatureCreature
+196,palmitoleyl alcohol,5367661,46,CCCCCC/C=C\CCCCCCCCO,FeatureCreature
+197,n-pentylbenzene,10864,8.5,CCCCCC1=CC=CC=C1,FeatureCreature
+198,1-heptene,11610,32,CCCCCC=C,FeatureCreature
+199,2-octene,8126,43,CCCCCC=CC,FeatureCreature
+200,propyl linoleate,53645533,42.5,CCCCCC=CCC=CCCCCCCCC(=O)OCCC,FeatureCreature
+201,n-heptane,8900,53.575,CCCCCCC,FeatureCreature
+202,methyl heptanoate,7826,34.2,CCCCCCC(=O)OC,FeatureCreature
+203,"2,2-dimethyloctane",85150,59,CCCCCCC(C)(C)C,FeatureCreature
+204,"7,8-dimethyltetradecane",530303,40,CCCCCCC(C)C(C)CCCCCC,FeatureCreature
+205,2-phenyloctane,276115,33,CCCCCCC(C)C1=CC=CC=C1,FeatureCreature
+206,"2,5-dimethylundecane",28452,58,CCCCCCC(C)CCC(C)C,FeatureCreature
+207,3-ethyl-3-(beta-naphthyl)nonane,,13,CCCCCCC(CC)(CC)c1ccc2ccccc2c1,Saldana
+208,"7,8-diethyltetradecane",530299,67,CCCCCCC(CC)C(CC)CCCCCC,FeatureCreature
+209,4-propyldecane,529908,39,CCCCCCC(CCC)CCC,FeatureCreature
+210,7-butyltridecane,530347,70,CCCCCCC(CCCC)CCCCCC,FeatureCreature
+211,7-phenyltridecane,16980,41,CCCCCCC(CCCCCC)C1=CC=CC=C1,FeatureCreature
+212,7-phenyltridecane,,41,CCCCCCC(CCCCCC)c1ccccc1,Saldana
+213,(5E)-5-butyldodec-4-ene,,45,CCCCCCC/C(=C/CCC)/CCCC,Saldana
+214,(8E)-8-propylpentadec-8-ene,,45,CCCCCCC/C(=C/CCCCCC)/CCC,Saldana
+215,(4Z)-5-butyldodec-4-ene,,45,CCCCCCC/C(=C\CCC)/CCCC,Saldana
+216,(8Z)-8-propylpentadec-8-ene,,45,CCCCCCC/C(=C\CCCCCC)/CCC,Saldana
+217,(4Z)-4-butyldodec-4-ene,,45,CCCCCCC/C=C(/CCC)\CCCC,Saldana
+218,(4E)-4-butyldodec-4-ene,,45,CCCCCCC/C=C(\CCC)/CCCC,Saldana
+219,n-hexylbenzene,14109,26,CCCCCCC1=CC=CC=C1,FeatureCreature
+220,3-cyclohexylhexane,20283,36,CCCCCCC1CCCCC1,FeatureCreature
+221,1-octene,8125,49,CCCCCCC=C,FeatureCreature
+222,n-octane,356,58.2,CCCCCCCC,FeatureCreature
+223,methyl octanoate,8091,33.6,CCCCCCCC(=O)OC,FeatureCreature
+224,butyl octanoate,11517,39.6,CCCCCCCC(=O)OCCCC,FeatureCreature
+225,2-nonanol,12367,39.6,CCCCCCCC(C)O,FeatureCreature
+226,2-methyl-4-isobutyl-4-phenylundecane,,18,CCCCCCCC(CC(C)C)(CC(C)C)c1ccccc1,Saldana
+227,3-ethyldecane,529827,48,CCCCCCCC(CC)CC,FeatureCreature
+228,8-propylpentadecane,530278,48,CCCCCCCC(CCC)CCCCCCC,FeatureCreature
+229,5-butyldodecane,529854,45,CCCCCCCC(CCCC)CCCC,FeatureCreature
+230,(9E)-9-methylheptadec-9-ene,,66,CCCCCCCC/C(=C/CCCCCCC)/C,Saldana
+231,(9Z)-9-methylheptadec-9-ene,,66,CCCCCCCC/C(=C\CCCCCCC)/C,Saldana
+232,(2Z)-phenylundec-2-ene,,23,CCCCCCCC/C=C(/C)\c1ccccc1,Saldana
+233,(2E)-phenylundec-2-ene,,23,CCCCCCCC/C=C(\C)/c1ccccc1,Saldana
+234,methyl elaidate,5280590,57.2,CCCCCCCC/C=C/CCCCCCCC(=O)OC,FeatureCreature
+235,isobutyl oleate,6436359,60,CCCCCCCC/C=C/CCCCCCCC(=O)OCC(C)C,FeatureCreature
+236,oleic acid,445639,46,CCCCCCCC/C=C\CCCCCCCC(=O)O,FeatureCreature
+237,methyl oleate,5364509,58.57,CCCCCCCC/C=C\CCCCCCCC(=O)OC,FeatureCreature
+238,isopropyl oleate,5356108,87,CCCCCCCC/C=C\CCCCCCCC(=O)OC(C)C,FeatureCreature
+239,sec-butyl (9Z)-octadec-9-enoate,,71.9,CCCCCCCC/C=C\CCCCCCCC(=O)OC(C)CC,Saldana
+240,"2,3-bis[[(9Z)-octadec-9-enoyl]oxy]propyl (9Z)-octadec-9-enoate",,45,CCCCCCCC/C=C\CCCCCCCC(=O)OC(COC(=O)CCCCCCC/C=C\CCCCCCCC)COC(=O)CCCCCCC/C=C\CCCCCCCC,Saldana
+241,ethyl oleate,5363269,72,CCCCCCCC/C=C\CCCCCCCC(=O)OCC,FeatureCreature
+242,isobutyl (9Z)-octadec-9-enoate,,59.6,CCCCCCCC/C=C\CCCCCCCC(=O)OCC(C)C,Saldana
+243,2-ethylhexyl oleate,6438028,88,CCCCCCCC/C=C\CCCCCCCC(=O)OCC(CC)CCCC,FeatureCreature
+244,triolein,5497163,45,CCCCCCCC/C=C\CCCCCCCC(=O)OCC(OC(=O)CCCCCCC/C=C\CCCCCCCC)COC(=O)CCCCCCC/C=C\CCCCCCCC,FeatureCreature
+245,propyl oleate,5356106,72,CCCCCCCC/C=C\CCCCCCCC(=O)OCCC,FeatureCreature
+246,2-ethylhexyl (9Z)-octadec-9-enoate,,88.2,CCCCCCCC/C=C\CCCCCCCC(=O)OCCC(CC)CCC,Saldana
+247,butyl oleate,5354342,102,CCCCCCCC/C=C\CCCCCCCC(=O)OCCCC,FeatureCreature
+248,hexyl (9Z)-octadec-9-enoate,,102,CCCCCCCC/C=C\CCCCCCCC(=O)OCCCCCC,Saldana
+249,octyl (Z)-octadec-9-enoate,,131,CCCCCCCC/C=C\CCCCCCCC(=O)OCCCCCCCC,Saldana
+250,methyl erucate,5364423,74.2,CCCCCCCC/C=C\CCCCCCCCCCCC(=O)OC,FeatureCreature
+251,oleyl alcohol,5284499,51,CCCCCCCC/C=C\CCCCCCCCO,FeatureCreature
+252,n-heptylbenzene,14115,34.67,CCCCCCCC1=CC=CC=C1,FeatureCreature
+253,1-nonene,31285,51,CCCCCCCC=C,FeatureCreature
+254,7-hexylpentadec-7-ene,,47,CCCCCCCC=C(CCCCCC)CCCCCC,Saldana
+255,octanal,454,80.5,CCCCCCCC=O,FeatureCreature
+256,n-nonane,8141,60.9,CCCCCCCCC,FeatureCreature
+257,n-octyldecalin,141998,31,CCCCCCCCC#CCCCCCCCC,FeatureCreature
+258,2-methyl-2-decalyldecane,,37,CCCCCCCCC(C)(C)C1CCCC2CCCCC12,Saldana
+259,2-methyl-2-(beta-naphthyl)decane,,18,CCCCCCCCC(C)(C)c1ccc2ccccc2c1,Saldana
+260,"9,10-dimethyloctadecane",530173,60,CCCCCCCCC(C)C(C)CCCCCCCC,FeatureCreature
+261,9-methylheptadecane,,66,CCCCCCCCC(C)CCCCCCCC,Saldana
+262,"9,10-dipropyloctadecane",530183,47,CCCCCCCCC(CCC)C(CCC)CCCCCCCC,FeatureCreature
+263,4-phenyldodecane,17631,42,CCCCCCCCC(CCC)C1=CC=CC=C1,FeatureCreature
+264,7-hexylpentadecane,91342400,83,CCCCCCCCC(CCCCCC)CCCCCC,FeatureCreature
+265,9-heptylheptadecane,528546,88,CCCCCCCCC(CCCCCCC)CCCCCCCC,FeatureCreature
+266,"methyl 4(Z),7(Z),10(Z),13(Z),16(Z),19(Z)-docosahexaenoate",6442386,24.4,CCCCCCCCC/C=C/C=C/C=C/C=C/C=C/C=C/C(=O)OC,FeatureCreature
+267,2-octylnaphthalene,520388,18,CCCCCCCCC1=CC2=CC=CC=C2C=C1,FeatureCreature
+268,n-octylbenzene,16607,37.5,CCCCCCCCC1=CC=CC=C1,FeatureCreature
+269,octyldecalin,,31,CCCCCCCCC1CCCC2CCCCC12,Saldana
+270,octyltetralin,,18,CCCCCCCCC1CCCc2ccccc12,Saldana
+271,"1,4-dioctyltetralin",,26,CCCCCCCCC1CCc2ccccc2C1CCCCCCCC,Saldana
+272,1-decene,13381,49.1,CCCCCCCCC=C,FeatureCreature
+273,hexyl oleate,88466,102,CCCCCCCCC=CCCCCCCCC(=O)OCCCCCC,FeatureCreature
+274,octyl oleate,94441,131,CCCCCCCCC=CCCCCCCCC(=O)OCCCCCCCC,FeatureCreature
+275,n-decane,15600,66.35,CCCCCCCCCC,FeatureCreature
+276,decanoic acid,2969,48,CCCCCCCCCC(=O)O,FeatureCreature
+277,methyl decanoate,8050,52.275,CCCCCCCCCC(=O)OC,FeatureCreature
+278,isopropyl decanoate,16833,46.6,CCCCCCCCCC(=O)OC(C)C,FeatureCreature
+279,ethyl decanoate,8048,51.2,CCCCCCCCCC(=O)OCC,FeatureCreature
+280,propyl decanoate,121739,52.9,CCCCCCCCCC(=O)OCCC,FeatureCreature
+281,butyl decanoate,35408,54.6,CCCCCCCCCC(=O)OCCCC,FeatureCreature
+282,hexyl caprate,82635,64,CCCCCCCCCC(=O)OCCCCCC,FeatureCreature
+283,2-phenylundecane,20656,51,CCCCCCCCCC(C)C1=CC=CC=C1,FeatureCreature
+284,5-butyl-5-phenyltetradecane,,58,CCCCCCCCCC(CCCC)(CCCC)c1ccccc1,Saldana
+285,n-nonylbenzene,14126,50,CCCCCCCCCC1=CC=CC=C1,FeatureCreature
+286,1-undecene,13190,65.5,CCCCCCCCCC=C,FeatureCreature
+287,n-undecane,14257,79,CCCCCCCCCCC,FeatureCreature
+288,methyl petroselinate,5362717,58.6,CCCCCCCCCCC/C=C\CCCCC(=O)OC,FeatureCreature
+289,1-dodecene,8183,56.8,CCCCCCCCCCC=C,FeatureCreature
+290,n-dodecane,8182,73.45,CCCCCCCCCCCC,FeatureCreature
+291,methyl laurate,8139,66.5,CCCCCCCCCCCC(=O)OC,FeatureCreature
+292,"2,3-di(dodecanoyloxy)propyl dodecanoate",,100,CCCCCCCCCCCC(=O)OC(COC(=O)CCCCCCCCCCC)COC(=O)CCCCCCCCCCC,Saldana
+293,ethyl laurate,7800,73,CCCCCCCCCCCC(=O)OCC,FeatureCreature
+294,trilaurin,10851,100,CCCCCCCCCCCC(=O)OCC(COC(=O)CCCCCCCCCCC)OC(=O)CCCCCCCCCCC,FeatureCreature
+295,propyl laurate,77255,71,CCCCCCCCCCCC(=O)OCCC,FeatureCreature
+296,butyl laurate,61015,73,CCCCCCCCCCCC(=O)OCCCC,FeatureCreature
+297,hexyl laurate,94454,74,CCCCCCCCCCCC(=O)OCCCCCC,FeatureCreature
+298,octyl laurate,79185,84,CCCCCCCCCCCC(=O)OCCCCCCCC,FeatureCreature
+299,decyl laurate,119003,84,CCCCCCCCCCCC(=O)OCCCCCCCCCC,FeatureCreature
+300,n-tridecane,12388,89.5,CCCCCCCCCCCCC,FeatureCreature
+301,2-phenyltetradecane,20642,49,CCCCCCCCCCCCC(C)C1=CC=CC=C1,FeatureCreature
+302,n-dodecylbenzene,31237,68,CCCCCCCCCCCCC1=CC=CC=C1,FeatureCreature
+303,1-methyl-3-dodecylcyclohexane,,70,CCCCCCCCCCCCC1CCCC(C)C1,Saldana
+304,1-tetradecene,14260,80.9,CCCCCCCCCCCCC=C,FeatureCreature
+305,n-tetradecane,12389,85.1,CCCCCCCCCCCCCC,FeatureCreature
+306,methyl myristate,31284,69.85,CCCCCCCCCCCCCC(=O)OC,FeatureCreature
+307,"2,3-di(tetradecanoyloxy)propyl tetradecanoate",,100,CCCCCCCCCCCCCC(=O)OC(COC(=O)CCCCCCCCCCCCC)COC(=O)CCCCCCCCCCCCC,Saldana
+308,ethyl myristate,31283,66.9,CCCCCCCCCCCCCC(=O)OCC,FeatureCreature
+309,trimyristin,11148,100,CCCCCCCCCCCCCC(=O)OCC(COC(=O)CCCCCCCCCCCCC)OC(=O)CCCCCCCCCCCCC,FeatureCreature
+310,propyl myristate,84338,71,CCCCCCCCCCCCCC(=O)OCCC,FeatureCreature
+311,butyl myristate,8047,69.4,CCCCCCCCCCCCCC(=O)OCCCC,FeatureCreature
+312,hexyl myristate,170623,72,CCCCCCCCCCCCCC(=O)OCCCCCC,FeatureCreature
+313,octyl myristate,85351,71,CCCCCCCCCCCCCC(=O)OCCCCCCCC,FeatureCreature
+314,decyl myristate,170588,72,CCCCCCCCCCCCCC(=O)OCCCCCCCCCC,FeatureCreature
+315,dodecyl myristate,74881,74,CCCCCCCCCCCCCC(=O)OCCCCCCCCCCCC,FeatureCreature
+316,2-methyl-2-phenylpentadecane,520412,39,CCCCCCCCCCCCCC(C)(C)C1=CC=CC=C1,FeatureCreature
+317,2-methyl-2-cyclohexylpentadecane,,45,CCCCCCCCCCCCCC(C)(C)C1CCCCC1,Saldana
+318,2-methyl-2-phenylpentadecane,,39,CCCCCCCCCCCCCC(C)(C)c1ccccc1,Saldana
+319,n-pentadecane,12391,96.5,CCCCCCCCCCCCCCC,FeatureCreature
+320,n-tetradecylbenzene,15086,72,CCCCCCCCCCCCCCC1=CC=CC=C1,FeatureCreature
+321,2-cyclohexyl- tetradecane,15715,57,CCCCCCCCCCCCCCC1CCCCC1,FeatureCreature
+322,1-hexadecene,12395,75.9,CCCCCCCCCCCCCCC=C,FeatureCreature
+323,n-hexadecane,11006,100.5,CCCCCCCCCCCCCCCC,FeatureCreature
+324,methyl palmitate,8181,85.9,CCCCCCCCCCCCCCCC(=O)OC,FeatureCreature
+325,isopropyl palmitate,8907,83,CCCCCCCCCCCCCCCC(=O)OC(C)C,FeatureCreature
+326,sec-butyl hexadecanoate,,84.8,CCCCCCCCCCCCCCCC(=O)OC(C)CC,Saldana
+327,"2,3-di(hexadecanoyloxy)propyl hexadecanoate",,89,CCCCCCCCCCCCCCCC(=O)OC(COC(=O)CCCCCCCCCCCCCCC)COC(=O)CCCCCCCCCCCCCCC,Saldana
+328,ethyl palmitate,12366,93,CCCCCCCCCCCCCCCC(=O)OCC,FeatureCreature
+329,isobutyl palmitate,66967,84,CCCCCCCCCCCCCCCC(=O)OCC(C)C,FeatureCreature
+330,2-ethylhexyl palmitate,62851,107,CCCCCCCCCCCCCCCC(=O)OCC(CC)CCCC,FeatureCreature
+331,tripalmitin,11147,89,CCCCCCCCCCCCCCCC(=O)OCC(COC(=O)CCCCCCCCCCCCCCC)OC(=O)CCCCCCCCCCCCCCC,FeatureCreature
+332,propyl palmitate,75232,83,CCCCCCCCCCCCCCCC(=O)OCCC,FeatureCreature
+333,2-ethylhexyl hexadecanoate,,98.2,CCCCCCCCCCCCCCCC(=O)OCCC(CC)CCC,Saldana
+334,butyl palmitate,8090,87,CCCCCCCCCCCCCCCC(=O)OCCCC,FeatureCreature
+335,hexyl palmitate,162505,87,CCCCCCCCCCCCCCCC(=O)OCCCCCC,FeatureCreature
+336,octyl hexadecanoate,,107,CCCCCCCCCCCCCCCC(=O)OCCCCCCCC,Saldana
+337,decyl palmitate,98603,91,CCCCCCCCCCCCCCCC(=O)OCCCCCCCCCC,FeatureCreature
+338,2-methyl-2-phenylheptadecane,,39,CCCCCCCCCCCCCCCC(C)(C)c1ccccc1,Saldana
+339,2-methylheptadecane,15265,91,CCCCCCCCCCCCCCCC(C)C,FeatureCreature
+340,5-phenyleicosane,16983,39,CCCCCCCCCCCCCCCC(CCCC)C1=CC=CC=C1,FeatureCreature
+341,5-cyclohexyleicosane,311971,66,CCCCCCCCCCCCCCCC(CCCC)C1CCCCC1,FeatureCreature
+342,n-heptadecane,12398,105,CCCCCCCCCCCCCCCCC,FeatureCreature
+343,2-methyloctadecane,15264,104.4,CCCCCCCCCCCCCCCCC(C)C,FeatureCreature
+344,methyl gondoate,6438470,73.2,CCCCCCCCCCCCCCCCC/C=C\C(=O)OC,FeatureCreature
+345,"1,2,4-trimethyl-5-hexadecylcyclohexane",,42,CCCCCCCCCCCCCCCCC1CC(C)C(C)CC1C,Saldana
+346,1-octadecene,8217,90,CCCCCCCCCCCCCCCCC=C,FeatureCreature
+347,n-octadecane,11635,106.3,CCCCCCCCCCCCCCCCCC,FeatureCreature
+348,stearic acid,5281,62,CCCCCCCCCCCCCCCCCC(=O)O,FeatureCreature
+349,methyl stearate,8201,95.6,CCCCCCCCCCCCCCCCCC(=O)OC,FeatureCreature
+350,isopropyl stearate,8162,97,CCCCCCCCCCCCCCCCCC(=O)OC(C)C,FeatureCreature
+351,sec-butyl octadecanoate,,97.5,CCCCCCCCCCCCCCCCCC(=O)OC(C)CC,Saldana
+352,"2,3-di(octadecanoyloxy)propyl octadecanoate",,85,CCCCCCCCCCCCCCCCCC(=O)OC(COC(=O)CCCCCCCCCCCCCCCCC)COC(=O)CCCCCCCCCCCCCCCCC,Saldana
+353,ethyl stearate,8122,76.8,CCCCCCCCCCCCCCCCCC(=O)OCC,FeatureCreature
+354,isobutyl stearate,12588,99,CCCCCCCCCCCCCCCCCC(=O)OCC(C)C,FeatureCreature
+355,2-ethylhexyl stearate,13132266,116,CCCCCCCCCCCCCCCCCC(=O)OCC(CC)CCCC,FeatureCreature
+356,tristearin,11146,85,CCCCCCCCCCCCCCCCCC(=O)OCC(COC(=O)CCCCCCCCCCCCCCCCC)OC(=O)CCCCCCCCCCCCCCCCC,FeatureCreature
+357,propyl stearate,77190,91,CCCCCCCCCCCCCCCCCC(=O)OCCC,FeatureCreature
+358,2-ethylhexyl octadecanoate,,115.5,CCCCCCCCCCCCCCCCCC(=O)OCCC(CC)CCC,Saldana
+359,butyl stearate,31278,86.5,CCCCCCCCCCCCCCCCCC(=O)OCCCC,FeatureCreature
+360,n-nonadecane,12401,110,CCCCCCCCCCCCCCCCCCC,FeatureCreature
+361,n-eicosane,8222,110,CCCCCCCCCCCCCCCCCCCC,FeatureCreature
+362,methyl arachidate,14259,100,CCCCCCCCCCCCCCCCCCCC(=O)OC,FeatureCreature
+363,1-octadecanol,8221,81,CCCCCCCCCCCCCCCCCCO,FeatureCreature
+364,octadecyl acetate,69968,90,CCCCCCCCCCCCCCCCCCOC(=O)C,FeatureCreature
+365,1-hexadecanol,2682,68,CCCCCCCCCCCCCCCCO,FeatureCreature
+366,hexadecyl acetate,12393,86,CCCCCCCCCCCCCCCCOC(=O)C,FeatureCreature
+367,hexadecyl pentanoate,,70,CCCCCCCCCCCCCCCCOC(=O)CCCC,Saldana
+368,hexadecyl laurate,88709,88,CCCCCCCCCCCCCCCCOC(=O)CCCCCCCCCCC,FeatureCreature
+369,"1,2,4-trimethyl-5-hexadecylbenzene",,42,CCCCCCCCCCCCCCCCc1cc(C)c(C)cc1C,Saldana
+370,5(R)-cyclohexyleicosane,,66,CCCCCCCCCCCCCCC[C@@H](CCCC)C1CCCCC1,Saldana
+371,5(R)-phenyleicosane,,39,CCCCCCCCCCCCCCC[C@@H](CCCC)c1ccccc1,Saldana
+372,5(S)-cyclohexyleicosane,,66,CCCCCCCCCCCCCCC[C@H](CCCC)C1CCCCC1,Saldana
+373,5(S)-phenyleicosane,,39,CCCCCCCCCCCCCCC[C@H](CCCC)c1ccccc1,Saldana
+374,1-tetradecanol,8209,80.8,CCCCCCCCCCCCCCO,FeatureCreature
+375,tetradecyl acetate,12531,81,CCCCCCCCCCCCCCOC(=O)C,FeatureCreature
+376,tetradecyl pentanoate,,68,CCCCCCCCCCCCCCOC(=O)CCCC,Saldana
+377,tetradecylbenzene,,72,CCCCCCCCCCCCCCc1ccccc1,Saldana
+378,1-dodecanol,8193,63.6,CCCCCCCCCCCCO,FeatureCreature
+379,dodecyl acetate,8205,77,CCCCCCCCCCCCOC(=O)C,FeatureCreature
+380,dodecyl valerate,545395,67,CCCCCCCCCCCCOC(=O)CCCC,FeatureCreature
+381,dodecyl (9Z)-octadec-9-enoate,,134,CCCCCCCCCCCCOC(=O)CCCCCCC/C=C\CCCCCCCC,Saldana
+382,dodecyl laurate,84113,85,CCCCCCCCCCCCOC(=O)CCCCCCCCCCC,FeatureCreature
+383,2(R)-cyclohexyltetradecane,,57,CCCCCCCCCCCC[C@@H](C)C1CCCCC1,Saldana
+384,2(R)-phenyltetradecane,,49,CCCCCCCCCCCC[C@@H](C)c1ccccc1,Saldana
+385,2(S)-cyclohexyltetradecane,,57,CCCCCCCCCCCC[C@H](C)C1CCCCC1,Saldana
+386,2(S)-phenyltetradecane,,49,CCCCCCCCCCCC[C@H](C)c1ccccc1,Saldana
+387,n-dodecylbenzene,,68,CCCCCCCCCCCCc1ccccc1,Saldana
+388,1-undecanol,8184,53.2,CCCCCCCCCCCO,FeatureCreature
+389,1-decanol,8174,50.3,CCCCCCCCCCO,FeatureCreature
+390,decyl acetate,8167,62,CCCCCCCCCCOC(=O)C,FeatureCreature
+391,decyl valerate,79553,61,CCCCCCCCCCOC(=O)CCCC,FeatureCreature
+392,decyl oleate,5363234,134,CCCCCCCCCCOC(=O)CCCCCCC/C=C\CCCCCCCC,FeatureCreature
+393,decyl caprate,74247,81,CCCCCCCCCCOC(=O)CCCCCCCCC,FeatureCreature
+394,1-nonanol,8914,46.2,CCCCCCCCCO,FeatureCreature
+395,"(11E)-(10R,13S)-dimethyldoeicos-11-ene",,56,CCCCCCCCC[C@@H](C)/C=C/[C@@H](C)CCCCCCCCC,Saldana
+396,"(11E)-(10R,13R)-dimethyldoeicos-11-ene",,56,CCCCCCCCC[C@@H](C)/C=C/[C@H](C)CCCCCCCCC,Saldana
+397,"(11Z)-(10R,13S)-dimethyldoeicos-11-ene",,56,CCCCCCCCC[C@@H](C)/C=C\[C@@H](C)CCCCCCCCC,Saldana
+398,"(11Z)-(10R,13R)-dimethyldoeicos-11-ene",,56,CCCCCCCCC[C@@H](C)/C=C\[C@H](C)CCCCCCCCC,Saldana
+399,"(10R,13S)-dimethyldocosane",,56,CCCCCCCCC[C@@H](C)CC[C@@H](C)CCCCCCCCC,Saldana
+400,"(10R,13R)-dimethyldocosane",,56,CCCCCCCCC[C@@H](C)CC[C@H](C)CCCCCCCCC,Saldana
+401,2(R)-phenylundecane,,51,CCCCCCCCC[C@@H](C)c1ccccc1,Saldana
+402,"(11E)-(10S,13S)-dimethyldoeicos-11-ene",,56,CCCCCCCCC[C@H](C)/C=C/[C@@H](C)CCCCCCCCC,Saldana
+403,"(11Z)-(10S,13S)-dimethyldoeicos-11-ene",,56,CCCCCCCCC[C@H](C)/C=C\[C@@H](C)CCCCCCCCC,Saldana
+404,"(10S,13S)-dimethyldocosane",,56,CCCCCCCCC[C@H](C)CC[C@@H](C)CCCCCCCCC,Saldana
+405,2(S)-phenylundecane,,51,CCCCCCCCC[C@H](C)c1ccccc1,Saldana
+406,nonylbenzene,,50,CCCCCCCCCc1ccccc1,Saldana
+407,1-octanol,957,33.7,CCCCCCCCO,FeatureCreature
+408,octyl valerate,79545,49,CCCCCCCCOC(=O)CCCC,FeatureCreature
+409,dioctyl adipate,31271,89,CCCCCCCCOC(=O)CCCCC(=O)OCCCCCCCC,FeatureCreature
+410,"(9R,10S)-dimethyloctadecane",,59,CCCCCCCC[C@@H](C)[C@@H](C)CCCCCCCC,Saldana
+411,"(9R,10R)-dimethyloctadecane",,59,CCCCCCCC[C@@H](C)[C@H](C)CCCCCCCC,Saldana
+412,"(9R,10S)-dipropyloctadecane",,47,CCCCCCCC[C@@H](CCC)[C@@H](CCC)CCCCCCCC,Saldana
+413,"(9R,10R)-dipropyloctadecane",,47,CCCCCCCC[C@@H](CCC)[C@H](CCC)CCCCCCCC,Saldana
+414,4(R)-phenyldodecane,,42,CCCCCCCC[C@@H](CCC)c1ccccc1,Saldana
+415,"(9S,10S)-dimethyloctadecane",,59,CCCCCCCC[C@H](C)[C@@H](C)CCCCCCCC,Saldana
+416,"(9S,10S)-dipropyloctadecane",,47,CCCCCCCC[C@H](CCC)[C@@H](CCC)CCCCCCCC,Saldana
+417,4(S)-phenyldodecane,,42,CCCCCCCC[C@H](CCC)c1ccccc1,Saldana
+418,2-octylnaphthalene,,18,CCCCCCCCc1ccc2ccccc2c1,Saldana
+419,octylxylene,,20,CCCCCCCCc1cccc(C)c1C,Saldana
+420,octylbenzene,,32,CCCCCCCCc1ccccc1,Saldana
+421,1-heptanol,8129,29,CCCCCCCO,FeatureCreature
+422,n-heptylbenzene,,35,CCCCCCCc1ccccc1,Saldana
+423,1-hexanol,8103,23.3,CCCCCCO,FeatureCreature
+424,hexylmethyl ether,78484,99.8,CCCCCCOC,FeatureCreature
+425,n-hexyl acetate,8908,33.8,CCCCCCOC(=O)C,FeatureCreature
+426,dihexyl phthalate,6786,48,CCCCCCOC(=O)C1=CC=CC=C1C(=O)OCCCCCC,FeatureCreature
+427,Hexyl butyrate,17525,29,CCCCCCOC(=O)CCC,FeatureCreature
+428,Hexyl hexanoate,22873,40,CCCCCCOC(=O)CCCCC,FeatureCreature
+429,dihexyl azelate,7985,99,CCCCCCOC(=O)CCCCCCCC(=O)OCCCCCC,FeatureCreature
+430,2-methyl-3(R)-cyclohexylnonane,,63,CCCCCC[C@@H](C(C)C)C1CCCCC1,Saldana
+431,"(8E)-(7R,10S)-dimethylhexadec-8-ene",,43,CCCCCC[C@@H](C)/C=C/[C@@H](C)CCCCCC,Saldana
+432,"(8E)-(7R,10R)-dimethylhexadec-8-ene",,43,CCCCCC[C@@H](C)/C=C/[C@H](C)CCCCCC,Saldana
+433,"(8Z)-(7R,10S)-dimethylhexadec-8-ene",,43,CCCCCC[C@@H](C)/C=C\[C@@H](C)CCCCCC,Saldana
+434,"(8Z)-(7R,10R)-dimethylhexadec-8-ene",,43,CCCCCC[C@@H](C)/C=C\[C@H](C)CCCCCC,Saldana
+435,"2,5(R)-dimethylundecane",,58,CCCCCC[C@@H](C)CCC(C)C,Saldana
+436,"(7R,8S)-dimethyltetradecane",,40,CCCCCC[C@@H](C)[C@@H](C)CCCCCC,Saldana
+437,"(7R,8R)-dimethyltetradecane",,40,CCCCCC[C@@H](C)[C@H](C)CCCCCC,Saldana
+438,2(R)-phenyloctane,,33,CCCCCC[C@@H](C)c1ccccc1,Saldana
+439,"(7R,8S)-diethyltetradecane",,67,CCCCCC[C@@H](CC)[C@@H](CC)CCCCCC,Saldana
+440,"(7R,8R)-diethyltetradecane",,67,CCCCCC[C@@H](CC)[C@H](CC)CCCCCC,Saldana
+441,7(R)-7-butyltridec-1-ene,,36,CCCCCC[C@@H](CCCC)CCCCC=C,Saldana
+442,3(R)-methyl-3-decalylnonane,,18,CCCCCC[C@@](C)(CC)C1CCCC2CCCCC12,Saldana
+443,2-methyl-3(S)-cyclohexylnonane,,63,CCCCCC[C@H](C(C)C)C1CCCCC1,Saldana
+444,"(8E)-(7S,10S)-dimethylhexadec-8-ene",,43,CCCCCC[C@H](C)/C=C/[C@@H](C)CCCCCC,Saldana
+445,"(8Z)-(7S,10S)-dimethylhexadec-8-ene",,43,CCCCCC[C@H](C)/C=C\[C@@H](C)CCCCCC,Saldana
+446,"2,5(S)-dimethylundecane",,58,CCCCCC[C@H](C)CCC(C)C,Saldana
+447,"(7S,8S)-dimethyltetradecane",,40,CCCCCC[C@H](C)[C@@H](C)CCCCCC,Saldana
+448,2(S)-phenyloctane,,33,CCCCCC[C@H](C)c1ccccc1,Saldana
+449,methyl ricinoleate,5354133,37.4,CCCCCC[C@H](C/C=C\CCCCCCCC(=O)OC)O,FeatureCreature
+450,"(7S,8S)-diethyltetradecane",,67,CCCCCC[C@H](CC)[C@@H](CC)CCCCCC,Saldana
+451,7(S)-7-butyltridec-1-ene,,36,CCCCCC[C@H](CCCC)CCCCC=C,Saldana
+452,3(S)-methyl-3-decalylnonane,,18,CCCCCC[C@](C)(CC)C1CCCC2CCCCC12,Saldana
+453,n-hexylbenzene,,26,CCCCCCc1ccccc1,Saldana
+454,1-pentanol,6276,18.2,CCCCCO,FeatureCreature
+455,pentyl pentanoate,62433,28.2,CCCCCOC(=O)CCCC,FeatureCreature
+456,dipentyl ether,12743,120.5,CCCCCOCCCCC,FeatureCreature
+457,pentylbenzene,,9,CCCCCc1ccccc1,Saldana
+458,n-butanol,263,12,CCCCO,FeatureCreature
+459,dibutyl fumarate,5271570,23,CCCCOC(=O)/C=C/C(=O)OCCCC,FeatureCreature
+460,dibutyl maleate,5271569,28,CCCCOC(=O)/C=C\C(=O)OCCCC,FeatureCreature
+461,dibutyl phthalate,3026,38,CCCCOC(=O)C1=CC=CC=C1C(=O)OCCCC,FeatureCreature
+462,dibutyl malonate,136925,21,CCCCOC(=O)CC(=O)OCCCC,FeatureCreature
+463,butyl butanoate,7983,17.8,CCCCOC(=O)CCC,FeatureCreature
+464,butyl levulinate,16331,14.4,CCCCOC(=O)CCC(=O)C,FeatureCreature
+465,dibutyl succinate,8830,13,CCCCOC(=O)CCC(=O)OCCCC,FeatureCreature
+466,dibutyl adipate,7784,81,CCCCOC(=O)CCCCC(=O)OCCCC,FeatureCreature
+467,"butyl (9Z,12Z,15Z)-octadeca-9,12,15-trienoate",,28.6,CCCCOC(=O)CCCCCCC/C=C\C/C=C\C/C=C\CC,Saldana
+468,dibutyl azelate,18016,83,CCCCOC(=O)CCCCCCCC(=O)OCCCC,FeatureCreature
+469,1-butoxy-2-propanol,21210,36.1,CCCCOCC(C)O,FeatureCreature
+470,dibutyl ether,8909,95.5,CCCCOCCCC,FeatureCreature
+471,2-butoxyethanol,8133,41,CCCCOCCO,FeatureCreature
+472,dibutoxymethane,17379,74,CCCCOCOCCCC,FeatureCreature
+473,2(R)-ethylhexan-1-ol,,23.4,CCCC[C@@H](CC)CO,Saldana
+474,5-methyl-5-(beta-naphthyl)nonane,,12,CCCC[C@@](C)(CCCC)c1ccc2ccccc2c1,Saldana
+475,2(S)-ethylhexan-1-ol,,23.4,CCCC[C@H](CC)CO,Saldana
+476,1-butylnaphthalene,,6,CCCCc1cccc2ccccc12,Saldana
+477,n-propanol,1031,12,CCCO,FeatureCreature
+478,"propyl (9Z,12Z,15Z)-octadeca-9,12,15-trienoate",,26.8,CCCOC(=O)CCCCCCC/C=C\C/C=C\C/C=C\CC,Saldana
+479,3(R)-cyclohexylhexane,,36,CCC[C@@H](CC)C1CCCCC1,Saldana
+480,"(4R,5S)-diethyloctane",,20,CCC[C@@H](CC)[C@@H](CC)CCC,Saldana
+481,"(4R,5R)-diethyloctane",,20,CCC[C@@H](CC)[C@H](CC)CCC,Saldana
+482,3(S)-cyclohexylhexane,,36,CCC[C@H](CC)C1CCCCC1,Saldana
+483,"(4S,5S)-diethyloctane",,20,CCC[C@H](CC)[C@@H](CC)CCC,Saldana
+484,ethanol,702,7,CCO,FeatureCreature
+485,diethyl oxalate,7268,21,CCOC(=O)C(=O)OCC,FeatureCreature
+486,ethyl levulinate,10883,5,CCOC(=O)CCC(=O)C,FeatureCreature
+487,diethyl butanedioate,31249,21,CCOC(=O)CCC(=O)OCC,FeatureCreature
+488,diethyl adipate,8844,15,CCOC(=O)CCCCC(=O)OCC,FeatureCreature
+489,diethyl azelate,12204,47,CCOC(=O)CCCCCCCC(=O)OCC,FeatureCreature
+490,diethyl sebacate,8049,47,CCOC(=O)CCCCCCCCC(=O)OCC,FeatureCreature
+491,"1,1-diethoxy ethane",7765,40,CCOC(C)OCC,FeatureCreature
+492,diethyl ether,3283,140,CCOCC,FeatureCreature
+493,2-ethoxyethyl acetate,8095,40,CCOCCOC(=O)C,FeatureCreature
+494,2-ethoxyethyl ether,8179,123,CCOCCOCCOCC,FeatureCreature
+495,"2,3(R)-dimethylpentane",,21,CC[C@@H](C)C(C)C,Saldana
+496,sec-(R)butyldecalin,,34,CC[C@@H](C)C1CCCC2CCCCC12,Saldana
+497,sec-(R)-butyltetralin,,7,CC[C@@H](C)C1CCCc2ccccc12,Saldana
+498,"(3R,6R)-dimethyl-3-(beta-naphthyl)octane",,18,CC[C@@H](C)C[C@@](C)(CC)c1ccc2ccccc2c1,Saldana
+499,"(3R,6S)-dimethyl-3-(beta-naphthyl)octane",,18,CC[C@@H](C)C[C@](C)(CC)c1ccc2ccccc2c1,Saldana
+500,sec-(R)-butylbenzene,,6,CC[C@@H](C)c1ccccc1,Saldana
+501,"2,7-dimethyl-(4S,5S)-diethyloctane",,39,CC[C@@H](CC(C)C)[C@@H](CC)CC(C)C,Saldana
+502,"2,3(S)-dimethylpentane",,21,CC[C@H](C)C(C)C,Saldana
+503,sec-(S)butyldecalin,,34,CC[C@H](C)C1CCCC2CCCCC12,Saldana
+504,sec-(S)-butyltetralin,,7,CC[C@H](C)C1CCCc2ccccc12,Saldana
+505,"(3S,6R)-dimethyl-3-(beta-naphthyl)octane",,18,CC[C@H](C)C[C@@](C)(CC)c1ccc2ccccc2c1,Saldana
+506,"(3S,6S)-dimethyl-3-(beta-naphthyl)octane",,18,CC[C@H](C)C[C@](C)(CC)c1ccc2ccccc2c1,Saldana
+507,sec-(S)-butylbenzene,,6,CC[C@H](C)c1ccccc1,Saldana
+508,"2,7-dimethyl-(4R,5S)-diethyloctane",,39,CC[C@H](CC(C)C)[C@@H](CC)CC(C)C,Saldana
+509,"2,7-dimethyl-(4R,5R)-diethyloctane",,39,CC[C@H](CC(C)C)[C@H](CC)CC(C)C,Saldana
+510,"1,3-diethylbenzene",,9,CCc1cccc(CC)c1,Saldana
+511,ethylbenzene,,8,CCc1ccccc1,Saldana
+512,methanol,887,3.33,CO,FeatureCreature
+513,dimethyl ether,8254,66.5,COC,FeatureCreature
+514,dimethyl phthalate,8554,19,COC(=O)C1=CC=CC=C1C(=O)OC,FeatureCreature
+515,dimethyl malonate,7943,15,COC(=O)CC(=O)OC,FeatureCreature
+516,dimethyl adipate,12329,5,COC(=O)CCCCC(=O)OC,FeatureCreature
+517,dimethyl azelate,15612,24,COC(=O)CCCCCCCC(=O)OC,FeatureCreature
+518,methyl-9-decenoate,1778877,38.3,COC(=O)CCCCCCCC=C,FeatureCreature
+519,anisole,7519,6.4,COC1=CC=CC=C1,FeatureCreature
+520,guaiacol,460,19,COC1=CC=CC=C1O,FeatureCreature
+521,"1,2 dimethoxybenzene",7043,17,COC1=CC=CC=C1OC,FeatureCreature
+522,dipropylene glycol monomethyl ether,66984,43.9,COCCCOCCCO,FeatureCreature
+523,2-methoxyethanol,8019,13,COCCO,FeatureCreature
+524,"1,2-dimethoxyethane",8071,94,COCCOC,FeatureCreature
+525,2-methoxyethyl ether,8150,122.67,COCCOCCOC,FeatureCreature
+526,triethylene glycol monomethyl ether,8178,80.7,COCCOCCOCCO,FeatureCreature
+527,triethyleneglycol dimethyl ether,8189,120,COCCOCCOCCOC,FeatureCreature
+528,dimethoxymethane,8020,44.67,COCOC,FeatureCreature
+529,"2,3(S),4,5(S),6-pentamethylheptane",,9,C[C@@H](C(C)C)C(C)[C@@H](C)C(C)C,Saldana
+530,"2,2,4,4,6(S),8,8-heptamethylnonane",,15,C[C@@H](CC(C)(C)C)CC(C)(C)CC(C)(C)C,Saldana
+531,"2,3(R),4,5(S),6-pentamethylheptane",,9,C[C@H](C(C)C)C(C)[C@@H](C)C(C)C,Saldana
+532,"2,3(R),4,5(R),6-pentamethylheptane",,9,C[C@H](C(C)C)C(C)[C@H](C)C(C)C,Saldana
+533,"2,2,4,4,6(R),8,8-heptamethylnonane",,15,C[C@H](CC(C)(C)C)CC(C)(C)CC(C)(C)C,Saldana
+534,"1,2,3,4-tetramethylbenzene",,17,Cc1ccc(C)c(C)c1C,Saldana
+535,"1,4-dimethylbenzene",,-13,Cc1ccc(C)cc1,Saldana
+536,4-isopropyltoluene,,2,Cc1ccc(cc1)C(C)C,Saldana
+537,"2,6-dimethylnaphthalene",,-13,Cc1ccc2cc(C)ccc2c1,Saldana
+538,"1,3-xylene",,1,Cc1cccc(C)c1,Saldana
+539,1-methylnaphthalene,,0,Cc1cccc2ccccc12,Saldana
+540,"1,2-dimethylbenzene",,8,Cc1ccccc1C,Saldana
+541,"(9Z,12Z,15Z)-octadeca-9,12,15-trien-1-ol",,41,OCCCCCCCC/C=C\C/C=C\C/C=C\CC,Saldana
+542,"1,2-diphenylethane",,1,c1ccc(cc1)CCc1ccccc1,Saldana
+543,diphenylmethane,,11,c1ccc(cc1)Cc1ccccc1,Saldana
+544,biphenyl,,21,c1ccc(cc1)c1ccccc1,Saldana
+545,benzene,,2,c1ccccc1,Saldana

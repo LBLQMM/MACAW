@@ -258,9 +258,8 @@ class Macaw:
         # Let us first extract the landmark fingerprints
         # If Y is not provided, pick the landmarks randomly
         lenY = len(Y)
-        if lenY != len(mols):
+        if lenY == 0: # Y = []
             lndmk_idx = np.random.choice(range(len(mols)), Nlndmk, replace=False)
-            self._Y = []
 
         else:
             if Yset == 'highest':  # gets the landmarks from the top
@@ -275,14 +274,18 @@ class Macaw:
                 Y_binned = np.floor(
                     (Y - min(Y)) / (1.00001 * (max(Y) - min(Y))) * nbins
                 )
-
-                proba = []
-                for i in range(lenY):
-                    proba.append(1.0 / sum(Y_binned == Y_binned[i]))
-                proba = proba / sum(proba)
+                
+                proba = np.zeros(lenY)
+                for i in range(nbins):
+                    idx = np.where(Y_binned == i)[0]
+                    if len(idx)>0:
+                        proba[idx] = 1.0/(len(idx))
+                proba = proba/sum(proba)
+                
                 lndmk_idx = np.random.choice(
-                    range(len(mols)), Nlndmk, replace=False, p=proba
-                )
+                    range(lenY), Nlndmk, replace=False, p=proba
+                )                
+                
 
         self._lndmk_idx = np.sort(lndmk_idx)
 
@@ -641,13 +644,6 @@ def Macaw_optimus(
             "`len(smiles)` = {len(smiles)} does not match `len(y)` = {leny}"
         )
     
-    # If not specified, we will use the same Y argument for the individual
-    # Macaw calls as the Macaw_optimus y argument.
-    if 'Y' not in kwargs:
-        kwargs['Y'] = y.copy()
-    else:
-        if len(smiles) != len(kwargs['Y']):
-            raise IOError(f"len(smiles) = {leny} does not match len(Y) = {len(kwargs['Y'])}")
     
     if problem == 'auto':
         tmp = set()
@@ -657,6 +653,18 @@ def Macaw_optimus(
         else:
             problem = 'classification'
         print(f"Problem type identified as {problem}")
+        
+    
+    # If not specified, we will use the same Y argument for the individual
+    # Macaw calls as the Macaw_optimus y argument.
+    # In the case of classification, this will amount to using a 'balanced'
+    # number of landmarks. I could set `Yset`equal to 2, but it is not necessary.
+    if 'Y' not in kwargs:
+        kwargs['Y'] = y.copy()
+        
+    else: # just checking that if Y is specified it matches len(smiles)
+        if (len(kwargs['Y']) != 0) and (len(smiles) != len(kwargs['Y'])):
+            raise IOError(f"len(smiles) = {leny} does not match len(Y) = {len(kwargs['Y'])}")
         
     
     smiles_subset = smiles

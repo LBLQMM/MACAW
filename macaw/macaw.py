@@ -158,7 +158,15 @@ class Macaw:
         else:
             self.set_lndmk_idx(lndmk_idx)
             # This includes refps_update, refD_update, and safe_lndmk_embed
-
+            
+            
+    def __repr__(self):
+        return 'Macaw_embedder'
+    
+    def __len__(self):
+        return self._edim
+    
+    
     # Setter methods
 
     def set_Nlndmk(self, Nlndmk):

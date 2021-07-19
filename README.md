@@ -1,17 +1,17 @@
 # Macaw
 
-Macaw (**m**olecular **a**utoen**c**oding **a**uto-**w**orkaround) is a cheminformatic tool that featurizes molecules by mapping them onto a low-dimensional, continuous numeric space. Their coordinates are molecular features that can be used as inputs in mathematical and machine-learning models.
+Macaw (**m**olecular **a**utoen**c**oding **a**uto-**w**orkaround) is a cheminformatic tool that embeds molecules onto a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
 
-Macaw features can be used as a drop-in replacement for conventional molecular descriptors. Macaw features are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
+Macaw embeddings can be used as a drop-in replacement for conventional molecular descriptors. Macaw embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
 
-The Macaw package also contains original algorithms to generate molecular libraries and to evolve molecular libraries *in silico* to satisfy a desired property specification (inverse design problem).
+The Macaw package also contains original algorithms to generate molecular libraries and to evolve molecular libraries *in silico* that approximate a desired property specification (inverse design problem).
 
-Details about the different algorithms are explained in the [Macaw publication](https://github.com/LBLQMM/macaw).
+Details about the different algorithms are explained in the [Macaw publication]().
 
 
 ## Installation
 
-1. Macaw requires rdkit to run, which can be installed using [conda](https://anaconda.org/conda-forge/rdkit):
+Macaw requires rdkit to run, which can be installed using [conda](https://anaconda.org/conda-forge/rdkit):
 
 ```bash
 conda install -c conda-forge rdkit
@@ -19,10 +19,11 @@ conda install -c conda-forge rdkit
 
 Alternative methods to install rdkit can be found [here](https://www.rdkit.org/docs/Install.html).
 
-2. Run the following command to install Macaw:
+
+Then run the following command to install Macaw:
 
 ```bash
-pip install macaw
+pip install macaw_py
 ```
 
 ## Usage
@@ -32,51 +33,53 @@ The following illustrates some of the main commands in Macaw. Detailed use examp
 
 ### Molecule embedding
 
-Given a list of molecules represented as SMILES strings (`smiles`), their Macaw features (`X`) can be obtained as follows:
+Given a list of molecules represented as SMILES strings (`smiles`), their Macaw embedding (`X`) can be obtained as follows:
 
 ```python
-from macaw import *
+from macaw_py import *
 
-mcw = Macaw(smiles)
-
-X = mcw.transform()
+mcw = Macaw()
+mcw.fit(smiles)
+X = mcw.transform(smiles)
 ```
 
-Any new list of molecules (`newsmiles`) can be embedded using an existing Macaw object:
+Any list of molecules in SMILES format (`newsmiles`) can be embedded using an existing Macaw object:
 
 ```python
 X_new = mcw.transform(newsmiles)
 ```
 
-The embedder has a variety of parameters that can be tuned to improve results. These include the dimensionality of the embedding (`edim`), the number of landmarks used (`Nlndmk`), the type of molecular fingeprint (`fptype`) and similarity metric (`metric`), etc. Property values (`Y_vals`) can also be provided to the argument `Y`. The arguments are described in the function help.
+The embedder has a variety of parameters that can be tuned to improve results. These include the dimensionality of the embedding (`n_components`), the number of landmarks used (`n_landmarks`), the type of molecular fingeprint (`type_fp`), and the similarity metric (`metric`). Property values (`y_values`) can also be provided to the argument `Y` to improve landmark choice. The arguments and options available are listed in the class help.
 
 ```python
-mcw = Macaw(smiles, Nldnmk=60, fptype="rdk5", metric="Sokal", edim=13, Y=Y_vals)
+mcw = Macaw(smiles, n_components=20, type_fp='rdk5', metric='Dice')
+
+mcw.fit_transform(smiles, n_landmarks=60, Y=y_values)
 ```
 
-The function `Macaw_optimus` automatically explores a variety of fingeprint type (`fptype`) and similarity metric (`metric`) combinations and returns a recommended embedder:
+The function `Macaw_optimus` automatically explores a variety of fingeprint type (`type_fp`) and similarity metric (`metric`) combinations and returns a recommended embedder:
 
 ```python
-mcw = Macaw_optimus(smiles, y,=Y_vals, verbose=True)
+mcw = Macaw_optimus(smiles, n_components=20, y=y_values, verbose=True)
 ```
 
 ### Molecule generation
 
-Given an input dataset of molecules in SELFIES format, Macaw's `library_maker` function can generate a library of molecules around it. The maximum number of molecules to generate is specified with the `N_gen` parameter, while the spread of the distribution can be controlled with the `noise_sd_factor` argument. Additional parameters are explained in the function help.
+Given an input dataset of molecules in SELFIES format, Macaw's `library_maker` function will generate a library of molecules around it. The maximum number of molecules to generate is specified with the `n_gen` parameter, while the spread of the distribution can be controlled with the `noise_sd_factor` argument. Additional parameters are explained in the function help.
 
 
 ```python
-smiles_lib = library_maker(smiles, N_gen=50000, noise_sd_factor=0.3)
+smiles_lib = library_maker(smiles, n_gen=50000, noise_sd_factor=0.3)
 ```
 
 ### Molecule recommendation (inverse design)
 
-Given a property of interest, a model `f` can be trained to predict the property values of different molecules. The model `f` is trained using as inputs the features generated by a Macaw embedder `mcw`.
+Given a property of interest, a model `f` can be trained to predict the property values of different molecules. The model `f` takes as inputs the features generated by the embedder `mcw`.
 
-Then, we can evolve and recommend molecules to satisfy a desired property specification value (`spec_val`) using the function `library_evolver`. It takes as input the number of molecules ro recommend (`N_hits`), the number of evolution rounds (`N_rounds`). Other optional arguments described in the function help.
+Then, we can evolve and recommend molecules to satisfy a desired property specification value (`spec`) using the function `library_evolver`. It takes as input an initial set of molecules (`smiles`), the featurizer (`mcw`), the predictive model (`f`), the desired specification value (`spec`), the number of molecules ro recommend (`n_hits`), the number of evolution rounds (`n_rounds`). Other optional arguments described in the function help.
 
 ```python
-recommended_smiles = library_evolver(smiles, mcw, model=f, spec=spec_val, N_hits=10, N_rounds=8)
+recommended_smiles = library_evolver(smiles, mcw, f, spec, n_hits=10, n_rounds=8)
 ```
 
 ## License

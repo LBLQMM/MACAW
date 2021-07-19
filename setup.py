@@ -3,10 +3,10 @@ from setuptools import setup
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
-exec(open('macaw/version.py').read())
+exec(open('macaw_py/version.py').read())
 
 setup(
-      name='macaw',
+      name='macaw_py',
       version=__version__,
       url='https://github.com/LBLQMM/macaw',
       author='Vincent Blay',
@@ -14,7 +14,7 @@ setup(
       description='Macaw molecular embedder',
       long_description=long_description,
       long_description_content_type='text/markdown',
-      packages=['macaw'],
+      packages=['macaw_py'],
       classifiers=[
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
@@ -29,7 +29,7 @@ setup(
         'Natural Language :: English'
           ],
       install_requires=[
-          'numpy >= 1.7.0',
+          'numpy >= 1.8.0',
           'scikit-learn >= 0.24.1',
           'scipy >= 1.6.1',
           'selfies >= 1.0.4',

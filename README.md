@@ -52,12 +52,12 @@ X_new = mcw.transform(newsmiles)
 The embedder has a variety of parameters that can be tuned to improve results. These include the dimensionality of the embedding (`n_components`), the number of landmarks used (`n_landmarks`), the type of molecular fingeprint (`type_fp`), and the similarity metric (`metric`). Property values (`y_values`) can also be provided to the argument `Y` to improve landmark choice. The arguments and options available are listed in the class help.
 
 ```python
-mcw = Macaw(smiles, n_components=20, type_fp='rdk5', metric='Dice')
+mcw = Macaw(n_components=20, type_fp='rdk5', metric='Dice')
 
 mcw.fit_transform(smiles, n_landmarks=60, Y=y_values)
 ```
 
-The function `Macaw_optimus` automatically explores a variety of fingeprint type (`type_fp`) and similarity metric (`metric`) combinations and returns a recommended embedder:
+The function `Macaw_optimus` automatically explores a variety of fingeprint type (`type_fp`) and similarity metric (`metric`) combinations and returns a recommended embedder ready to use:
 
 ```python
 mcw = Macaw_optimus(smiles, n_components=20, y=y_values, verbose=True)
@@ -69,7 +69,7 @@ Given an input dataset of molecules in SELFIES format, Macaw's `library_maker` f
 
 
 ```python
-smiles_lib = library_maker(smiles, n_gen=50000, noise_sd_factor=0.3)
+smiles_lib = library_maker(smiles, n_gen=50000, noise_factor=0.3)
 ```
 
 ### Molecule recommendation (inverse design)

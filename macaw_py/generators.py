@@ -21,10 +21,11 @@ from rdkit import Chem
 
 
 def library_maker(
-    smiles,
+    smiles=None,
     n_gen=20000,
-    pad_to_len=0,
-    noise_sd_factor=0.3,
+    max_len=0,
+    p="exp",
+    noise_factor=0.3,
     algorithm="position",
     efficient=True,
     return_selfies=False,
@@ -43,11 +44,11 @@ def library_maker(
         Target number of molecules to be generated. The actual number of
         molecules returned can be lower. Defaults to 20000.
 
-    pad_to_len : int, optional
-        Maximum length of the molecules generated in SELFIES format. By
-        default, the maximum length seen in the input molecules will be used.
+    max_len : int, optional
+        Maximum length of the molecules generated in SELFIES format. If 0
+        (default), the maximum length seen in the input molecules will be used.
 
-    noise_sd_factor: float, optional
+    noise_factor: float, optional
         Adjusts the level of noise being added to the SELFIES frequency counts.
         Defaults to 0.3.
 
@@ -71,11 +72,18 @@ def library_maker(
     equivalent SMILES. The molecules returned are canonical SMILES.
 
     """
+    
+    if smiles is None:
+        return _random_library_maker( n_gen=n_gen,
+                                    max_len=max_len,
+                                    return_selfies=return_selfies )
+    
+    
     # Let us convert the smiles to selfies onehot
     selfies = []
-    maxlen = 0
+    lengths = []
     for smi in smiles:
-        smi = smi.replace(".", "")
+        smi = smi.replace(" ", "")
         smi = smi.replace(".", "")
         smi = smi.replace("[C@H]", "C")
         smi = smi.replace("[C@@H]", "C")
@@ -85,102 +93,80 @@ def library_maker(
         smi = smi.replace("\\c", "c")
 
         try:
-            s = sf.encoder(smi)
-            if s is None:
+            selfie = sf.encoder(smi)
+            if selfie is None:
                 print(
                     f"Warning: SMILES {smi} is encoded as `None` and "
                     "will be dropped."
                 )
-                # This is likely due to a space in the smiles
             else:
-                selfies.append(s)
-                maxlen = max(
-                    maxlen, sf.len_selfies(s)
-                )  # Stores the length of the longest SELFIES
+                selfies.append(selfie)
+                lengths.append(sf.len_selfies(selfie))
         except MemoryError:
             print(f"Warning: SMILES {smi} could not be encoded as SELFIES.")
             # This may be due to the SELFIES encoding not finishing,
             # **MemoryError, which was happening for some symmetric molecules.
 
-    if pad_to_len < 1:
-        pad_to_len = maxlen
-
+    
+    
+    lengths, max_len = __lengths_generator(max_len, n_gen, p, lengths) 
+    
+    
     alphabet = sf.get_alphabet_from_selfies(selfies)
 
     # Remove symbols from alphabet and columns of prob_matrix that
     # do not have a state-dependent derivation rule in the SELFIES package
     robust_symbols = sf.get_semantic_robust_alphabet()
     alphabet = alphabet.intersection(robust_symbols)
-
     alphabet = list(sorted(alphabet))
-    alphabet.append("[nop]")
-
     len_alphabet = len(alphabet)
-
+    
     symbol_to_idx = {s: i for i, s in enumerate(alphabet)}
 
     idx_list = []
-
+    
     for selfi in selfies:
         try:
             idx = sf.selfies_to_encoding(
-                selfi, vocab_stoi=symbol_to_idx, pad_to_len=pad_to_len, enc_type="label"
+                selfi, vocab_stoi=symbol_to_idx, pad_to_len=0, enc_type="label"
             )
 
-            idx_list.append(idx[:pad_to_len])
+            idx_list.append(idx)
         except KeyError:
             print(f"Warning: SELFIES {selfi} is not valid and will be dropped.")
             # This may be due to some character missing in the alphabet
-
-    manysmiles = [None] * n_gen
+        
     manyselfies = [None] * n_gen
 
     if algorithm.lower() == "transition":
 
         trans_mat = np.zeros((len_alphabet, len_alphabet))
-        start_mat = np.zeros(len_alphabet)
+        start_mat = np.zeros((1,len_alphabet))
 
         for idx in idx_list:
 
             i_old = idx[0]
-            start_mat[i_old] += 1
+            start_mat[0, i_old] += 1
 
             for i in idx[1:]:
                 trans_mat[i_old, i] += 1
                 i_old = i
 
-        if efficient:
-            start_mat[-1] = 0
-            trans_mat[:, -1] = 0
-            # This lowers the chance of sampling a [nop] selfies character
-
         # Here we will add some noise to the prob matrix and normalize it
-        row_sums = trans_mat.sum(axis=1, keepdims=True)
-        row_sums[row_sums == 0] = 1
-        trans_mat = trans_mat / row_sums
+        trans_mat = __noise_adder(trans_mat, noise_factor=noise_factor)
+        start_mat = __noise_adder(start_mat, noise_factor=noise_factor)
 
-        noise_mean = 0  # noise_mean_factor * 1./len_alphabet
-        noise_sd = noise_sd_factor * 1.0 / len_alphabet
-        noise = np.random.normal(noise_mean, noise_sd, (len_alphabet, len_alphabet))
-        trans_mat = abs(trans_mat + noise)
 
-        row_sums = trans_mat.sum(axis=1, keepdims=True)
-        trans_mat = trans_mat / row_sums
-
-        start_mat = start_mat / start_mat.sum()
-        noise = np.random.normal(noise_mean, noise_sd, len_alphabet)
-        start_mat = abs(start_mat + noise)
-        start_mat = start_mat / start_mat.sum()
-
-        choices = [None] * pad_to_len
+        
         range_alphabet = range(len_alphabet)
-        range_1_pad_to_len = range(1, pad_to_len)
         for i in range(n_gen):
             if (i + 1) % 10000 == 0:  # progress indicator
                 print(i + 1)
-
-            choices[0] = np.random.choice(range_alphabet, size=1, p=start_mat)[0]
-            for j in range_1_pad_to_len:
+                
+            len_i = lengths[i]
+            choices = [None] * len_i
+            choices[0] = np.random.choice(range_alphabet, size=1, p=start_mat[0,:])[0]
+            for j in range(1,len_i):
                 idx = choices[j - 1]  # return the corresponding row of probabilities
                 choices[j] = np.random.choice(
                     range_alphabet, size=1, p=trans_mat[idx, :]
@@ -190,88 +176,164 @@ def library_maker(
             selfies = "".join(itemgetter(*choices)(alphabet))
             # Equivalent to selfies = ''.join([alphabet[i] for i in choices])
 
-            smiles = sf.decoder(selfies)
-
             # And let us save the molecule
-            manysmiles[i] = smiles
             manyselfies[i] = selfies
 
     elif algorithm.lower() == "position":
 
-        prob_matrix = np.zeros((pad_to_len, len_alphabet))
+        prob_matrix = np.zeros((max_len, len_alphabet))
 
         for idx in idx_list:
-            for i in range(pad_to_len):
+            for i in range(min(len(idx), max_len)):
                 prob_matrix[i, idx[i]] += 1
 
-        if efficient:
-            prob_matrix[:, -1] = 0
 
         # Here we will add some noise to the prob matrix and normalize it
-        row_sums = prob_matrix.sum(axis=1, keepdims=True)
-        prob_matrix = prob_matrix / row_sums
-
-        noise_mean = 0  # noise_mean_factor * 1./len_alphabet
-        noise_sd = noise_sd_factor * 1.0 / len_alphabet
-        noise = np.random.normal(noise_mean, noise_sd, (pad_to_len, len_alphabet))
-        prob_matrix = abs(prob_matrix + noise)
-
-        # let us normalize the prob_matrix row-wise again
-        row_sums = prob_matrix.sum(axis=1, keepdims=True)
-        prob_matrix = prob_matrix / row_sums
+        prob_matrix = __noise_adder(prob_matrix, 
+                                    noise_factor=noise_factor)
 
         c = prob_matrix.cumsum(axis=1)
-
         # End of computing the probability matrix c
 
         # Let us now start generating random molecules based on c
 
         for i in range(n_gen):
-            if i % 10000 == 0:  # progress indicator
-                print(i)
-
-            u = np.random.rand(len(c), 1)
-            choices = (u < c).argmax(axis=1)
+            if (i + 1) % 10000 == 0:  # progress indicator
+                print(i + 1)
+            
+            len_i = lengths[i]
+            u = np.random.rand(len_i, 1)
+            choices = (u < c[:len_i,:]).argmax(axis=1)
 
             # Let us obtain the corresponding selfies and smiles
             selfies = "".join(
                 itemgetter(*choices)(alphabet)
             )  # Equivalent to selfies = ''.join([alphabet[i] for i in choices])
-            smiles = sf.decoder(selfies)
 
             # And let us save the molecule
-            manysmiles[i] = smiles
             manyselfies[i] = selfies
 
     else:
-        raise IOError("Unknown algorithm: {algorithm}.")
+        raise IOError("Invalid algorithm input value: {algorithm}.")
 
     # Let us now clean the generated library
-
-    # Multiple selfies can be synonyms of the same smiles
-    manysmiles, idx = np.unique(manysmiles, return_index=True)
-    manysmiles = list(manysmiles)
-    manyselfies = [manyselfies[i] for i in idx]
-
-    for i in range(len(manysmiles)):
-        # Vincent's patches to SELFIES
-        # I do not want the triple bond S#C being available
-        manysmiles[i] = manysmiles[i].replace("S#C", "S=C")
-        manysmiles[i] = manysmiles[i].replace("C#S", "C=S")
-        manysmiles[i] = manysmiles[i].replace("[SH]#C", "S=C")
-        manysmiles[i] = manysmiles[i].replace("C#[SH]", "C=S")
-
-        # Several smiles can correspond to the same canonical smiles
-        manysmiles[i] = Chem.CanonSmiles(manysmiles[i])
-
-    manysmiles, idx = np.unique(manysmiles, return_index=True)
-    manysmiles = list(manysmiles)
-    manyselfies = [manyselfies[i] for i in idx]
+    manysmiles, manyselfies = __selfies_to_smiles(manyselfies)
 
     if return_selfies:
         return manysmiles, manyselfies
     else:
         return manysmiles
+
+
+def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, p='exp'):
+    """Generates random molecules using robust SELFIES"""
+    if max_len <= 0:
+        max_len = 15
+     
+    # In order to ensure that we get molecules of all lengths up to max_len
+    # I first choose the length of the molecule, and then draw the number of
+    # SELFIES symbols accordingly. We will not be padding the resulting SELFIES
+    
+    # In this case we will randomly sample and append selfies symbols
+    alphabet = sf.get_semantic_robust_alphabet()
+    alphabet = list(sorted(alphabet))
+
+    # Choose the length of the molecules
+    lengths, max_len = __lengths_generator(max_len,n_gen,p)
+    
+    
+    manyselfies = [None]*n_gen
+    for i in range(n_gen):
+        if (i + 1) % 10000 == 0:  # progress indicator
+            print(i + 1)
+        selfies = np.random.choice(alphabet, size=lengths[i], replace=True)
+        selfies = ''.join(selfies)
+        manyselfies[i] = selfies
+
+    manysmiles, manyselfies = __selfies_to_smiles(manyselfies)
+    
+    if return_selfies:
+        return manysmiles, manyselfies
+    else:
+        return manysmiles
+
+
+def __noise_adder(matrix, noise_factor=0.3):
+    """Normalizes the input matrix row-wise and mixes it linearly with a
+    uniform matrix"""
+    # Here we will add some noise to the prob matrix and normalize it
+    row_sums = matrix.sum(axis=1, keepdims=True)
+    row_sums[row_sums==0] = 1 # prevent division by zero
+    prob_matrix = matrix / row_sums
+    
+    B = np.ones(prob_matrix.shape) / prob_matrix.shape[1] # uniform matrix
+    prob_matrix = (1-noise_factor)*prob_matrix + noise_factor*B
+    
+    # normalize prob_matrix row-wise again, although should not be necessary
+    row_sums = prob_matrix.sum(axis=1, keepdims=True)
+    prob_matrix = prob_matrix / row_sums
+    
+    return prob_matrix
+
+
+
+def __selfies_to_smiles(manyselfies):
+    """Converts an input list of SELFIES into canonical SMILES
+    removing duplicates and synonyms"""
+    manysmiles = [None]*len(manyselfies)
+    for i, selfies in enumerate(manyselfies):
+        smiles = sf.decoder(selfies)
+        # Vincent's patches to SELFIES
+        # I do not want the triple bond S#C being available
+        smiles = smiles.replace("S#C", "S=C")
+        smiles = smiles.replace("C#S", "C=S")
+        smiles = smiles.replace("[SH]#C", "S=C")
+        smiles = smiles.replace("C#[SH]", "C=S")
+
+        # Several smiles can correspond to the same canonical smiles
+        manysmiles[i] = Chem.CanonSmiles(smiles)
+
+    manysmiles, idx = np.unique(manysmiles, return_index=True)
+    manysmiles = list(manysmiles)
+    manyselfies = [manyselfies[i] for i in idx]
+    return manysmiles, manyselfies
+
+
+def __lengths_generator(max_len, n_gen, p, lengths=None):
+    """Returns a list of n_gen molecule lengths up to max_len.
+    If max_len is 0, then max_len will be obtained from p or lengths.
+    p describes the probability of generating different length values."""
+    if max_len <= 0:
+        if isinstance(p, np.ndarray):
+            max_len = len(p)
+        else:
+            max_len = max(lengths)
+    
+    if isinstance(p, (int, float)):
+        p = np.power(range(max_len), p)
+    elif isinstance(p, str):
+        p = p.lower()
+        if p == 'exp':
+            p = np.exp(range(max_len))
+        elif p == 'empirical':
+            p = np.zeros(max_len)
+            for i in lengths:
+                p[i-1] += 1
+        elif p == 'cumsum':
+            # This makes drawing longer molecules at least as likely as shorter ones
+            p = np.zeros(max_len)
+            for i in lengths:
+                p[i-1] += 1
+            p = p.cumsum()
+        
+        else:
+            raise IOError("Invalid p input value: {p}.")
+    
+    p = p/sum(p)
+            
+    lengths = np.random.choice(range(1,max_len+1), size=n_gen,
+                               replace=True, p=p)
+    return lengths, max_len
 
 
 def library_evolver(
@@ -284,7 +346,7 @@ def library_evolver(
     n_rounds=8,
     n_hits=10,
     algorithm="transition",
-    efficient=False,
+    p="cumsum",
     **kwargs,
 ):
     """
@@ -356,14 +418,15 @@ def library_evolver(
 
     X = mcw(smiles)
     Y_old = model(X)
-
+    max_len = 0
     for i in range(n_rounds):
         print(f"\nRound {i+1}")
         smiles_lib = library_maker(
             smiles,
             n_gen=k1,
             algorithm=algorithm,
-            efficient=efficient,
+            max_len=max_len,
+            p=p,
             return_selfies=False,
             **kwargs,
         )
@@ -372,17 +435,30 @@ def library_evolver(
         Y_lib = model(X)
 
         # We want to carry over the best molecules from the previous round
+        
+        # Append the old molecules and remove duplicates
         smiles_lib += smiles  # concatenates lists
         smiles_lib, idx = np.unique(smiles_lib, return_index=True)
         smiles_lib = list(smiles_lib)
 
-        # Append Y_old
         Y = np.concatenate((Y_lib, Y_old))
         Y = Y[idx]
-
+        
+        
+        # Select k2 best molecules
         idx = find_Knearest_idx(spec, Y, k=k2)
         smiles = [smiles_lib[i] for i in idx]
         Y_old = Y[idx]
+        
+        # Compute max_len to use in next round
+        # For this I take the longest 10 SMILES amongst the k2
+        # compute their SELFIES length and add +1 to the longest
+        lengths = [len(smi) for smi in smiles] # lengths of smiles
+        idx = np.argpartition(lengths, -10)[-10:] # indices of 10 longest smiles
+        lengths = [sf.len_selfies(sf.encoder(smiles[i])) for i in idx] # length of selfies
+        max_len =  max(lengths) + 1
+        
+        print(max_len)
 
     # Return best molecules
     idx = find_Knearest_idx(spec, Y_old, k=n_hits)

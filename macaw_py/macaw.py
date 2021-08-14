@@ -2,8 +2,7 @@
 """
 Created on Sun Jun 13 13:22:31 2021
 
-Contains the Macaw class, the Macaw_optimus function, and the smiles_clean
-function.
+Contains the Macaw class and the Macaw_optimus function.
 
 @author: Vincent
 """
@@ -24,98 +23,99 @@ from functools import partial
 
 
 class Macaw:
+    """
+    Class providing Macaw numeric embeddings of molecules.
+
+    ...
+
+    Attributes
+    ----------
+
+    _n_landmarks : int, optional
+        Desired number of landmark molecules to use. Defaults to 50.
+
+    _type_fp : str, optional
+        Desired type of fingerprint to use to characterize molecules.
+        Options include 'RDK5', 'RDK7', 'Morgan2', 'Morgan3',
+        'featMorgan2', 'featMorgan3,'Avalon','MACCS', 'atompairs',
+        'torsion', 'pattern', 'secfp6', and 'layered'. Combinations can
+        also be specified with the '+' symbol, e.g. 'RDK5+MACCS'.
+        Defaults to 'Morgan2'.
+
+    _metric : str, optional
+        Distrance metric used to measure similarity between molecular
+        fingerprints. Options include 'Tanimoto', 'dice', 'cosine',
+        'Sokal', 'Kulczynski', 'Mcconnaughey', 'Braun-Blanquet',
+        'Rogot-Goldberg', 'asymmetric', and 'Manhattan'. Defaults to
+        'Tanimoto'.
+
+    _idx_landmarks : numpy.ndarray, optional
+        Array indicating the `smiles` indices to be used as landmarks.
+
+    _Y : numpy.ndarray, optional
+        Array containing the property of interest for each molecule in the
+        smiles input.
+
+    _Yset : str or int, optional
+        Specifies how to use the input in `Y`, if provided.
+        Options include 'highest' and 'lowest'. If an integer is provided,
+        it will use uniform sampling of landmarks after splitting the
+        molecules in `Yset` bins. Defaults to 10.
+
+    _n_components : int, optional
+        Number of dimensions for the embedding. Defaults to 15.
+
+    _algorithm : str, optional
+        Algorithm to use for the projection. Options available are 'MDS',
+        'isomap', 'PCA', ICA', and 'FA'. Defaults to 'MDS'.
+
+    Methods
+    -------
+
+    fit(smiles: list, Y: list, optional, n_landmarks: int, optional,
+        idx_landmarks: list, optional, Yset: int or str, optional)
+
+    transform(smiles : list)
+        Returns the Macaw embedding for the molecules provided in SMILES
+        format.
+
+    fit_transform(smiles: list, Y: list, optional, n_landmarks: int,
+        optional, idx_landmarks: list, optional, Yset: int or str,
+        optional)
+
+
+    set_type_fp(str)
+
+    set_metric(str)
+
+    set_algorithm(str)
+
+    set_n_components(int)
+
+
+    Notes
+    -------
+
+    No attribute should be modified directly. Instead, setter methods are
+    available for the modifiable attributes: `set_type_fp()`,
+    `set_metric()`, `set_Y()`, `set_n_components()`, and `set_algorithm()`.
+
+    If the `Y` argument is provided during fitting, it will be used in the
+    choice of the landmarks. If `Yset` is an integer, then the dataset will
+    be split in `Yset` bins according to `Y` and landmarks will be sampled
+    from the bins with equal probability. If `Yset` is set to 'highest' or
+    'lowest', then the landmarks will be the `n_landmarks` molecules with
+    the highest or lowest `Y` values, respectively.
+
+
+    """
     __version__ = "alpha_10"
     __author__ = "Vincent Blay"
 
     def __init__(
         self, type_fp="Morgan2", metric="Tanimoto", n_components=15, algorithm="MDS"
     ):
-        """
-        Class providing Macaw numeric embeddings of molecules.
 
-        ...
-
-        Attributes
-        ----------
-
-        _n_landmarks : int, optional
-            Desired number of landmark molecules to use. Defaults to 50.
-
-        _type_fp : str, optional
-            Desired type of fingerprint to use to characterize molecules.
-            Options include 'RDK5', 'RDK7', 'Morgan2', 'Morgan3',
-            'featMorgan2', 'featMorgan3,'Avalon','MACCS', 'atompairs',
-            'torsion', 'pattern', 'secfp6', and 'layered'. Combinations can
-            also be specified with the '+' symbol, e.g. 'RDK5+MACCS'.
-            Defaults to 'Morgan2'.
-
-        _metric : str, optional
-            Distrance metric used to measure similarity between molecular
-            fingerprints. Options include 'Tanimoto', 'dice', 'cosine',
-            'Sokal', 'Kulczynski', 'Mcconnaughey', 'Braun-Blanquet',
-            'Rogot-Goldberg', 'asymmetric', and 'Manhattan'. Defaults to
-            'Tanimoto'.
-
-        _idx_landmarks : numpy.ndarray, optional
-            Array indicating the `smiles` indices to be used as landmarks.
-
-        _Y : numpy.ndarray, optional
-            Array containing the property of interest for each molecule in the
-            smiles input.
-
-        _Yset : str or int, optional
-            Specifies how to use the input in `Y`, if provided.
-            Options include 'highest' and 'lowest'. If an integer is provided,
-            it will use uniform sampling of landmarks after splitting the
-            molecules in `Yset` bins. Defaults to 10.
-
-        _n_components : int, optional
-            Number of dimensions for the embedding. Defaults to 15.
-
-        _algorithm : str, optional
-            Algorithm to use for the projection. Options available are 'MDS',
-            'isomap', 'PCA', ICA', and 'FA'. Defaults to 'MDS'.
-
-        Methods
-        -------
-
-        fit(smiles: list, Y: list, optional, n_landmarks: int, optional,
-            idx_landmarks: list, optional, Yset: int or str, optional)
-
-        transform(smiles : list)
-            Returns the Macaw embedding for the molecules provided in SMILES
-            format.
-
-        fit_transform(smiles: list, Y: list, optional, n_landmarks: int,
-            optional, idx_landmarks: list, optional, Yset: int or str,
-            optional)
-
-
-        set_type_fp(str)
-
-        set_metric(str)
-
-        set_algorithm(str)
-
-        set_n_components(int)
-
-
-        Notes
-        -------
-
-        No attribute should be modified directly. Instead, setter methods are
-        available for the modifiable attributes: `set_type_fp()`,
-        `set_metric()`, `set_Y()`, `set_n_components()`, and `set_algorithm()`.
-
-        If the `Y` argument is provided during fitting, it will be used in the
-        choice of the landmarks. If `Yset` is an integer, then the dataset will
-        be split in `Yset` bins according to `Y` and landmarks will be sampled
-        from the bins with equal probability. If `Yset` is set to 'highest' or
-        'lowest', then the landmarks will be the `n_landmarks` molecules with
-        the highest or lowest `Y` values, respectively.
-
-
-        """
 
         self._n_components = n_components
         self._type_fp = type_fp.lower().replace(" ", "")
@@ -453,9 +453,9 @@ class Macaw:
     def _smiles_to_mols(self, smiles, bad_idx=False):
         mols = []
         bad_ind = []
-        for i in range(len(smiles)):
+        for i, smi in enumerate(smiles):
             m = MolFromSmiles(
-                smiles[i], sanitize=True
+                smi, sanitize=True
             )  # let us implement a more robust strategy
             if m is not None:
                 mols.append(m)
@@ -749,7 +749,7 @@ def Macaw_optimus(
 
             y_subset = y[idx]
 
-        for i in range(len(type_fps)):
+        for i, type_fp in enumerate(type_fps):
             mcw.set_type_fp(type_fps[i])
 
             for j in J:
@@ -779,13 +779,13 @@ def Macaw_optimus(
         for i in ind:
             mcw.set_type_fp(type_fps[i])
 
-            for j in range(len(metrics)):
+            for j, metric in enumerate(metrics):
                 if M[i, j] != 0:
                     continue
                 if (i, j) == (9, 3):  # torsion + sokal returns nan
                     continue
 
-                mcw.set_metric(metrics[j])
+                mcw.set_metric(metric)
 
                 x = mcw.transform(smiles_subset)
 
@@ -799,11 +799,11 @@ def Macaw_optimus(
     else:
         cv = 5
 
-        for i in range(len(type_fps)):
-            mcw.set_type_fp(type_fps[i])
+        for i, type_fp in enumerate(type_fps):
+            mcw.set_type_fp(type_fp)
 
-            for j in range(len(metrics)):
-                mcw.set_metric(metrics[j])
+            for j, metric in enumerate(metrics):
+                mcw.set_metric(metric)
 
                 x = mcw.transform(smiles)
 
@@ -825,25 +825,3 @@ def Macaw_optimus(
     mcw.set_metric(metric=metrics[max_j])
 
     return mcw
-
-
-# ----- AUXILIARY FUNCTIONS -----
-
-
-def smiles_clean(smiles, idx=False):
-    smiles = list(smiles)
-    ind = []
-    for i in range(len(smiles)):
-        m = MolFromSmiles(smiles[i], sanitize=True)
-        if m is not None:
-            ind.append(i)
-        else:
-            print(f"Warning: Skipping invalid SMILES in position {i}: {smiles[i]}")
-
-    clean_smiles = [smiles[i] for i in ind]
-    # Equivalent to clean_smiles = list(itemgetter(*ind)(smiles))
-
-    if idx:
-        return clean_smiles, ind
-    else:
-        return clean_smiles

@@ -48,13 +48,22 @@ def library_maker(
         Maximum length of the molecules generated in SELFIES format. If 0
         (default), the maximum length seen in the input molecules will be used.
 
+    p: str, float or np.ndarray, optional
+        Controls the SELFIES length distribution of molecules being generated.
+        Options include 'exp' (exponential distribution, default), 'empirical' 
+        (observed input distribution), and 'cumsum' (cumulative observed 
+        input distribution). If `p` is numeric, then a potential distribution
+        of degree `p` is used. If `p` is an array, then each element is
+        considered to be the weight of sampling molecules of length
+        given by the corresponding index (range(1,len(p+1))).
+
     noise_factor: float, optional
-        Adjusts the level of noise being added to the SELFIES frequency counts.
+        Controls the level of randomness added to the SELFIES frequency counts.
         Defaults to 0.3.
 
     algorithm : str, optional
         Select to use 'position' (default) or 'transition' algorithm to compute
-        the probability of sampling different SELFIES characters.
+        the probability of sampling different SELFIES symbols.
 
     efficient : bool, optional
         If true (default) the efficiency of molecule generation will be higher
@@ -134,7 +143,7 @@ def library_maker(
             idx_list.append(idx)
         except KeyError:
             print(f"Warning: SELFIES {selfi} is not valid and will be dropped.")
-            # This may be due to some character missing in the alphabet
+            # This may be due to some symbol missing in the alphabet
         
     manyselfies = [None] * n_gen
 
@@ -226,7 +235,7 @@ def library_maker(
 
 
 def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, p='exp'):
-    """Generates random molecules using robust SELFIES"""
+    """Generates random molecules using robust SELFIES symbols"""
     if max_len <= 0:
         max_len = 15
      

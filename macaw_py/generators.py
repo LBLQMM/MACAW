@@ -362,6 +362,7 @@ def library_evolver(
     algorithm="transition",
     p="cumsum",
     max_len=0,
+    random_state=None,
     **kwargs,
 ):
     """
@@ -416,6 +417,8 @@ def library_evolver(
     parameters.
 
     """
+    if random_state is not None:
+        np.random.seed(random_state)
     
     if smiles is None:
         if max_len==0:

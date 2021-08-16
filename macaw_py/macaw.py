@@ -184,7 +184,8 @@ class Macaw:
 
     # Main functions for the embedding
 
-    def fit(self, smiles, n_landmarks=50, Y=[], Yset=10, idx_landmarks=[]):
+    def fit(self, smiles, n_landmarks=50, Y=[], Yset=10, idx_landmarks=[],
+            random_state=None):
 
         smiles = list(smiles)
 
@@ -198,7 +199,8 @@ class Macaw:
         if len(idx_landmarks) == 0:
 
             n_temp = min(len(smiles), int(1.1 * n_landmarks))
-            idx_landmarks = self.__lndmk_choice(smiles, n_temp, Y, Yset)
+            idx_landmarks = self.__lndmk_choice(smiles, n_temp, Y, Yset,
+                                                random_state)
             resmiles = [smiles[i] for i in idx_landmarks]
             remols, bad_idx = self._smiles_to_mols(resmiles, bad_idx=True)
 
@@ -243,7 +245,8 @@ class Macaw:
 
         return self.__project(D, bad_idx)
 
-    def fit_transform(self, qsmiles, n_landmarks=50, Y=[], Yset=10, idx_landmarks=[]):
+    def fit_transform(self, qsmiles, n_landmarks=50, Y=[], Yset=10, 
+                      idx_landmarks=[], random_state=None):
 
         qsmiles = list(qsmiles)
         self.fit(
@@ -252,6 +255,7 @@ class Macaw:
             Y=Y,
             Yset=Yset,
             idx_landmarks=idx_landmarks,
+            random_state=random_state
         )
 
         idx_landmarks = self._idx_landmarks
@@ -308,9 +312,12 @@ class Macaw:
 
         return X
 
-    def __lndmk_choice(self, smiles, n_landmarks, Y, Yset):
+    def __lndmk_choice(self, smiles, n_landmarks, Y, Yset, random_state):
         # Returns unsorted indices
-
+        
+        if random_state is not None:
+            np.random.seed(random_state)
+        
         # Let us first extract the landmark fingerprints
         # If Y is not provided, pick the landmarks randomly
         lenY = len(Y)

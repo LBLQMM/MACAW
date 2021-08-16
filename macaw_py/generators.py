@@ -3,7 +3,7 @@
 Created on Sun Jun 13 13:27:53 2021
 
 Contains the library_maker and library_evolver functions, the hit_finder
-and hit_finder2 functions, and some auxiliary functions.
+and hit_finder2 functions.
 
 @author: Vincent
 """
@@ -27,8 +27,8 @@ def library_maker(
     p="exp",
     noise_factor=0.3,
     algorithm="position",
-    efficient=True,
     return_selfies=False,
+    random_state=None,
 ):
     """
     Generates molecules in a probabilistic manner from a list of input
@@ -65,9 +65,8 @@ def library_maker(
         Select to use 'position' (default) or 'transition' algorithm to compute
         the probability of sampling different SELFIES symbols.
 
-    efficient : bool, optional
-        If true (default) the efficiency of molecule generation will be higher
-        but molecules may tend to be longer than the input dataset.
+    return_selfies: bool, optional
+        If True, the ouptut will include both SMILES and SELFIES.
 
     Returns
     -------
@@ -82,11 +81,14 @@ def library_maker(
 
     """
     
+    if random_state is not None:
+        np.random.seed(random_state)
+    
     if smiles is None:
         return _random_library_maker( n_gen=n_gen,
                                     max_len=max_len,
-                                    return_selfies=return_selfies )
-    
+                                    return_selfies=return_selfies,
+                                    p=p)
     
     # Let us convert the smiles to selfies onehot
     selfies = []
@@ -227,18 +229,18 @@ def library_maker(
 
     # Let us now clean the generated library
     manysmiles, manyselfies = __selfies_to_smiles(manyselfies)
-
+    
+    print(f'{len(manysmiles)} unique molecules generated.')
+    
     if return_selfies:
         return manysmiles, manyselfies
     else:
         return manysmiles
 
 
-def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, p='exp'):
+def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, 
+                          p='exp'):
     """Generates random molecules using robust SELFIES symbols"""
-    if max_len <= 0:
-        max_len = 15
-     
     # In order to ensure that we get molecules of all lengths up to max_len
     # I first choose the length of the molecule, and then draw the number of
     # SELFIES symbols accordingly. We will not be padding the resulting SELFIES
@@ -260,6 +262,8 @@ def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, p='exp'
         manyselfies[i] = selfies
 
     manysmiles, manyselfies = __selfies_to_smiles(manyselfies)
+    
+    print(f'{len(manysmiles)} unique molecules generated.')
     
     if return_selfies:
         return manysmiles, manyselfies
@@ -317,6 +321,7 @@ def __lengths_generator(max_len, n_gen, p, lengths=None):
             max_len = len(p)
         else:
             max_len = max(lengths)
+        print(f'max_len set to {max_len}.')
     
     if isinstance(p, (int, float)):
         p = np.power(range(max_len), p)
@@ -336,7 +341,7 @@ def __lengths_generator(max_len, n_gen, p, lengths=None):
             p = p.cumsum()
         
         else:
-            raise IOError("Invalid p input value: {p}.")
+            raise IOError(f"Invalid p input value: {p}.")
     
     p = p/sum(p)
             
@@ -350,12 +355,13 @@ def library_evolver(
     mcw,
     model,
     spec,
-    k1=3000,
+    k1=2000,
     k2=100,
     n_rounds=8,
     n_hits=10,
     algorithm="transition",
     p="cumsum",
+    max_len=0,
     **kwargs,
 ):
     """
@@ -410,7 +416,13 @@ def library_evolver(
     parameters.
 
     """
-
+    
+    if smiles is None:
+        if max_len==0:
+            max_len=15
+        smiles = _random_library_maker(n_gen=20000, max_len=max_len, 
+                                       return_selfies=False, p=p)
+    
     smiles = list(smiles)
 
     if not callable(mcw):
@@ -427,11 +439,12 @@ def library_evolver(
 
     X = mcw(smiles)
     Y_old = model(X)
-    max_len = 0
+    smiles_lib_old = smiles
+    
     for i in range(n_rounds):
         print(f"\nRound {i+1}")
         smiles_lib = library_maker(
-            smiles,
+            smiles_lib_old,
             n_gen=k1,
             algorithm=algorithm,
             max_len=max_len,
@@ -446,7 +459,7 @@ def library_evolver(
         # We want to carry over the best molecules from the previous round
         
         # Append the old molecules and remove duplicates
-        smiles_lib += smiles  # concatenates lists
+        smiles_lib += smiles_lib_old  # concatenates lists
         smiles_lib, idx = np.unique(smiles_lib, return_index=True)
         smiles_lib = list(smiles_lib)
 
@@ -455,23 +468,23 @@ def library_evolver(
         
         
         # Select k2 best molecules
-        idx = find_Knearest_idx(spec, Y, k=k2)
-        smiles = [smiles_lib[i] for i in idx]
+        idx = __find_Knearest_idx(spec, Y, k=k2)
+        smiles_lib_old = [smiles_lib[i] for i in idx]
         Y_old = Y[idx]
         
         # Compute max_len to use in next round
         # For this I take the longest 10 SMILES amongst the k2
         # compute their SELFIES length and add +1 to the longest
-        lengths = [len(smi) for smi in smiles] # lengths of smiles
+        lengths = [len(smi) for smi in smiles_lib_old] # lengths of smiles
         idx = np.argpartition(lengths, -10)[-10:] # indices of 10 longest smiles
-        lengths = [sf.len_selfies(sf.encoder(smiles[i])) for i in idx] # length of selfies
+        lengths = [sf.len_selfies(sf.encoder(smiles_lib_old[i])) for i in idx] # length of selfies
         max_len =  max(lengths) + 1
         
         print(max_len)
 
     # Return best molecules
-    idx = find_Knearest_idx(spec, Y_old, k=n_hits)
-    smiles = [smiles[i] for i in idx]  # Access multiple elements of a list
+    idx = __find_Knearest_idx(spec, Y_old, k=n_hits)
+    smiles = [smiles_lib_old[i] for i in idx]  # Access multiple elements of a list
     Y = Y_old[idx]
 
     return smiles, Y
@@ -562,7 +575,7 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
 
     if len(X) > k1:
         if len(Y) == len(X):
-            idx_seed = find_Knearest_idx(spec, Y, k=k1)
+            idx_seed = __find_Knearest_idx(spec, Y, k=k1)
         else:
             if len(Y) != 0:
                 print(
@@ -582,7 +595,7 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
     if p == 1:
         dt = DistanceMetric.get_metric("manhattan")
     elif p < 1:
-        dt = DistanceMetric.get_metric("pyfunc", func=vdistance, p=p)
+        dt = DistanceMetric.get_metric("pyfunc", func=__vdistance, p=p)
     else:
         dt = DistanceMetric.get_metric("minkowski", p=p)  # p > 1
 
@@ -601,11 +614,11 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
 
         # This is only relevant if we are to iterate
         if i < (n_rounds - 1):
-            newidx = find_Knearest_idx(spec, Y_hits_pred, k=k1)
+            newidx = __find_Knearest_idx(spec, Y_hits_pred, k=k1)
             newidx = idx[newidx]
             Xseed = X_lib[newidx]
 
-    ind = find_Knearest_idx(spec, Y_hits_pred, k=n_hits)  # ind in idx
+    ind = __find_Knearest_idx(spec, Y_hits_pred, k=n_hits)  # ind in idx
 
     idx = idx[ind]  # idx in library
     idx = list(idx)
@@ -687,7 +700,7 @@ def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
 
     if len(X) > k1:
         if len(Y) == len(X):
-            idx_seed = find_Knearest_idx(spec, Y, k=k1)
+            idx_seed = __find_Knearest_idx(spec, Y, k=k1)
         else:
             if len(Y) != 0:
                 print(
@@ -723,7 +736,7 @@ def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
     if p == 1:
         dt = DistanceMetric.get_metric("manhattan")
     elif p < 1:
-        dt = DistanceMetric.get_metric("pyfunc", func=vdistance, p=p)
+        dt = DistanceMetric.get_metric("pyfunc", func=__vdistance, p=p)
     else:
         dt = DistanceMetric.get_metric("minkowski", p=p)  # p > 1
 
@@ -738,7 +751,7 @@ def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
 
     Y_hits_pred = model(X_hits)
 
-    ind = find_Knearest_idx(spec, Y_hits_pred, k=n_hits)  # ind in idx
+    ind = __find_Knearest_idx(spec, Y_hits_pred, k=n_hits)  # ind in idx
 
     idx = idx[ind]  # idx in library
     idx = list(idx)
@@ -750,7 +763,7 @@ def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
 # ----- AUXILIARY FUNCTIONS -----
 
 
-def find_Knearest_idx(x, arr, k=1):
+def __find_Knearest_idx(x, arr, k=1):
     """
     Finds the `k` nearest values to number `x` in unsorted array `arr` using a
     heap data structue.
@@ -796,7 +809,7 @@ def find_Knearest_idx(x, arr, k=1):
     return idx
 
 
-def vdistance(v1, v2, p=1):
+def __vdistance(v1, v2, p=1):
     """
     Computes the V-distance between points v1 and v2.
 

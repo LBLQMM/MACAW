@@ -19,7 +19,6 @@ from sklearn.manifold import Isomap
 from sklearn.decomposition import PCA, FastICA, FactorAnalysis
 from sklearn.svm import SVR, SVC
 from sklearn.model_selection import cross_val_score
-from functools import partial
 
 
 class Macaw:
@@ -109,7 +108,7 @@ class Macaw:
 
 
     """
-    __version__ = "alpha_10"
+    __version__ = "alpha_11"
     __author__ = "Vincent Blay"
 
     def __init__(
@@ -175,15 +174,15 @@ class Macaw:
 
     def set_algorithm(self, algorithm):
         algorithm = algorithm.lower().replace(" ", "")
-        if algorithm not in ["mds", "isomap"]:
+        if algorithm not in ["mds", "isomap", "pca", "ica", "fa"]:
             raise IOError(f"Unknown algorithm {algorithm}.")
         self._algorithm = algorithm
 
         if self._n_landmarks is not None:
             self.__safe_lndmk_embed()
-
+    
     # Main functions for the embedding
-
+    
     def fit(self, smiles, n_landmarks=50, Y=[], Yset=10, idx_landmarks=[],
             random_state=None):
 
@@ -194,32 +193,24 @@ class Macaw:
                 f"Warning: requested n_landmarks={n_landmarks} but only "
                 f"{len(smiles)} smiles provided. n_landmarks will be lower."
             )
-
-        idx_landmarks = np.array(idx_landmarks)
+        
         if len(idx_landmarks) == 0:
-
-            n_temp = min(len(smiles), int(1.1 * n_landmarks))
-            idx_landmarks = self.__lndmk_choice(smiles, n_temp, Y, Yset,
+            idx_landmarks = self.__lndmk_choice(smiles, n_landmarks, Y, Yset,
                                                 random_state)
-            resmiles = [smiles[i] for i in idx_landmarks]
-            remols, bad_idx = self._smiles_to_mols(resmiles, bad_idx=True)
-
-            if len(bad_idx) > 0:
-                # This will preserve order in idx_landmarks
-                idx_landmarks = np.setdiff1d(idx_landmarks, bad_idx, assume_unique=True)
-
-            idx_landmarks = idx_landmarks[:n_landmarks]
-            remols = remols[:n_landmarks]
-
         else:
-            resmiles = [smiles[i] for i in idx_landmarks]
-            remols = self._smiles_to_mols(resmiles)
-
-        self._idx_landmarks = np.sort(idx_landmarks)
-        self._n_landmarks = len(self._idx_landmarks)
-        if len(remols) != n_landmarks:
-            print(f"n_landmarks has been set to {self._n_landmarks}")
-
+            idx_landmarks = np.sort(idx_landmarks)
+        
+        resmiles = [smiles[i] for i in idx_landmarks]
+        remols, bad_idx = self._smiles_to_mols(resmiles, bad_idx=True)
+        
+        if len(bad_idx) > 0:
+            idx_landmarks = np.setdiff1d(idx_landmarks, bad_idx)
+            print(f"n_landmarks has been set to {len(idx_landmarks)}")
+        
+        resmiles = [smiles[i] for i in idx_landmarks]
+        
+        self._idx_landmarks = idx_landmarks
+        self._n_landmarks = len(idx_landmarks)
         self._resmiles = resmiles
         self.__remols = remols
         self.__refps_update()
@@ -230,7 +221,7 @@ class Macaw:
 
         if self._n_landmarks is None:
             raise RuntimeError(
-                "This Macaw instance is not fitted yet. Call "
+                "Macaw instance not fitted. Call "
                 "'fit' with appropriate arguments before using"
                 " this embedder."
             )
@@ -270,7 +261,7 @@ class Macaw:
 
         # Now we can insert the rows in D corresponding to the landmarks
         # We first need to correct the idx_landmarks for the bad_idx positions
-        # since these will not have a fingeprint and distance row generated
+        # since these will not have a fingerprint and distance row generated
         for i in bad_idx:
             idx_landmarks[idx_landmarks > i] -= 1
 
@@ -307,13 +298,13 @@ class Macaw:
             X = LndS.transform(D)
 
         #  We insert nan rows in the bad_idx positions if there were any
-        for i in bad_idx:
-            X = np.insert(X, i, np.nan, axis=0)
+        ix = [bad_idx[i]-i for i in range(len(bad_idx))]
+        X = np.insert(X, ix, np.nan)
 
         return X
 
     def __lndmk_choice(self, smiles, n_landmarks, Y, Yset, random_state):
-        # Returns unsorted indices
+        # Returns SORTED indices
         
         if random_state is not None:
             np.random.seed(random_state)
@@ -351,7 +342,7 @@ class Macaw:
                     range(lenY), n_landmarks, replace=False, p=proba
                 )
 
-        return idx_landmarks
+        return np.sort(idx_landmarks)
 
     def __refps_update(self):
         remols = self.__remols
@@ -477,39 +468,23 @@ class Macaw:
 
     def __fps_maker(self, mols):
         type_fp = self._type_fp
-
-        switcher = {
-            "morgan2": partial(
-                AllChem.GetMorganFingerprintAsBitVect, radius=2, nBits=1024
-            ),
-            "morgan3": partial(
-                AllChem.GetMorganFingerprintAsBitVect, radius=3, nBits=1024
-            ),
-            "rdk5": partial(Chem.RDKFingerprint, minPath=1, maxPath=5, fpSize=1024),
-            "rdk7": partial(Chem.RDKFingerprint, minPath=1, maxPath=7, fpSize=2048),
-            "featmorgan2": partial(
-                AllChem.GetMorganFingerprintAsBitVect,
-                radius=2,
-                useFeatures=True,
-                useChirality=True,
-                nBits=2048,
-            ),
-            "featmorgan3": partial(
-                AllChem.GetMorganFingerprintAsBitVect,
-                radius=3,
-                useFeatures=True,
-                useChirality=True,
-                nBits=2048,
-            ),
-            "maccs": rdMolDescriptors.GetMACCSKeysFingerprint,
-            "avalon": pyAvalonTools.GetAvalonFP,
-            "atompairs": rdMolDescriptors.GetHashedAtomPairFingerprintAsBitVect,
-            "torsion": rdMolDescriptors.GetHashedTopologicalTorsionFingerprintAsBitVect,
-            "pattern": partial(Chem.PatternFingerprint, fpSize=4096),
-            "secfp6": partial(rdMHFPFingerprint.MHFPEncoder(0,0).EncodeSECFPMol,
-                              radius=3),
-            "layered": LayeredFingerprint,
-        }
+               
+        switcher = {}
+        switcher["morgan2"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m, radius=2, nBits=1024)
+        switcher["morgan3"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m, radius=3, nBits=1024)
+        switcher["rdk5"] = lambda m: Chem.RDKFingerprint(m, minPath=1, maxPath=5, fpSize=1024)
+        switcher["rdk7"] = lambda m: Chem.RDKFingerprint(m, minPath=1, maxPath=7, fpSize=2048)
+        switcher["featmorgan2"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m,
+            radius=2, useFeatures=True, useChirality=True, nBits=2048)
+        switcher["featmorgan3"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m,
+            radius=3, useFeatures=True, useChirality=True, nBits=2048)
+        switcher["maccs"] = rdMolDescriptors.GetMACCSKeysFingerprint
+        switcher["avalon"] = pyAvalonTools.GetAvalonFP
+        switcher["atompairs"] = rdMolDescriptors.GetHashedAtomPairFingerprintAsBitVect
+        switcher["torsion"] = rdMolDescriptors.GetHashedTopologicalTorsionFingerprintAsBitVect
+        switcher["pattern"] = lambda m: Chem.PatternFingerprint(m, fpSize=4096)
+        switcher["secfp6"] = lambda m: rdMHFPFingerprint.MHFPEncoder(0,0).EncodeSECFPMol(m, radius=3)
+        switcher["layered"] = LayeredFingerprint
 
         type_fps = type_fp.split("+")
 
@@ -575,38 +550,29 @@ class Macaw:
     def __metric_to_class(self):
         metric = self._metric
 
-        if metric == "tanimoto":
-            # r = DataStructs.TanimotoSimilarity
-            r = DataStructs.OnBitSimilarity
-        elif metric == "cosine":
-            r = DataStructs.CosineSimilarity
-        elif metric == "dice":
-            r = DataStructs.DiceSimilarity
+        switcher = {}
+        switcher["tanimoto"] = DataStructs.OnBitSimilarity
+        switcher["cosine"] = DataStructs.CosineSimilarity
+        switcher["dice"] = DataStructs.DiceSimilarity
         # elif metric =='russel': r = DataStructs.RusselSimilarity # non-commutative
-        elif metric == "sokal":
-            r = DataStructs.SokalSimilarity
-        elif metric == "kulczynski":
-            r = DataStructs.KulczynskiSimilarity
-        elif metric == "mcconnaughey":
-            r = DataStructs.McConnaugheySimilarity
+        switcher["sokal"] = DataStructs.SokalSimilarity
+        switcher["kulczynski"] = DataStructs.KulczynskiSimilarity
+        switcher["mcconnaughey"] = DataStructs.McConnaugheySimilarity
         # elif metric == 'tversky': r = lambda x, y: DataStructs.TverskySimilarity(x, y, 0.01, 0.99) # non-commutative
-        elif metric == "braun-blanquet":
-            r = DataStructs.BraunBlanquetSimilarity
-        elif metric == "rogot-goldberg":
-            r = DataStructs.RogotGoldbergSimilarity
-        # elif metric == 'onbit': r = DataStructs.OnBitSimilarity # Same as Tanimoto
-        elif metric == "asymmetric":
-            r = DataStructs.AsymmetricSimilarity
-        elif metric == "manhattan":
-            r = DataStructs.AllBitSimilarity
-        else:
+        switcher["braun-blanquet"] = DataStructs.BraunBlanquetSimilarity
+        switcher["rogot-goldberg"] = DataStructs.RogotGoldbergSimilarity
+        switcher["asymmetric"] = DataStructs.AsymmetricSimilarity
+        switcher["manhattan"] = DataStructs.AllBitSimilarity     
+        
+        r = switcher.get(metric)
+        if r is None:
             print(
                 f"Warning: Invalid similarity metric {metric}. \
                     metric has been set to Tanimoto."
             )
             self._metric = "tanimoto"
             r = DataStructs.TanimotoSimilarity
-
+            
         return r
 
 

@@ -9,13 +9,12 @@ and hit_finder2 functions.
 """
 
 import numpy as np
-import selfies as sf
 from operator import itemgetter
 from queue import PriorityQueue
-from sklearn.neighbors import BallTree, DistanceMetric
-from scipy.optimize import minimize
 from rdkit import Chem
-
+from scipy.optimize import minimize
+import selfies as sf
+from sklearn.neighbors import BallTree, DistanceMetric
 
 # ----- Molecular library generation functions -----
 

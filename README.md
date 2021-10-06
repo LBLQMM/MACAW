@@ -1,17 +1,17 @@
-# Macaw
+# MACAW
 
-Macaw (**m**olecular **a**utoen**c**oding **a**uto-**w**orkaround) is a cheminformatic tool that embeds molecules onto a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
+MACAW (Molecular AutoenCoding Auto-Workaround) is a cheminformatic toolkit that embeds molecules onto a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
 
-Macaw embeddings can be used as a drop-in replacement for conventional molecular descriptors. Macaw embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
+MACAW embeddings can be used as a drop-in replacement for conventional molecular descriptors. MACAW embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
 
-The Macaw package also contains original algorithms to generate molecular libraries and to evolve molecular libraries *in silico* that approximate a desired property specification (inverse design problem).
+The MACAW library also contains original algorithms to generate molecular libraries and to evolve molecular libraries *in silico* that approximate a desired property specification (inverse molecular design).
 
-Details about the different algorithms are explained in the [Macaw publication]().
+Details about the different algorithms are explained in the [MACAW publication]().
 
 
 ## Installation
 
-Macaw requires rdkit to run, which can be installed using [conda](https://anaconda.org/conda-forge/rdkit):
+MACAW requires rdkit to run, which can be installed using [conda](https://anaconda.org/conda-forge/rdkit):
 
 ```bash
 conda install -c conda-forge rdkit
@@ -20,30 +20,30 @@ conda install -c conda-forge rdkit
 Alternative methods to install rdkit can be found [here](https://www.rdkit.org/docs/Install.html).
 
 
-Then run the following command to install Macaw:
+Then run the following command to install MACAW:
 
 ```bash
 pip install macaw_py
 ```
 
-## Usage
+## Use
 
-The following illustrates some of the main commands in Macaw. Detailed use examples with real datasets are available as Jupyter Notebooks in the [Macaw repository](https://github.com/LBLQMM/macaw).
+The following illustrates some of the main commands in MACAW. Detailed use examples with real datasets are available as Jupyter Notebooks in the [MACAW repository](https://github.com/LBLQMM/macaw).
 
 
 ### Molecule embedding
 
-Given a list of molecules represented as SMILES strings (`smiles`), their Macaw embedding (`X`) can be obtained as follows:
+Given a list of molecules represented as SMILES strings (`smiles`), their MACAW embeddings (`X`) can be obtained as follows:
 
 ```python
 from macaw_py import *
 
-mcw = Macaw()
+mcw = MACAW()
 mcw.fit(smiles)
 X = mcw.transform(smiles)
 ```
 
-Any list of molecules in SMILES format (`newsmiles`) can be embedded using an existing Macaw object:
+Any list of molecules in SMILES format (`newsmiles`) can be embedded using an existing MACAW object:
 
 ```python
 X_new = mcw.transform(newsmiles)
@@ -52,20 +52,20 @@ X_new = mcw.transform(newsmiles)
 The embedder has a variety of parameters that can be tuned to improve results. These include the dimensionality of the embedding (`n_components`), the number of landmarks used (`n_landmarks`), the type of molecular fingeprint (`type_fp`), and the similarity metric (`metric`). Property values (`y_values`) can also be provided to the argument `Y` to improve landmark choice. The arguments and options available are listed in the class help.
 
 ```python
-mcw = Macaw(n_components=20, type_fp='rdk5', metric='Dice')
+mcw = MACAW(n_components=20, type_fp='rdk5', metric='Dice')
 
 mcw.fit_transform(smiles, n_landmarks=60, Y=y_values)
 ```
 
-The function `Macaw_optimus` automatically explores a variety of fingeprint type (`type_fp`) and similarity metric (`metric`) combinations and returns a recommended embedder ready to use:
+The function `MACAW_optimus` automatically explores a variety of fingeprint type (`type_fp`) and similarity metric (`metric`) combinations and returns a recommended embedder ready to use:
 
 ```python
-mcw = Macaw_optimus(smiles, n_components=20, y=y_values, verbose=True)
+mcw = MACAW_optimus(smiles, n_components=20, y=y_values, verbose=True)
 ```
 
 ### Molecule generation
 
-Given an input dataset of molecules in SELFIES format, Macaw's `library_maker` function will generate a library of molecules around it. The maximum number of molecules to generate is specified with the `n_gen` parameter, while the spread of the distribution can be controlled with the `noise_sd_factor` argument. Additional parameters are explained in the function help.
+Given an input dataset of molecules in SELFIES format, MACAW's `library_maker` function will generate a library of molecules around it. The maximum number of molecules to generate is specified with the `n_gen` parameter, while the spread of the distribution can be controlled with the `noise_factor` argument. Additional parameters are explained in the function help.
 
 
 ```python
@@ -83,4 +83,7 @@ recommended_smiles = library_evolver(smiles, mcw, f, spec, n_hits=10, n_rounds=8
 ```
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+
+MACAW is free for research, non-commercial use under an [MIT](https://choosealicense.com/licenses/mit/) license.
+
+For commercial use of MACAW, please [contact us](mailto:vblayroger@lbl.gov).

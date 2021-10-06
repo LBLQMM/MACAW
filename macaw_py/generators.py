@@ -353,7 +353,7 @@ def library_evolver(
     smiles,
     mcw,
     model,
-    spec,
+    spec=0.,
     k1=2000,
     k2=100,
     n_rounds=8,
@@ -375,12 +375,12 @@ def library_evolver(
     smiles : list
         List of molecules in SMILES format.
 
-    mcw : Macaw
+    mcw : MACAW
         Embedder to featurize the `smiles` input.
 
     model :
         Function that takes as input the features produced by the
-        Macaw embedder `mcw` and returns a scalar (predicted property).
+        MACAW embedder `mcw` and returns a scalar (predicted property).
 
     spec : float
         Target specification that the recommended molecules should be close to.
@@ -501,8 +501,8 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
     Parameters
     ----------
     X_lib : numpy.ndarray
-        Array containing the Macaw embedding of a library of molecules.
-        It can be generated with the `Macaw_proj` function.
+        Array containing the MACAW embedding of a library of molecules.
+        It can be generated with the MACAW `transform` method.
 
     model : function
         Function that predicts property values given instances from `X_lib`.
@@ -511,8 +511,8 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
         Desired property value specification.
 
     X : numpy.ndarray, optional
-        Array containing the Macaw embedding of known molecules.
-        It can be generated with the Macaw `transform` method.
+        Array containing the MACAW embedding of known molecules.
+        It can be generated with the MACAW `transform` method.
 
     Y : numpy.ndarray, optional
         Array containing the property values for the known molecules.
@@ -551,7 +551,7 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
 
     If `X`and `Y` are provided, it first takes the `k1` known
     molecules closest to the specification to guide the retrieval of the `k2`
-    closest molecules in the Macaw embedding space (according to a `p`-norm).
+    closest molecules in the MACAW embedding space (according to a `p`-norm).
     This process is done using a sklearn BallTree structure. The `k1`x`k2`
     molecules retrieved are then evaluated using the model provided (`model`).
     If `n_rounds` = 1 (default), the indices of the `n_hits` molecules
@@ -632,14 +632,14 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
 def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
     """
     Identifies promising hit molecules from a library according to a property
-    specification. Best suited for smooth embeddings like Macaw.
+    specification. Best suited for smooth embeddings like MACAW.
 
     ...
     Parameters
     ----------
     X_lib : numpy.ndarray
-        Array containing the Macaw embedding of a library of molecules.
-        It can be generated with the `Macaw_proj` function.
+        Array containing the MACAW embedding of a library of molecules.
+        It can be generated with the MACAW `transform` method.
 
     model : function
         Function that predicts property values given instances from `X_lib`.
@@ -647,8 +647,8 @@ def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
     spec : float
         Desired property value specification.
 
-    mcw : Macaw object, optional
-        Macaw object used to embed molecules in `X_lib`.
+    mcw : MACAW object, optional
+        MACAW object used to embed molecules in `X_lib`.
 
     n_hits : int, optional
         Number of desired hit molecules to be output. Defaults to 10.

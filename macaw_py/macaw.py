@@ -2,7 +2,7 @@
 """
 Created on Sun Jun 13 13:22:31 2021
 
-Contains the Macaw class and the Macaw_optimus function.
+Contains the MACAW class and the MACAW_optimus function.
 
 @author: Vincent
 """
@@ -21,9 +21,9 @@ from sklearn.svm import SVR, SVC
 from sklearn.model_selection import cross_val_score
 
 
-class Macaw:
+class MACAW:
     """
-    Class providing Macaw numeric embeddings of molecules.
+    Class providing MACAW numeric embeddings of molecules.
 
     ...
 
@@ -75,7 +75,7 @@ class Macaw:
         idx_landmarks: list, optional, Yset: int or str, optional)
 
     transform(smiles : list)
-        Returns the Macaw embedding for the molecules provided in SMILES
+        Returns the MACAW embedding for the molecules provided in SMILES
         format.
 
     fit_transform(smiles: list, Y: list, optional, n_landmarks: int,
@@ -143,7 +143,7 @@ class Macaw:
 
     def __repr__(self):
         return (
-            f"Macaw_embedder(n_landmarks={self._n_landmarks}, "
+            f"MACAW_embedder(n_landmarks={self._n_landmarks}, "
             f"n_components={self._n_components}, type_fp={self._type_fp},"
             f" metric={self._metric}, algorithm={self._algorithm})"
         )
@@ -221,7 +221,7 @@ class Macaw:
 
         if self._n_landmarks is None:
             raise RuntimeError(
-                "Macaw instance not fitted. Call "
+                "MACAW instance not fitted. Call "
                 "'fit' with appropriate arguments before using"
                 " this embedder."
             )
@@ -577,10 +577,10 @@ class Macaw:
         return r
 
 
-# ----- End of Macaw class -----
+# ----- End of MACAW class -----
 
 
-def Macaw_optimus(
+def MACAW_optimus(
     smiles,
     y,
     fast=True,
@@ -592,7 +592,7 @@ def Macaw_optimus(
     **kwargs,
 ):
     """
-    Function that identifies and recommends a Macaw embedding for a given
+    Function that identifies and recommends a MACAW embedding for a given
     problem. It does so by evaluating the performance of different embeddings
     as inputs to a support vector machine.
 
@@ -626,14 +626,14 @@ def Macaw_optimus(
         combinations.
 
     **kwargs : optional
-        Allows to pass additional parameters to the Macaw class (other than
+        Allows to pass additional parameters to the MACAW class (other than
         `type_fp`and `metric`).
 
 
     Returns
     -------
-    Macaw
-        Macaw object with the optimal settings identified.
+    MACAW
+        MACAW object with the optimal settings identified.
 
 
     """
@@ -654,7 +654,7 @@ def Macaw_optimus(
         print(f"Problem type identified as {problem}")
 
     # If not specified, we will use the same Y argument for the individual
-    # Macaw calls as the Macaw_optimus y argument.
+    # MACAW calls as the MACAW_optimus y argument.
     # In the case of classification, this will amount to using a 'balanced'
     # number of landmarks. I could set `Yset`equal to 2, but it is not necessary.
     if "Y" not in kwargs:
@@ -695,7 +695,7 @@ def Macaw_optimus(
         "manhattan",
     ]
 
-    mcw = Macaw(n_components=n_components, algorithm=algorithm)
+    mcw = MACAW(n_components=n_components, algorithm=algorithm)
     mcw.fit(smiles, **kwargs)  # Landmark selection
 
     if problem == "regression":

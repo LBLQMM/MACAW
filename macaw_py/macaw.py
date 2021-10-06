@@ -267,8 +267,8 @@ class Macaw:
 
         D_lndmks = self.__refD
         i = 0
-        for row_idx in idx_landmarks:
-            D = np.insert(D, row_idx, D_lndmks[i, :], axis=0)
+        for ix in idx_landmarks:
+            D = np.insert(D, ix, D_lndmks[i, :], axis=0)
             i += 1
 
         return self.__project(D, bad_idx)
@@ -298,8 +298,9 @@ class Macaw:
             X = LndS.transform(D)
 
         #  We insert nan rows in the bad_idx positions if there were any
-        ix = [bad_idx[i]-i for i in range(len(bad_idx))]
-        X = np.insert(X, ix, np.nan)
+        if len(bad_idx)>0:
+            ix = [bad_idx[i]-i for i in range(len(bad_idx))]
+            X = np.insert(X, ix, np.nan, axis=0)
 
         return X
 

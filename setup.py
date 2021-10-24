@@ -11,7 +11,7 @@ setup(
       url='https://github.com/LBLQMM/macaw',
       author='Vincent Blay',
       author_email='vblayroger@lbl.gov',
-      description='Macaw molecular embedder',
+      description='MACAW molecular embedder and generator',
       long_description=long_description,
       long_description_content_type='text/markdown',
       packages=['macaw_py'],
@@ -33,5 +33,6 @@ setup(
           'scikit-learn >= 0.24.1',
           'scipy >= 1.6.1',
           'selfies >= 1.0.4',
+          'umap >= 0.5.1',
           ],
       )

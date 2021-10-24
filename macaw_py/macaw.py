@@ -2,6 +2,7 @@
 """
 Created on Sun Jun 13 13:22:31 2021
 
+Part of the MACAW project.
 Contains the MACAW class and the MACAW_optimus function.
 
 @author: Vincent
@@ -19,6 +20,7 @@ from sklearn.manifold import Isomap
 from sklearn.decomposition import PCA, FastICA, FactorAnalysis
 from sklearn.svm import SVR, SVC
 from sklearn.model_selection import cross_val_score
+import umap
 
 
 class MACAW:
@@ -66,7 +68,7 @@ class MACAW:
 
     _algorithm : str, optional
         Algorithm to use for the projection. Options available are 'MDS',
-        'isomap', 'PCA', ICA', and 'FA'. Defaults to 'MDS'.
+        'isomap', 'PCA', ICA', 'FA', and 'umap'. Defaults to 'MDS'.
 
     Methods
     -------
@@ -121,7 +123,7 @@ class MACAW:
         self._metric = metric.lower().replace(" ", "")
 
         algorithm = algorithm.lower().replace(" ", "")
-        if algorithm not in ["mds", "isomap", "pca", "ica", "fa"]:
+        if algorithm not in ["mds", "isomap", "pca", "ica", "fa", "umap"]:
             raise IOError(
                 (
                     f"Error: Invalid algorithm {algorithm}. See the "
@@ -174,7 +176,7 @@ class MACAW:
 
     def set_algorithm(self, algorithm):
         algorithm = algorithm.lower().replace(" ", "")
-        if algorithm not in ["mds", "isomap", "pca", "ica", "fa"]:
+        if algorithm not in ["mds", "isomap", "pca", "ica", "fa", "umap"]:
             raise IOError(f"Unknown algorithm {algorithm}.")
         self._algorithm = algorithm
 
@@ -444,6 +446,11 @@ class MACAW:
 
         elif algorithm == "fa":
             LndS = FactorAnalysis(n_components=n_components)
+            LndS.fit(D)
+            
+        elif algorithm == "umap":
+            LndS = umap.UMAP(n_components=n_components, metric='precomputed',
+                             min_dist=0.3)
             LndS.fit(D)
 
         self.__LndS = LndS

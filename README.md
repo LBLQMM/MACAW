@@ -14,7 +14,7 @@ Details about the different algorithms are explained in the [MACAW publication](
 MACAW requires rdkit to run, which can be installed using [conda](https://anaconda.org/conda-forge/rdkit):
 
 ```bash
-conda install -c conda-forge rdkit
+conda install -c conda-forge rdkit=2020.09.4
 ```
 
 Alternative methods to install rdkit can be found [here](https://www.rdkit.org/docs/Install.html).

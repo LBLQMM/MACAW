@@ -2,7 +2,7 @@
 """
 Created on Sun Jun 13 13:23:53 2021
 
-Contains plotting functions for Macaw project.
+Contains plotting functions for MACAW project.
 
 @author: Vincent
 """

@@ -2,6 +2,7 @@
 """
 Created on Sun Jun 13 13:27:53 2021
 
+Part of the MACAW project.
 Contains the library_maker and library_evolver functions, the hit_finder
 and hit_finder2 functions.
 

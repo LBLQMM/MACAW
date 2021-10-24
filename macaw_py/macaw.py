@@ -478,50 +478,35 @@ class MACAW:
         type_fp = self._type_fp
                
         switcher = {}
-        switcher["morgan2"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m, radius=2, nBits=1024)
-        switcher["morgan3"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m, radius=3, nBits=1024)
-        switcher["rdk5"] = lambda m: Chem.RDKFingerprint(m, minPath=1, maxPath=5, fpSize=1024)
+        switcher["morgan2"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m, radius=2, nBits=2048)
+        switcher["morgan3"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m, radius=3, nBits=2048)
+        switcher["rdk5"] = lambda m: Chem.RDKFingerprint(m, minPath=1, maxPath=5, fpSize=2048)
         switcher["rdk7"] = lambda m: Chem.RDKFingerprint(m, minPath=1, maxPath=7, fpSize=2048)
         switcher["featmorgan2"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m,
             radius=2, useFeatures=True, useChirality=True, nBits=2048)
         switcher["featmorgan3"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m,
             radius=3, useFeatures=True, useChirality=True, nBits=2048)
         switcher["maccs"] = rdMolDescriptors.GetMACCSKeysFingerprint
-        switcher["avalon"] = pyAvalonTools.GetAvalonFP
-        switcher["atompairs"] = rdMolDescriptors.GetHashedAtomPairFingerprintAsBitVect
-        switcher["torsion"] = rdMolDescriptors.GetHashedTopologicalTorsionFingerprintAsBitVect
-        switcher["pattern"] = lambda m: Chem.PatternFingerprint(m, fpSize=4096)
-        switcher["secfp6"] = lambda m: rdMHFPFingerprint.MHFPEncoder(0,0).EncodeSECFPMol(m, radius=3)
-        switcher["layered"] = LayeredFingerprint
+        switcher["avalon"] = lambda m: pyAvalonTools.GetAvalonFP(m, nBits=2048)
+        switcher["atompairs"] = lambda m: rdMolDescriptors.GetHashedAtomPairFingerprintAsBitVect(m, nBits=2048)
+        switcher["torsion"] = lambda m: rdMolDescriptors.GetHashedTopologicalTorsionFingerprintAsBitVect(m, nBits=2048)
+        switcher["pattern"] = lambda m: Chem.PatternFingerprint(m, fpSize=2048)
+        switcher["secfp6"] = lambda m: rdMHFPFingerprint.MHFPEncoder(0,0).EncodeSECFPMol(m, radius=3, length=2048)
+        switcher["layered"] = lambda m: LayeredFingerprint(fpSize=2048)
 
         type_fps = type_fp.split("+")
-
-        if len(type_fps) > 1:
-
-            def F(mol, type_fps):
-                n = 0
-                keys = []
-                for type_fp_i in type_fps:
-                    f = switcher[type_fp_i]
-                    fpi = f(mol)
-                    for i in fpi.GetOnBits():
-                        keys.append(i + n)
-
-                    n += fpi.GetNumBits()
-
-                fp = Chem.DataStructs.ExplicitBitVect(n)
-                for i in keys:
-                    fp[i] = 1
-
-                return fp
-
-            fps = [F(mol, type_fps) for mol in mols]
-
-        else:  # len(type_fps)==1
-            f = switcher[type_fps[0]]
-            fps = list(map(f, mols))
-            # Equivalent to fps = [f(mol) for mol in mols]
-
+        
+        f = switcher[type_fps[0]]
+        fps = [f(mol) for mol in mols] # list(map(f, mols))
+        
+        # This loop will only run if len(type_fps)>1
+        for type_fp_i in type_fps[1:]:
+            f = switcher[type_fp_i]
+            fps_i = [f(mol) for mol in mols]
+            # Adding two ExplicitBitVectors simply appends them
+            fps = [fp + fp_i for fp, fp_i in zip(fps, fps_i)]
+        
+        
         return fps
 
     def __self_fps_distance(self, fps):
@@ -776,25 +761,25 @@ def MACAW_optimus(
 
                 if verbose:
                     print(f"{type_fps[i]} + {metrics[j]}: {M[i,j]:0.3f}")
-
+                
     else:
         cv = 5
-
+        
         for i, type_fp in enumerate(type_fps):
             mcw.set_type_fp(type_fp)
 
             for j, metric in enumerate(metrics):
                 mcw.set_metric(metric)
-
+                
                 x = mcw.transform(smiles)
-
+                
                 # splitters are instantiated with shuffle=False so the splits
                 # will be the same across calls.
                 M[i, j] = cross_val_score(f, x, y, cv=cv).mean()
-
+                
                 if verbose:
                     print(f"{type_fps[i]} + {metrics[j]}: {M[i,j]:0.3f}")
-
+                
     # Torsion + sokal combination returns nan's. We set its score to 0.0
     np.nan_to_num(M, copy=False)
     max_i, max_j = np.unravel_index(M.argmax(), M.shape)

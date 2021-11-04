@@ -83,19 +83,27 @@ def parity_plot(
         plt.show()
 
 
-def plot_precision_vs_recall(precisions, recalls, title=None, savetitle=None):
+def plot_precision_vs_recall(precisions, recalls, precisions_test=None, recalls_test=None, title=None, savetitle=None):
     fignow = plt.figure(figsize=(6.5, 5.5))
     plt.plot(recalls, precisions, 'b-', linewidth=2)
     plt.xlabel('Recall', fontsize=14)
     plt.ylabel('Precision', fontsize=14)
     plt.axis([0, 1, 0, 1])
-    text1 = f"PRAUC = {auc(recalls, precisions):0.3f}"
-    plt.gca().text(
-        0.05, 0.05, text1, transform=plt.gca().transAxes, fontsize=13, c='blue'
-    )
+
+    if precisions_test is None:
+        text1 = f"$AUPRC = {auc(recalls, precisions):0.3f}$"
+    else:
+        text1 = f"$AUPRC_{{train}} = {auc(recalls, precisions):0.3f}$"
+        
+        plt.plot(recalls_test, precisions_test, 'r-', linewidth=2)
+        text2 = f"$AUPRC_{{test}} = {auc(recalls_test, precisions_test):0.3f}$"
+        plt.gca().text(0.05, 0.13, text2, transform=plt.gca().transAxes, fontsize=13, c='red')
+    
+    plt.gca().text(0.05, 0.05, text1, transform=plt.gca().transAxes, fontsize=13, c='blue')
+    
     if title:
         plt.title(title)
-    # Save the figure into 300 dpi
+    
     if savetitle:
         fignow.savefig(savetitle, format='png', dpi=300, bbox_inches='tight')
     else:

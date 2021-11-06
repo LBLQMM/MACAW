@@ -3,7 +3,8 @@
 Created on Sun Jun 13 13:22:31 2021
 
 Part of the MACAW project.
-Contains the MACAW class and the MACAW_optimus function.
+Contains the MACAW class, the MACAW_optimus function, and the smiles_cleaner
+function.
 
 @author: Vincent
 """
@@ -114,7 +115,8 @@ class MACAW:
     __author__ = "Vincent Blay"
 
     def __init__(
-        self, type_fp="Morgan2", metric="Tanimoto", n_components=15, algorithm="MDS"
+        self, type_fp="Morgan2", metric="Tanimoto", n_components=15, algorithm="MDS",
+        n_landmarks=50, Yset=10, idx_landmarks=None, random_state=None
     ):
 
 
@@ -132,8 +134,9 @@ class MACAW:
             )
         self._algorithm = algorithm
 
-        self._n_landmarks = None
-        self._idx_landmarks = []
+        self._n_landmarks = n_landmarks
+
+        self._idx_landmarks = idx_landmarks
         self._resmiles = []
 
         # These attributes need not be visible or modified by the user,
@@ -142,6 +145,9 @@ class MACAW:
         self.__refps = []
         self.__refD = []
         self.__LndS = []
+        self.__Yset = Yset
+        self.__random_state = random_state
+        
 
     def __repr__(self):
         return (
@@ -185,22 +191,33 @@ class MACAW:
     
     # Main functions for the embedding
     
-    def fit(self, smiles, n_landmarks=50, Y=[], Yset=10, idx_landmarks=[],
-            random_state=None):
+    def fit(self, smiles, Y=None, idx_landmarks=None,
+            random_state=None, n_landmarks=None, Yset=None,):
 
         smiles = list(smiles)
+            
+        if Yset is not None:
+            self.__Yset = Yset
+            
+        if random_state is not None:
+            self.__random_state = random_state
+        
+        if n_landmarks is not None:
+            self._n_landmarks = n_landmarks
 
-        if n_landmarks > len(smiles):
+        if self._n_landmarks > len(smiles):
             print(
                 f"Warning: requested n_landmarks={n_landmarks} but only "
                 f"{len(smiles)} smiles provided. n_landmarks will be lower."
             )
         
-        if len(idx_landmarks) == 0:
-            idx_landmarks = self.__lndmk_choice(smiles, n_landmarks, Y, Yset,
-                                                random_state)
-        else:
-            idx_landmarks = np.sort(idx_landmarks)
+        if idx_landmarks is not None:
+            self._idx_landmarks = idx_landmarks
+        
+        if self._idx_landmarks is None:
+            self._idx_landmarks = self.__lndmk_choice(smiles, n_landmarks, Y)
+        
+        self.__idx_landmarks = np.sort(self.__idx_landmarks)
         
         resmiles = [smiles[i] for i in idx_landmarks]
         remols, bad_idx = self._smiles_to_mols(resmiles, bad_idx=True)
@@ -211,7 +228,7 @@ class MACAW:
         
         resmiles = [smiles[i] for i in idx_landmarks]
         
-        self._idx_landmarks = idx_landmarks
+        #self._idx_landmarks = idx_landmarks
         self._n_landmarks = len(idx_landmarks)
         self._resmiles = resmiles
         self.__remols = remols
@@ -238,8 +255,8 @@ class MACAW:
 
         return self.__project(D, bad_idx)
 
-    def fit_transform(self, qsmiles, n_landmarks=50, Y=[], Yset=10, 
-                      idx_landmarks=[], random_state=None):
+    def fit_transform(self, qsmiles, Y=None, idx_landmarks=None, 
+                      random_state=None, n_landmarks=None, Yset=None, ):
 
         qsmiles = list(qsmiles)
         self.fit(
@@ -306,21 +323,23 @@ class MACAW:
 
         return X
 
-    def __lndmk_choice(self, smiles, n_landmarks, Y, Yset, random_state):
+    def __lndmk_choice(self, smiles, n_landmarks, Y):
         # Returns SORTED indices
         
-        if random_state is not None:
-            np.random.seed(random_state)
+        if self.__random_state is not None:
+            np.random.seed(self.__random_state)
         
         # Let us first extract the landmark fingerprints
         # If Y is not provided, pick the landmarks randomly
-        lenY = len(Y)
-        if lenY == 0:  # Y = []
+        if Y is None:
             idx_landmarks = np.random.choice(
                 range(len(smiles)), n_landmarks, replace=False
             )
 
         else:
+            lenY = len(Y)
+            Yset = self.__Yset
+            
             if Yset == "highest":  # gets the landmarks from the top
                 idx_landmarks = np.argpartition(Y, -n_landmarks)[-n_landmarks:]
             elif Yset == "lowest":  # get the landmarks from the bottom
@@ -576,7 +595,7 @@ def MACAW_optimus(
     smiles,
     y,
     fast=True,
-    C=20.0,
+    C=20.,
     problem="auto",
     verbose=False,
     n_components=15,
@@ -791,3 +810,30 @@ def MACAW_optimus(
     mcw.set_metric(metric=metrics[max_j])
 
     return mcw
+
+
+
+def smiles_cleaner(smiles, return_idx=False):
+    smiles = list(smiles)
+    ind = []
+    ind_bad = []
+    clean_smiles = []
+    for i in range(len(smiles)):
+        try:
+            smi = smiles[i]
+            
+            m = Chem.MolFromSmiles(smi, sanitize=True)
+            if m is not None:
+                ind.append(i)
+                clean_smiles.append(smi)
+            else:
+                ind_bad.append(i)
+                print(f"Warning: invalid SMILES in position {i}: {smiles[i]}")
+        except:
+            print(f"Warning: invalid SMILES in position {i}: {smiles[i]}")
+            ind_bad.append(i)
+        
+    if return_idx:
+        return clean_smiles, ind, ind_bad
+    else:
+        return clean_smiles

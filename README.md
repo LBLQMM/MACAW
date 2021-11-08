@@ -41,7 +41,7 @@ The following illustrates some of the main commands in MACAW. Detailed use examp
 Given a list of molecules represented as SMILES strings (`smiles`), their MACAW embeddings (`X`) can be obtained as follows:
 
 ```python
-from macaw_py import *
+from macaw import *
 
 mcw = MACAW()
 mcw.fit(smiles)

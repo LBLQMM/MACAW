@@ -78,14 +78,13 @@ def parity_plot(
 
     # Save the figure into 300 dpi
     if savetitle:
-        plt.savefig(savetitle, format='png', dpi=300, bbox_inches='tight',
-                    treansparent=False)
+        plt.savefig(savetitle, format='png', dpi=300, bbox_inches='tight')
     else:
         plt.show()
 
 
 def plot_precision_vs_recall(precisions, recalls, precisions_test=None, recalls_test=None, title=None, savetitle=None):
-    fignow = plt.figure(figsize=(6.5, 5.5))
+    plt.figure(figsize=(6.5, 5.5))
     plt.plot(recalls, precisions, 'b-', linewidth=2)
     plt.xlabel('Recall', fontsize=14)
     plt.ylabel('Precision', fontsize=14)
@@ -106,8 +105,7 @@ def plot_precision_vs_recall(precisions, recalls, precisions_test=None, recalls_
         plt.title(title)
     
     if savetitle:
-        fignow.savefig(savetitle, format='png', dpi=300, bbox_inches='tight',
-                       transparent=False)
+        savefig(savetitle, format='png', dpi=300, bbox_inches='tight')
     else:
         plt.show()
 
@@ -127,8 +125,6 @@ def plot_histogram(
             title = f"{len(Y)} compounds"
         plt.title(title)
     if savetitle:
-        plt.savefig(savetitle, format='png', dpi=300, bbox_inches='tight',
-                    transparent=False)
+        plt.savefig(savetitle, format='png', dpi=300, bbox_inches='tight')
     else:
         plt.show()
-    plt.show()

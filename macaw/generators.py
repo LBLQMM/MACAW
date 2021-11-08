@@ -352,8 +352,8 @@ def __lengths_generator(max_len, n_gen, p, lengths=None):
 
 def library_evolver(
     smiles,
-    mcw,
     model,
+    mcw=None,
     spec=0.,
     k1=2000,
     k2=100,
@@ -376,12 +376,17 @@ def library_evolver(
     smiles : list
         List of molecules in SMILES format.
 
-    mcw : MACAW
-        Embedder to featurize the `smiles` input.
-
-    model :
+    model : function
         Function that takes as input the features produced by the
         MACAW embedder `mcw` and returns a scalar (predicted property).
+        The model may also directly take SMILES as its input, in which case
+        no embedder needs to be provided.
+        
+    mcw : MACAW or function, optional
+        Embedder to featurize the `smiles` input into a representation 
+        compatible with `model`. If not provided, it will be
+        assigned the unity function, and the model will have to take SMILES
+        directly as its input.
 
     spec : float
         Target specification that the recommended molecules should be close to.
@@ -427,6 +432,9 @@ def library_evolver(
                                        return_selfies=False, p=p)
     
     smiles = list(smiles)
+    
+    if mcw is None:
+        mcw = lambda x: x
 
     if not callable(mcw):
         try:

@@ -1,10 +1,10 @@
 # MACAW
 
-MACAW (Molecular AutoenCoding Auto-Workaround) is a cheminformatic toolkit that embeds molecules onto a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
+MACAW (Molecular AutoenCoding Auto-Workaround) is a cheminformatic toolkit that embeds in a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
 
-MACAW embeddings can be used as a drop-in replacement for conventional molecular descriptors. MACAW embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
+MACAW embeddings can be used as an alternative for conventional molecular descriptors. MACAW embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
 
-The MACAW library also contains original algorithms to generate molecular libraries and to evolve molecular libraries *in silico* that approximate a desired property specification (inverse molecular design).
+MACAW also provides original algorithms to generate molecular libraries and to evolve molecules *in silico* that satisfy a desired specification (inverse molecular design). The design specification can be any property or combination of properties that can be predicted for the molecule, such as its octane number or its binding affinity to a protein.
 
 Details about the different algorithms are explained in the [MACAW publication]().
 

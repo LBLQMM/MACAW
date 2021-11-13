@@ -95,6 +95,6 @@ recommended_smiles = library_evolver(smiles, mcw, f, spec, n_hits=10, n_rounds=8
 
 MACAW code is distributed under the license specified in the [`Noncomercial_Academic_LA.pdf`](https://github.com/LBLQMM/macaw/Noncomercial_Academic_LA.pdf) file. This license allows free **non-commercial** use for **academic institutions**. Modifications should be fed back to the original repository to benefit all users. 
 
-A separate **commercial** use license is available from Berkeley Lab @ ipo@lbl.gov. The license terms (10 years) are $5,000 for small businesses (less than 250 employees) and $15,000 for large businesses (more than 250 employees).
+A separate **commercial** use license is available from [Berkeley Lab](mailto:ipo@lbl.gov). The license terms (10 years) are $5,000 for small businesses (less than 250 employees) and $15,000 for large businesses (more than 250 employees).
 
-An **evaluation license** for commercial users can be obtained for 45 days of testing by filling the [`Evaluation_LA.pdf`](https://github.com/JBEI/ART/blob/master/Evaluation_LA.pdf) file and sending back to [Jean Haemmerle, LBNL Licensing Associate](mailto:jhaemmerle@lbl.gov).
+An **evaluation license** for commercial users can be obtained for 30 days of testing by filling the [`Evaluation_LA.pdf`](https://github.com/JBEI/ART/blob/master/Evaluation_LA.pdf) file and sending back to [Jean Haemmerle, LBNL Licensing Associate](mailto:jhaemmerle@lbl.gov).

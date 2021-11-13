@@ -12,10 +12,10 @@ Details about the different algorithms are explained in the [MACAW publication](
 
 ## Installation
 
-MACAW requires rdkit to run, which can be installed using [conda](https://anaconda.org/conda-forge/rdkit):
+MACAW requires rdkit 2020.09.4 or later to run, which can be installed using [conda](https://anaconda.org/conda-forge/rdkit):
 
 ```bash
-conda install -c conda-forge rdkit=2020.09.4
+conda install -c conda-forge rdkit
 ```
 
 Alternative methods to install rdkit can be found [here](https://www.rdkit.org/docs/Install.html).
@@ -57,9 +57,9 @@ X_new = mcw.transform(newsmiles)
 The embedder has a variety of parameters that can be tuned to improve results. These include the dimensionality of the embedding (`n_components`), the number of landmarks used (`n_landmarks`), the type of molecular fingeprint (`type_fp`), and the similarity metric (`metric`). Property values (`y_values`) can also be provided to the argument `Y` to improve landmark choice. The arguments and options available are listed in the class help.
 
 ```python
-mcw = MACAW(n_components=20, type_fp='rdk5', metric='Dice')
+mcw = MACAW(n_components=20, type_fp='rdk5', metric='Dice', n_landmarks=60)
 
-mcw.fit_transform(smiles, n_landmarks=60, Y=y_values)
+mcw.fit_transform(smiles, Y=y_values)
 ```
 
 The function `MACAW_optimus` automatically explores a variety of fingeprint type (`type_fp`) and similarity metric (`metric`) combinations and returns a recommended embedder ready to use:
@@ -93,6 +93,8 @@ recommended_smiles = library_evolver(smiles, mcw, f, spec, n_hits=10, n_rounds=8
 
 ## License
 
-MACAW is free for research, non-commercial use under an [MIT](https://choosealicense.com/licenses/mit/) license.
+MACAW code is distributed under the license specified in the [`Noncomercial_Academic_LA.pdf`](https://github.com/LBLQMM/macaw/Noncomercial_Academic_LA.pdf) file. This license allows free **non-commercial** use for **academic institutions**. Modifications should be fed back to the original repository to benefit all users. 
 
-For commercial use of MACAW, please [contact us](mailto:vblayroger@lbl.gov).
+A separate **commercial** use license is available from Berkeley Lab @ ipo@lbl.gov. The license terms (10 years) are $5,000 for small businesses (less than 250 employees) and $15,000 for large businesses (more than 250 employees).
+
+An **evaluation license** for commercial users can be obtained for 45 days of testing by filling the [`Evaluation_LA.pdf`](https://github.com/JBEI/ART/blob/master/Evaluation_LA.pdf) file and sending back to [Jean Haemmerle, LBNL Licensing Associate](mailto:jhaemmerle@lbl.gov).

@@ -539,7 +539,8 @@ class MACAW:
         np.fill_diagonal(S, 1)
         for i in range(l2 - 1):
             for j in range(i + 1, l2):
-                s = DataStructs.FingerprintSimilarity(fps[i], fps[j], metric=metric)
+                #s = DataStructs.FingerprintSimilarity(fps[i], fps[j], metric=metric)
+                s = metric(fps[i], fps[j])
                 S[i, j] = s
                 S[j, i] = s
 
@@ -557,7 +558,8 @@ class MACAW:
         S = np.zeros((l1, l2))
         for i in range(l1):
             for j in range(l2):
-                s = DataStructs.FingerprintSimilarity(fps1[i], fps2[j], metric=metric)
+                #s = DataStructs.FingerprintSimilarity(fps1[i], fps2[j], metric=metric)
+                s = metric(fps1[i], fps2[j])
                 S[i, j] = s
 
         D = 1.0 - S
@@ -578,18 +580,25 @@ class MACAW:
         switcher["braun-blanquet"] = DataStructs.BraunBlanquetSimilarity
         switcher["rogot-goldberg"] = DataStructs.RogotGoldbergSimilarity
         switcher["asymmetric"] = DataStructs.AsymmetricSimilarity
-        switcher["manhattan"] = DataStructs.AllBitSimilarity     
+        switcher["manhattan"] = DataStructs.AllBitSimilarity
+        switcher["blay-roger"] = self.__BlayRogerSimilarity
         
         r = switcher.get(metric)
         if r is None:
             print(
-                f"Warning: Invalid similarity metric {metric}. \
-                    metric has been set to Tanimoto."
+                f"Warning: Invalid similarity metric {metric}. "
+                "metric has been set to Tanimoto."
             )
             self._metric = "tanimoto"
             r = DataStructs.TanimotoSimilarity
             
         return r
+    
+    def __BlayRogerSimilarity(self, x, y, a=0.5, b=0.5):
+        v1 = DataStructs.RusselSimilarity(x, y, False)
+        v2 = DataStructs.RusselSimilarity(y, x, False)
+        s = (a*v1 + b*v2) / (a + b)
+        return s
 
 
 # ----- End of MACAW class -----
@@ -598,12 +607,13 @@ class MACAW:
 def MACAW_optimus(
     smiles,
     y,
-    fast=True,
+    exhaustiveness=1,
     C=20.,
     problem="auto",
     verbose=False,
     n_components=15,
     algorithm="MDS",
+    random_state=None,
     **kwargs,
 ):
     """
@@ -622,11 +632,12 @@ def MACAW_optimus(
         Array containing the property of interest for each molecule in the
         smiles input.
 
-    fast : bool, optional
-        If set to True (default), evaluates only a subset of fingeprint types
-        and distance metrics, works with a random sample of the dataset
-        provided if it is large (>400 points), and uses 3 cv folds instead
-        of 5.
+    exhaustiveness : int, optional
+        Controls how many combinations of fingeprint types and distance
+        metrics to explore. If set to 1, it will only explore individual 
+        fingeprints. If set to 2, it will explore individual fingeprints and 
+        combinations of two fingeprints. If set to 3, it will explore 
+        additional metrics and perform a slower cross-validation.
 
     C : float , optional
         Regularization hyperparameter for the SVM. Defaults to 20.
@@ -671,7 +682,7 @@ def MACAW_optimus(
     # If not specified, we will use the same Y argument for the individual
     # MACAW calls as the MACAW_optimus y argument.
     # In the case of classification, this will amount to using a 'balanced'
-    # number of landmarks. I could set `Yset`equal to 2, but it is not necessary.
+    # number of landmarks. I could set `Yset` equal to 2, but it is not necessary.
     if "Y" not in kwargs:
         kwargs["Y"] = y.copy()
 
@@ -680,7 +691,101 @@ def MACAW_optimus(
             raise IOError(
                 f"len(smiles) = {leny} does not match " f"len(Y) = {len(kwargs['Y'])}"
             )
+    
 
+    metrics = [
+        "tanimoto",
+        "cosine",
+        "dice",
+        "sokal",
+        "kulczynski",
+        "mcconnaughey",
+        "braun-blanquet",
+        "rogot-goldberg",
+        "asymmetric",
+        "manhattan",
+        "blay-roger"]
+
+    mcw = MACAW(n_components=n_components, algorithm=algorithm, 
+                random_state=random_state)
+    mcw.fit(smiles, **kwargs)  # Landmark selection
+
+    if problem == "regression":
+        epsilon = np.ptp(y) / 25.0
+        f = SVR(kernel="rbf", C=C, epsilon=epsilon, verbose=False)
+    else:
+        f = SVC(kernel="rbf", C=C, gamma="scale", verbose=False)
+    
+    scores_dict = {}
+    
+    type_fps = __type_fp_lister()
+    
+    
+    if exhaustiveness < 3:
+        cv = 3
+        metrics_short = ["tanimoto"]
+        maxlen = 400
+    else:
+        cv = 5
+        metrics_short = ["tanimoto", "cosine", "dice"]
+        maxlen = 4000
+    
+    if random_state is not None:
+        np.random.seed(random_state)
+    
+    if leny > maxlen:
+        idx = np.random.choice(range(len(smiles)), maxlen, replace=False)
+
+        smiles_subset = [smiles[i] for i in idx]
+        # Equivalent to list(itemgetter(*idx)(smiles))
+
+        y_subset = y[idx]
+    else:
+        smiles_subset = smiles
+        y_subset = y
+
+    
+    # First retrieve the best single type_fp
+    scores_dict = __scores_getter(f, mcw, smiles_subset, y_subset, 
+                                  type_fps, metrics_short, 
+                                  verbose=verbose, cv=cv,
+                                  scores_dict={})
+
+    max_key = max(scores_dict, key=scores_dict.get)
+    max_type_fp = max_key.split(' & ')[0]
+    
+    if exhaustiveness >= 2:
+        # Second try to append another type_fp to the best single type_fp
+        type_fps = __type_fp_lister([max_type_fp])
+        scores_dict = __scores_getter(f, mcw, smiles_subset, y_subset, 
+                                      type_fps, metrics_short, 
+                                      verbose=verbose, cv=cv, 
+                                      scores_dict=scores_dict)
+        
+        max_key = max(scores_dict, key=scores_dict.get)
+        max_type_fp = max_key.split(' & ')[0]
+    
+    # Finally, explore all distance metrics
+    scores_dict = __scores_getter(f, mcw, smiles_subset, y_subset, 
+                                  [max_type_fp], metrics, 
+                                  verbose=verbose, cv=cv, 
+                                  scores_dict=scores_dict)
+    
+    
+    max_key = max(scores_dict, key=scores_dict.get)
+    max_type_fp, max_metric = max_key.split(' & ')
+
+    print(f"Setting recommended combination: {max_key}")
+
+    # Now we set the embedder to the optimal combination
+    mcw.set_type_fp(max_type_fp)
+    mcw.set_metric(max_metric)
+
+    return mcw
+
+
+def __type_fp_lister(type_fp=None):
+    
     type_fps = [
         "morgan2",
         "morgan3",
@@ -696,131 +801,60 @@ def MACAW_optimus(
         "secfp6",
         "layered",
     ]
-
-    metrics = [
-        "tanimoto",
-        "cosine",
-        "dice",
-        "sokal",
-        "kulczynski",
-        "mcconnaughey",
-        "braun-blanquet",
-        "rogot-goldberg",
-        "asymmetric",
-        "manhattan",
-    ]
-
-    mcw = MACAW(n_components=n_components, algorithm=algorithm)
-    mcw.fit(smiles, **kwargs)  # Landmark selection
-
-    if problem == "regression":
-        epsilon = np.ptp(y) / 25.0
-        f = SVR(kernel="rbf", C=C, epsilon=epsilon, verbose=False)
+    
+    if type_fp is None:
+        return type_fps
     else:
-        f = SVC(kernel="rbf", C=C, gamma="scale", verbose=False)
-
-    M = np.zeros((len(type_fps), len(metrics)))
-    if fast:
-        cv = 3
-        metrics_short = ["tanimoto"]
-
-        J = [metrics.index(m) for m in metrics_short]
-
-        smiles_subset = smiles
-        y_subset = y
-
-        if leny > 400:
-            np.random.seed(123)
-            idx = np.random.choice(range(len(smiles)), 400, replace=False)
-
-            smiles_subset = [smiles[i] for i in idx]
-            # Equivalent to list(itemgetter(*idx)(smiles))
-
-            y_subset = y[idx]
-
-        for i, type_fp in enumerate(type_fps):
-            mcw.set_type_fp(type_fps[i])
-
-            for j in J:
-
-                if (i, j) == (9, 3):  # torsion + sokal returns nan
-                    continue
-
-                mcw.set_metric(metrics[j])
-
-                x = mcw.transform(smiles_subset)
-
-                # splitters are instantiated with shuffle=False so the splits
-                # will be the same across calls.
-                M[i, j] = cross_val_score(f, x, y_subset, cv=cv, verbose=0).mean()
-
-                if verbose:
-                    print(f"{type_fps[i]} + {metrics[j]}: {M[i,j]:0.3f}")
-
-        # Now we select a couple promising fps to evaluate all the
-        # similarity metrics on them
-        tmp_ranks = M[:, J].argsort(axis=0).argsort(axis=0) + 1
-        tmp_ranks = np.sum(tmp_ranks, axis=1)
-        # n = len(metrics_short)
-        n = 3
-        ind = np.argpartition(tmp_ranks, -n)[-n:]
-
-        for i in ind:
-            mcw.set_type_fp(type_fps[i])
-
-            for j, metric in enumerate(metrics):
-                if M[i, j] != 0:
-                    continue
-                if (i, j) == (9, 3):  # torsion + sokal returns nan
-                    continue
-
-                mcw.set_metric(metric)
-
-                x = mcw.transform(smiles_subset)
-
-                # splitters are instantiated with shuffle=False so the splits
-                # will be the same across calls.
-                M[i, j] = cross_val_score(f, x, y_subset, cv=cv, verbose=0).mean()
-
-                if verbose:
-                    print(f"{type_fps[i]} + {metrics[j]}: {M[i,j]:0.3f}")
-                
-    else:
-        cv = 5
+        if not isinstance(type_fp, list):
+            type_fp = [type_fp]
         
-        for i, type_fp in enumerate(type_fps):
-            mcw.set_type_fp(type_fp)
+        list_type_fps = []
+        for t in type_fp:
+            type_fps_new = np.setdiff1d(type_fps, t)
+            for type_fp_new in type_fps_new:
+                tmp = t + '+' + type_fp_new
+                list_type_fps.append(tmp)
+        return list_type_fps
 
-            for j, metric in enumerate(metrics):
-                mcw.set_metric(metric)
-                
-                x = mcw.transform(smiles)
-                
-                # splitters are instantiated with shuffle=False so the splits
-                # will be the same across calls.
-                M[i, j] = cross_val_score(f, x, y, cv=cv).mean()
-                
-                if verbose:
-                    print(f"{type_fps[i]} + {metrics[j]}: {M[i,j]:0.3f}")
-                
-    # Torsion + sokal combination returns nan's. We set its score to 0.0
-    np.nan_to_num(M, copy=False)
-    max_i, max_j = np.unravel_index(M.argmax(), M.shape)
 
-    print(f"Setting recommended combination: {type_fps[max_i]} + {metrics[max_j]}")
-
-    # Now we set the embedder to the optimal combination
-    mcw.set_type_fp(type_fps[max_i])
-    mcw.set_metric(metric=metrics[max_j])
-
-    return mcw
+def __scores_getter(f, mcw, smiles, y, type_fps, metrics, 
+                    verbose=False, cv=5, scores_dict={}):
+    if not isinstance(type_fps, list):
+        type_fps = [type_fps]
+    if not isinstance(metrics, list):
+        metrics = [metrics]
+    
+    for type_fp in type_fps:
+        
+        mcw.set_type_fp(type_fp)
+        
+        for m in metrics:
+            
+            if ('torsion' in type_fp) & (m=='sokal'):
+                continue
+    
+            mcw.set_metric(m)
+    
+            x = mcw.transform(smiles)
+    
+            # splitters are instantiated with shuffle=False so the splits
+            # will be the same across calls.
+            score = cross_val_score(f, x, y, cv=cv, verbose=0).mean()
+            
+            key = type_fp + ' & ' + m
+            scores_dict[key] = score
+    
+            if verbose:
+                print(f"{key}: {score:0.3f}")
+     
+    return scores_dict
 
 
 
 def smiles_cleaner(smiles, return_idx=False):
     smiles = list(smiles)
-    ind = []
-    ind_bad = []
+    idx = []
+    idx_bad = []
     clean_smiles = []
     for i in range(len(smiles)):
         try:
@@ -828,16 +862,16 @@ def smiles_cleaner(smiles, return_idx=False):
             
             m = Chem.MolFromSmiles(smi, sanitize=True)
             if m is not None:
-                ind.append(i)
+                idx.append(i)
                 clean_smiles.append(smi)
             else:
-                ind_bad.append(i)
+                idx_bad.append(i)
                 print(f"Warning: invalid SMILES in position {i}: {smiles[i]}")
         except:
             print(f"Warning: invalid SMILES in position {i}: {smiles[i]}")
-            ind_bad.append(i)
+            idx_bad.append(i)
         
     if return_idx:
-        return clean_smiles, ind, ind_bad
+        return clean_smiles, idx, idx_bad
     else:
         return clean_smiles

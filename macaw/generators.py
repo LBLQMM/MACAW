@@ -141,8 +141,8 @@ def library_maker(
             idx = sf.selfies_to_encoding(
                 selfi, vocab_stoi=symbol_to_idx, pad_to_len=0, enc_type="label"
             )
-
-            idx_list.append(idx)
+            if len(idx)>0:
+                idx_list.append(idx)
         except KeyError:
             print(f"Warning: SELFIES {selfi} is not valid and will be dropped.")
             # This may be due to some symbol missing in the alphabet

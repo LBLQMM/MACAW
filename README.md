@@ -1,6 +1,6 @@
 # MACAW
 
-MACAW (Molecular AutoenCoding Auto-Workaround) is a cheminformatic tool that embeds molecules in a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
+**MACAW** (Molecular AutoenCoding Auto-Workaround) is a cheminformatic tool for Python that embeds molecules in a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
 
 MACAW embeddings can be used as an alternative for conventional molecular descriptors. MACAW embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
 
@@ -27,7 +27,11 @@ Then run the following command to install MACAW:
 pip install macaw_py
 ```
 
-## Use
+### Documentation
+
+Read the documentation on [Read the Docs](https://vinbl-test-docs.readthedocs.io/en/latest/).
+
+## Usage
 
 The following illustrates some of the main commands in MACAW. Detailed use examples with real datasets are available as Jupyter Notebooks in the [MACAW repository](https://github.com/LBLQMM/macaw).
 

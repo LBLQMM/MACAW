@@ -366,7 +366,6 @@ def library_evolver(
     **kwargs,
 ):
     """
-
     Recommends a list of molecules close to a desired specification by
     evolving increasingly focused libraries.
 
@@ -575,7 +574,7 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
     If a `p` value is provided such that 0 < `p` < 1, then V-distance
     is used. This can be regarded as a weighted version of Manhattan distance,
     see publication for details.
-
+    
     """
 
     if not callable(model):
@@ -700,7 +699,7 @@ def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
     If a `p` value is provided such that 0 < `p` < 1, then V-distance
     is used. This can be regarded as a weighted version of Manhattan distance,
     see publication for details.
-
+    
     """
 
     if not callable(model):

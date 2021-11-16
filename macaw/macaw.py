@@ -28,97 +28,69 @@ class MACAW:
     """
     Class providing MACAW numeric embeddings of molecules.
 
-    ...
-
-    Attributes
-    ----------
-
-    _n_landmarks : int, optional
-        Desired number of landmark molecules to use. Defaults to 50.
-
-    _type_fp : str, optional
-        Desired type of fingerprint to use to characterize molecules.
+    :param type_fp: Desired type of fingerprint to use to characterize molecules.
         Options include 'RDK5', 'RDK7', 'Morgan2', 'Morgan3',
         'featMorgan2', 'featMorgan3,'Avalon','MACCS', 'atompairs',
         'torsion', 'pattern', 'secfp6', and 'layered'. Combinations can
         also be specified with the '+' symbol, e.g. 'RDK5+MACCS'.
         Defaults to 'Morgan2'.
-
-    _metric : str, optional
+    :type type_fp: str, optional
+    :param metric: str, optional
         Distrance metric used to measure similarity between molecular
         fingerprints. Options include 'Tanimoto', 'dice', 'cosine',
         'Sokal', 'Kulczynski', 'Mcconnaughey', 'Braun-Blanquet',
-        'Rogot-Goldberg', 'asymmetric', and 'Manhattan'. Defaults to
-        'Tanimoto'.
-
-    _idx_landmarks : numpy.ndarray, optional
-        Array indicating the `smiles` indices to be used as landmarks.
-
-    _Y : numpy.ndarray, optional
-        Array containing the property of interest for each molecule in the
-        smiles input.
-
-    _Yset : str or int, optional
-        Specifies how to use the input in `Y`, if provided.
+        'Rogot-Goldberg', 'asymmetric', 'Manhattan', and 'Blay-Roger'. 
+        Defaults to 'Tanimoto'.
+    :type metric: str, optional
+    :param n_components: Number of dimensions for the embedding. Defaults to 15.
+    :type n_components: int, optional
+    :param algorithm: Algorithm to use for the projection. Options available 
+        are 'MDS', 'isomap', 'PCA', ICA', 'FA', and 'umap'. Defaults to 'MDS'.
+    :type algorithm: str, optional
+    :param n_landmarks: Desired number of landmark molecules to use. 
+        Defaults to 50.
+    :type n_landmarks: int, optional
+    :param Yset: Specifies how to use the input in `Y` during fitting, if provided.
         Options include 'highest' and 'lowest'. If an integer is provided,
         it will use uniform sampling of landmarks after splitting the
         molecules in `Yset` bins. Defaults to 10.
+    :param idx_landmarks: List indicating the indices of the molecules to be 
+        used as landmarks.
+    :type idx_landmarks: list, optional
+    :type Yset: str or int, optional
+    :param random_state: Seed to have the same choice of
+        landmarks across runs.
+    :type random_state: int, optional
 
-    _n_components : int, optional
-        Number of dimensions for the embedding. Defaults to 15.
-
-    _algorithm : str, optional
-        Algorithm to use for the projection. Options available are 'MDS',
-        'isomap', 'PCA', ICA', 'FA', and 'umap'. Defaults to 'MDS'.
-
-    Methods
-    -------
-
-    fit(smiles: list, Y: list, optional, n_landmarks: int, optional,
-        idx_landmarks: list, optional, Yset: int or str, optional)
-
-    transform(smiles : list)
-        Returns the MACAW embedding for the molecules provided in SMILES
-        format.
-
-    fit_transform(smiles: list, Y: list, optional, n_landmarks: int,
-        optional, idx_landmarks: list, optional, Yset: int or str,
-        optional)
-
-
-    set_type_fp(str)
-
-    set_metric(str)
-
-    set_algorithm(str)
-
-    set_n_components(int)
-
-
-    Notes
-    -------
-
-    No attribute should be modified directly. Instead, setter methods are
-    available for the modifiable attributes: `set_type_fp()`,
-    `set_metric()`, `set_Y()`, `set_n_components()`, and `set_algorithm()`.
-
-    If the `Y` argument is provided during fitting, it will be used in the
-    choice of the landmarks. If `Yset` is an integer, then the dataset will
-    be split in `Yset` bins according to `Y` and landmarks will be sampled
-    from the bins with equal probability. If `Yset` is set to 'highest' or
-    'lowest', then the landmarks will be the `n_landmarks` molecules with
-    the highest or lowest `Y` values, respectively.
-
-
+    .. note::
+        If the `Y` argument is provided during fitting, it will be used in the
+        choice of the landmarks. If `Yset` is an integer, then the dataset will
+        be split in `Yset` bins according to `Y` and landmarks will be sampled
+        from the bins with equal probability. If `Yset` is set to 'highest' or
+        'lowest', then the landmarks will be the `n_landmarks` molecules with
+        the highest or lowest `Y` values, respectively.
+    
+    .. warning::
+        No attribute should be modified directly. Instead, setter methods are
+        available for the modifiable attributes: `set_type_fp()`,
+        `set_metric()`, `set_Y()`, `set_n_components()`, and `set_algorithm()`.
     """
+
     __version__ = "alpha_11"
     __author__ = "Vincent Blay"
 
     def __init__(
-        self, type_fp="Morgan2", metric="Tanimoto", n_components=15, algorithm="MDS",
-        n_landmarks=50, Yset=10, idx_landmarks=None, random_state=None
+        self,
+        type_fp="Morgan2",
+        metric="Tanimoto",
+        n_components=15,
+        algorithm="MDS",
+        n_landmarks=50,
+        Yset=10,
+        idx_landmarks=None,
+        random_state=None,
     ):
-
+        """Constructor method"""
 
         self._n_components = n_components
         self._type_fp = type_fp.lower().replace(" ", "")
@@ -147,7 +119,6 @@ class MACAW:
         self.__LndS = []
         self.__Yset = Yset
         self.__random_state = random_state
-        
 
     def __repr__(self):
         return (
@@ -162,6 +133,7 @@ class MACAW:
     # Setter algorithms
 
     def set_type_fp(self, type_fp):
+        """Method to change the `type_fp` used in an existing MACAW object."""
         self._type_fp = type_fp.lower().replace(" ", "")
         if self._n_landmarks is not None:
             self.__refps_update()
@@ -169,6 +141,7 @@ class MACAW:
             self.__safe_lndmk_embed()
 
     def set_metric(self, metric):
+        """Method to change the `metric` used in an existing MACAW object."""
         self._metric = metric.lower().replace(" ", "")
         # self.__refps_update()
         if self._n_landmarks is not None:
@@ -176,11 +149,13 @@ class MACAW:
             self.__safe_lndmk_embed()
 
     def set_n_components(self, n_components):
+        """Method to change the `n_components` used in an existing MACAW object."""
         self._n_components = n_components
         if self._n_landmarks is not None:
             self.__safe_lndmk_embed()
 
     def set_algorithm(self, algorithm):
+        """Method to change the `algorithm` used in an existing MACAW object."""
         algorithm = algorithm.lower().replace(" ", "")
         if algorithm not in ["mds", "isomap", "pca", "ica", "fa", "umap"]:
             raise IOError(f"Unknown algorithm {algorithm}.")
@@ -188,20 +163,42 @@ class MACAW:
 
         if self._n_landmarks is not None:
             self.__safe_lndmk_embed()
-    
+
     # Main functions for the embedding
-    
-    def fit(self, smiles, Y=None, idx_landmarks=None,
-            random_state=None, n_landmarks=None, Yset=None,):
+
+    def fit(
+        self,
+        smiles,
+        Y=None,
+        idx_landmarks=None,
+        random_state=None,
+        n_landmarks=None,
+        Yset=None,
+    ):
+        """Method to select the landmarks and initialize the MACAW embedding
+        space.
+        
+        :param smiles: List of molecules given in SMILES format.
+        :type smiles: list
+        :param Y: List of property values of interest, one for each molecule in
+            `smiles`. If provided, it may help choosing a more diverse 
+            set of landmark molecules.
+        
+        .. note::
+            Some parameters like `idx_landmarks`, `random_state`, `n_landmarks`,
+            and `Yset` may be provided here as well if they were not
+            input when the MACAW object was created.
+        
+        """
 
         smiles = list(smiles)
-            
+
         if Yset is not None:
             self.__Yset = Yset
-            
+
         if random_state is not None:
             self.__random_state = random_state
-        
+
         if n_landmarks is not None:
             self._n_landmarks = n_landmarks
         n_landmarks = self._n_landmarks
@@ -211,24 +208,23 @@ class MACAW:
                 f"Warning: requested n_landmarks={n_landmarks} but only "
                 f"{len(smiles)} smiles provided. n_landmarks will be lower."
             )
-        
+
         if idx_landmarks is not None:
             self._idx_landmarks = idx_landmarks
         idx_landmarks = self._idx_landmarks
-        
+
         if idx_landmarks is None:
             idx_landmarks = self.__lndmk_choice(smiles, Y)
-        
-        
+
         resmiles = [smiles[i] for i in idx_landmarks]
         remols, bad_idx = self._smiles_to_mols(resmiles, bad_idx=True)
-        
+
         if len(bad_idx) > 0:
             idx_landmarks = np.setdiff1d(idx_landmarks, bad_idx)
             print(f"n_landmarks has been set to {len(idx_landmarks)}")
-        
+
         resmiles = [smiles[i] for i in idx_landmarks]
-        
+
         self._idx_landmarks = np.sort(idx_landmarks)
         self._n_landmarks = len(idx_landmarks)
         self._resmiles = resmiles
@@ -238,6 +234,20 @@ class MACAW:
         self.__safe_lndmk_embed()
 
     def transform(self, qsmiles):
+        """Method to embed a list of molecules in an existing MACAW space.
+        
+        :param qsmiles: List of query molecules to be embedded given in SMILES 
+            format.
+        :type qsmiles: list
+        
+        :return: A 2D array such that each row is the embedding of each `qsmiles`
+            molecule.
+        :rtype: numpy.ndarray
+        
+        .. note::
+            If any invalid SMILES is encountered in the input, the corresponding
+            row in the output will be filled with nan's.
+        """
 
         if self._n_landmarks is None:
             raise RuntimeError(
@@ -256,8 +266,17 @@ class MACAW:
 
         return self.__project(D, bad_idx)
 
-    def fit_transform(self, qsmiles, Y=None, idx_landmarks=None, 
-                      random_state=None, n_landmarks=None, Yset=None, ):
+    def fit_transform(
+        self,
+        qsmiles,
+        Y=None,
+        idx_landmarks=None,
+        random_state=None,
+        n_landmarks=None,
+        Yset=None,
+    ):
+        """A combination of the `fit` and `transform` methods.
+        """
 
         qsmiles = list(qsmiles)
         self.fit(
@@ -266,7 +285,7 @@ class MACAW:
             Y=Y,
             Yset=Yset,
             idx_landmarks=idx_landmarks,
-            random_state=random_state
+            random_state=random_state,
         )
 
         idx_landmarks = self._idx_landmarks
@@ -318,21 +337,20 @@ class MACAW:
             X = LndS.transform(D)
 
         #  We insert nan rows in the bad_idx positions if there were any
-        if len(bad_idx)>0:
-            ix = [bad_idx[i]-i for i in range(len(bad_idx))]
+        if len(bad_idx) > 0:
+            ix = [bad_idx[i] - i for i in range(len(bad_idx))]
             X = np.insert(X, ix, np.nan, axis=0)
 
         return X
 
     def __lndmk_choice(self, smiles, Y):
         # Returns SORTED indices
-        
+
         if self.__random_state is not None:
             np.random.seed(self.__random_state)
-        
-        
+
         n_landmarks = self._n_landmarks
-        
+
         # Let us first extract the landmark fingerprints
         # If Y is not provided, pick the landmarks randomly
         if Y is None:
@@ -343,7 +361,7 @@ class MACAW:
         else:
             lenY = len(Y)
             Yset = self.__Yset
-            
+
             if Yset == "highest":  # gets the landmarks from the top
                 idx_landmarks = np.argpartition(Y, -n_landmarks)[-n_landmarks:]
             elif Yset == "lowest":  # get the landmarks from the bottom
@@ -470,10 +488,11 @@ class MACAW:
         elif algorithm == "fa":
             LndS = FactorAnalysis(n_components=n_components)
             LndS.fit(D)
-            
+
         elif algorithm == "umap":
-            LndS = umap.UMAP(n_components=n_components, metric='precomputed',
-                             min_dist=0.3)
+            LndS = umap.UMAP(
+                n_components=n_components, metric="precomputed", min_dist=0.3
+            )
             LndS.fit(D)
 
         self.__LndS = LndS
@@ -499,37 +518,56 @@ class MACAW:
 
     def __fps_maker(self, mols):
         type_fp = self._type_fp
-               
+
         switcher = {}
-        switcher["morgan2"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m, radius=2, nBits=2048)
-        switcher["morgan3"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m, radius=3, nBits=2048)
-        switcher["rdk5"] = lambda m: Chem.RDKFingerprint(m, minPath=1, maxPath=5, fpSize=2048)
-        switcher["rdk7"] = lambda m: Chem.RDKFingerprint(m, minPath=1, maxPath=7, fpSize=2048)
-        switcher["featmorgan2"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m,
-            radius=2, useFeatures=True, useChirality=True, nBits=2048)
-        switcher["featmorgan3"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(m,
-            radius=3, useFeatures=True, useChirality=True, nBits=2048)
+        switcher["morgan2"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(
+            m, radius=2, nBits=2048
+        )
+        switcher["morgan3"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(
+            m, radius=3, nBits=2048
+        )
+        switcher["rdk5"] = lambda m: Chem.RDKFingerprint(
+            m, minPath=1, maxPath=5, fpSize=2048
+        )
+        switcher["rdk7"] = lambda m: Chem.RDKFingerprint(
+            m, minPath=1, maxPath=7, fpSize=2048
+        )
+        switcher["featmorgan2"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(
+            m, radius=2, useFeatures=True, useChirality=True, nBits=2048
+        )
+        switcher["featmorgan3"] = lambda m: AllChem.GetMorganFingerprintAsBitVect(
+            m, radius=3, useFeatures=True, useChirality=True, nBits=2048
+        )
         switcher["maccs"] = rdMolDescriptors.GetMACCSKeysFingerprint
         switcher["avalon"] = lambda m: pyAvalonTools.GetAvalonFP(m, nBits=2048)
-        switcher["atompairs"] = lambda m: rdMolDescriptors.GetHashedAtomPairFingerprintAsBitVect(m, nBits=2048)
-        switcher["torsion"] = lambda m: rdMolDescriptors.GetHashedTopologicalTorsionFingerprintAsBitVect(m, nBits=2048)
+        switcher[
+            "atompairs"
+        ] = lambda m: rdMolDescriptors.GetHashedAtomPairFingerprintAsBitVect(
+            m, nBits=2048
+        )
+        switcher[
+            "torsion"
+        ] = lambda m: rdMolDescriptors.GetHashedTopologicalTorsionFingerprintAsBitVect(
+            m, nBits=2048
+        )
         switcher["pattern"] = lambda m: Chem.PatternFingerprint(m, fpSize=2048)
-        switcher["secfp6"] = lambda m: rdMHFPFingerprint.MHFPEncoder(0,0).EncodeSECFPMol(m, radius=3, length=2048)
+        switcher["secfp6"] = lambda m: rdMHFPFingerprint.MHFPEncoder(
+            0, 0
+        ).EncodeSECFPMol(m, radius=3, length=2048)
         switcher["layered"] = lambda m: LayeredFingerprint(m, fpSize=2048)
 
         type_fps = type_fp.split("+")
-        
+
         f = switcher[type_fps[0]]
-        fps = [f(mol) for mol in mols] # list(map(f, mols))
-        
+        fps = [f(mol) for mol in mols]  # list(map(f, mols))
+
         # This loop will only run if len(type_fps)>1
         for type_fp_i in type_fps[1:]:
             f = switcher[type_fp_i]
             fps_i = [f(mol) for mol in mols]
             # Adding two ExplicitBitVectors simply appends them
             fps = [fp + fp_i for fp, fp_i in zip(fps, fps_i)]
-        
-        
+
         return fps
 
     def __self_fps_distance(self, fps):
@@ -539,7 +577,7 @@ class MACAW:
         np.fill_diagonal(S, 1)
         for i in range(l2 - 1):
             for j in range(i + 1, l2):
-                #s = DataStructs.FingerprintSimilarity(fps[i], fps[j], metric=metric)
+                # s = DataStructs.FingerprintSimilarity(fps[i], fps[j], metric=metric)
                 s = metric(fps[i], fps[j])
                 S[i, j] = s
                 S[j, i] = s
@@ -558,7 +596,7 @@ class MACAW:
         S = np.zeros((l1, l2))
         for i in range(l1):
             for j in range(l2):
-                #s = DataStructs.FingerprintSimilarity(fps1[i], fps2[j], metric=metric)
+                # s = DataStructs.FingerprintSimilarity(fps1[i], fps2[j], metric=metric)
                 s = metric(fps1[i], fps2[j])
                 S[i, j] = s
 
@@ -582,7 +620,7 @@ class MACAW:
         switcher["asymmetric"] = DataStructs.AsymmetricSimilarity
         switcher["manhattan"] = DataStructs.AllBitSimilarity
         switcher["blay-roger"] = self.__BlayRogerSimilarity
-        
+
         r = switcher.get(metric)
         if r is None:
             print(
@@ -591,13 +629,13 @@ class MACAW:
             )
             self._metric = "tanimoto"
             r = DataStructs.TanimotoSimilarity
-            
+
         return r
-    
+
     def __BlayRogerSimilarity(self, x, y, a=0.5, b=0.5):
         v1 = DataStructs.RusselSimilarity(x, y, False)
         v2 = DataStructs.RusselSimilarity(y, x, False)
-        s = (a*v1 + b*v2) / (a + b)
+        s = (a * v1 + b * v2) / (a + b)
         return s
 
 
@@ -608,7 +646,7 @@ def MACAW_optimus(
     smiles,
     y,
     exhaustiveness=1,
-    C=20.,
+    C=20.0,
     problem="auto",
     verbose=False,
     n_components=15,
@@ -621,47 +659,33 @@ def MACAW_optimus(
     problem. It does so by evaluating the performance of different embeddings
     as inputs to a support vector machine.
 
-    ...
-
-    Parameters
-    ----------
-    smiles : list
-        List of molecules in SMILES format.
-
-    y : numpy.ndarray
-        Array containing the property of interest for each molecule in the
-        smiles input.
-
-    exhaustiveness : int, optional
+    :param smiles: List of molecules in SMILES format.
+    :type smiles: list
+    :param y: List containing the property of interest for each molecule in 
+        `smiles`.
+    :type y: list or numpy.ndarray
+    :param exhaustiveness: int, optional
         Controls how many combinations of fingeprint types and distance
         metrics to explore. If set to 1, it will only explore individual 
         fingeprints. If set to 2, it will explore individual fingeprints and 
         combinations of two fingeprints. If set to 3, it will explore 
         additional metrics and perform a slower cross-validation.
-
-    C : float , optional
-        Regularization hyperparameter for the SVM. Defaults to 20.
-
-    problem : str, optional
-        Indicates whether it is a 'regression' or 'classification' problem. It
+    :type exhaustiveness: int, optional
+    :param C: Regularization hyperparameter for the SVM. Defaults to 20.
+    :type C: float, optional
+    :param problem: Indicates whether it is a 'regression' or 'classification' problem. It
         determines if the model to use is a SVR or SVC. Defaults to 'auto',
         which will try to guess the problem type.
-
-    verbose : bool, optional
-        Prints intermediate scores for the different `type_fp` and `metric`
+    :type problem: str, optional
+    :param verbose: Prints intermediate scores for the different `type_fp` and `metric`
         combinations.
-
-    **kwargs : optional
+    :type verbose: bool, optional
+    :param kwargs: optional
         Allows to pass additional parameters to the MACAW class (other than
-        `type_fp`and `metric`).
+        `type_fp` and `metric`).
 
-
-    Returns
-    -------
-    MACAW
-        MACAW object with the optimal settings identified.
-
-
+    :return: MACAW object with the optimal settings identified.
+    :rtype: MACAW
     """
     smiles = list(smiles)
     y = np.array(y)
@@ -691,7 +715,6 @@ def MACAW_optimus(
             raise IOError(
                 f"len(smiles) = {leny} does not match " f"len(Y) = {len(kwargs['Y'])}"
             )
-    
 
     metrics = [
         "tanimoto",
@@ -704,10 +727,12 @@ def MACAW_optimus(
         "rogot-goldberg",
         "asymmetric",
         "manhattan",
-        "blay-roger"]
+        "blay-roger",
+    ]
 
-    mcw = MACAW(n_components=n_components, algorithm=algorithm, 
-                random_state=random_state)
+    mcw = MACAW(
+        n_components=n_components, algorithm=algorithm, random_state=random_state
+    )
     mcw.fit(smiles, **kwargs)  # Landmark selection
 
     if problem == "regression":
@@ -715,12 +740,11 @@ def MACAW_optimus(
         f = SVR(kernel="rbf", C=C, epsilon=epsilon, verbose=False)
     else:
         f = SVC(kernel="rbf", C=C, gamma="scale", verbose=False)
-    
+
     scores_dict = {}
-    
+
     type_fps = __type_fp_lister()
-    
-    
+
     if exhaustiveness < 3:
         cv = 3
         metrics_short = ["tanimoto"]
@@ -729,10 +753,10 @@ def MACAW_optimus(
         cv = 5
         metrics_short = ["tanimoto", "cosine", "dice"]
         maxlen = 4000
-    
+
     if random_state is not None:
         np.random.seed(random_state)
-    
+
     if leny > maxlen:
         idx = np.random.choice(range(len(smiles)), maxlen, replace=False)
 
@@ -744,36 +768,55 @@ def MACAW_optimus(
         smiles_subset = smiles
         y_subset = y
 
-    
     # First retrieve the best single type_fp
-    scores_dict = __scores_getter(f, mcw, smiles_subset, y_subset, 
-                                  type_fps, metrics_short, 
-                                  verbose=verbose, cv=cv,
-                                  scores_dict={})
+    scores_dict = __scores_getter(
+        f,
+        mcw,
+        smiles_subset,
+        y_subset,
+        type_fps,
+        metrics_short,
+        verbose=verbose,
+        cv=cv,
+        scores_dict={},
+    )
 
     max_key = max(scores_dict, key=scores_dict.get)
-    max_type_fp = max_key.split(' & ')[0]
-    
+    max_type_fp = max_key.split(" & ")[0]
+
     if exhaustiveness >= 2:
         # Second try to append another type_fp to the best single type_fp
         type_fps = __type_fp_lister([max_type_fp])
-        scores_dict = __scores_getter(f, mcw, smiles_subset, y_subset, 
-                                      type_fps, metrics_short, 
-                                      verbose=verbose, cv=cv, 
-                                      scores_dict=scores_dict)
-        
+        scores_dict = __scores_getter(
+            f,
+            mcw,
+            smiles_subset,
+            y_subset,
+            type_fps,
+            metrics_short,
+            verbose=verbose,
+            cv=cv,
+            scores_dict=scores_dict,
+        )
+
         max_key = max(scores_dict, key=scores_dict.get)
-        max_type_fp = max_key.split(' & ')[0]
-    
+        max_type_fp = max_key.split(" & ")[0]
+
     # Finally, explore all distance metrics
-    scores_dict = __scores_getter(f, mcw, smiles_subset, y_subset, 
-                                  [max_type_fp], metrics, 
-                                  verbose=verbose, cv=cv, 
-                                  scores_dict=scores_dict)
-    
-    
+    scores_dict = __scores_getter(
+        f,
+        mcw,
+        smiles_subset,
+        y_subset,
+        [max_type_fp],
+        metrics,
+        verbose=verbose,
+        cv=cv,
+        scores_dict=scores_dict,
+    )
+
     max_key = max(scores_dict, key=scores_dict.get)
-    max_type_fp, max_metric = max_key.split(' & ')
+    max_type_fp, max_metric = max_key.split(" & ")
 
     print(f"Setting recommended combination: {max_key}")
 
@@ -785,7 +828,7 @@ def MACAW_optimus(
 
 
 def __type_fp_lister(type_fp=None):
-    
+
     type_fps = [
         "morgan2",
         "morgan3",
@@ -801,57 +844,75 @@ def __type_fp_lister(type_fp=None):
         "secfp6",
         "layered",
     ]
-    
+
     if type_fp is None:
         return type_fps
     else:
         if not isinstance(type_fp, list):
             type_fp = [type_fp]
-        
+
         list_type_fps = []
         for t in type_fp:
             type_fps_new = np.setdiff1d(type_fps, t)
             for type_fp_new in type_fps_new:
-                tmp = t + '+' + type_fp_new
+                tmp = t + "+" + type_fp_new
                 list_type_fps.append(tmp)
         return list_type_fps
 
 
-def __scores_getter(f, mcw, smiles, y, type_fps, metrics, 
-                    verbose=False, cv=5, scores_dict={}):
+def __scores_getter(
+    f, mcw, smiles, y, type_fps, metrics, verbose=False, cv=5, scores_dict={}
+):
     if not isinstance(type_fps, list):
         type_fps = [type_fps]
     if not isinstance(metrics, list):
         metrics = [metrics]
-    
+
     for type_fp in type_fps:
-        
+
         mcw.set_type_fp(type_fp)
-        
+
         for m in metrics:
-            
-            if ('torsion' in type_fp) & (m=='sokal'):
+
+            if ("torsion" in type_fp) & (m == "sokal"):
                 continue
-    
+
             mcw.set_metric(m)
-    
+
             x = mcw.transform(smiles)
-    
+
             # splitters are instantiated with shuffle=False so the splits
             # will be the same across calls.
             score = cross_val_score(f, x, y, cv=cv, verbose=0).mean()
-            
-            key = type_fp + ' & ' + m
+
+            key = type_fp + " & " + m
             scores_dict[key] = score
-    
+
             if verbose:
                 print(f"{key}: {score:0.3f}")
-     
+
     return scores_dict
 
 
-
 def smiles_cleaner(smiles, return_idx=False):
+    """Function to remove invalid SMILES from a list.
+    
+    :param smiles: List of molecules in SMILES format.
+    :type smiles: list
+    :param return_idx: Specifies whether to return indices or not.
+        Defaults to False.
+    :type return_idx: bool, optional
+    
+    :return: Returns a list containing only the valid SMILES, in the same order
+        as the input. 
+        If `return_idx` is set to True, the return will be a tuple
+        `(list, list, list)`: the first element contains the valid SMILES,
+        the second element contains the indices of the valid SMILES,
+        and the third element contains the indices of the invalid SMILES in the
+        input.
+    :rtype: list or tuple
+    
+    """
     smiles = list(smiles)
     idx = []
     idx_bad = []
@@ -859,7 +920,7 @@ def smiles_cleaner(smiles, return_idx=False):
     for i in range(len(smiles)):
         try:
             smi = smiles[i]
-            
+
             m = Chem.MolFromSmiles(smi, sanitize=True)
             if m is not None:
                 idx.append(i)
@@ -870,7 +931,7 @@ def smiles_cleaner(smiles, return_idx=False):
         except:
             print(f"Warning: invalid SMILES in position {i}: {smiles[i]}")
             idx_bad.append(i)
-        
+
     if return_idx:
         return clean_smiles, idx, idx_bad
     else:

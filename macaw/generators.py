@@ -30,66 +30,59 @@ def library_maker(
     return_selfies=False,
     random_state=None,
 ):
-    """
-    Generates molecules in a probabilistic manner from a list of input
+    """ Generates molecules in a probabilistic manner. The molecules generated 
+    can be fully random or be biased around the distribution of input 
     molecules.
 
-    ...
-    Parameters
-    ----------
-    smiles : list
-        List of molecules in SMILES format.
-
-    n_gen : int, optional
-        Target number of molecules to be generated. The actual number of
-        molecules returned can be lower. Defaults to 20000.
-
-    max_len : int, optional
-        Maximum length of the molecules generated in SELFIES format. If 0
-        (default), the maximum length seen in the input molecules will be used.
-
-    p: str, float or np.ndarray, optional
-        Controls the SELFIES length distribution of molecules being generated.
+    :param smiles: List of molecules in SMILES format. If not provided, it
+        will generate random molecules using the alphabet of robust SELFIES
+        tokens.
+    :type smiles: list, optional
+    :param n_gen: Target number of molecules to be generated. The actual 
+        number of molecules returned can be lower. Defaults to 20000.
+    :type n_gen: int, optional
+    :param max_len: Maximum length of the molecules generated in SELFIES 
+        format. If 0 (default), the maximum length seen in the input molecules 
+        will be used.
+    :type max_len: int, optional
+    :param p: Controls the SELFIES length distribution of molecules being generated.
         Options include 'exp' (exponential distribution, default), 'empirical' 
         (observed input distribution), and 'cumsum' (cumulative observed 
         input distribution). If `p` is numeric, then a potential distribution
         of degree `p` is used. If `p` is an array, then each element is
-        considered to be the weight of sampling molecules of length
+        considered to be a weight for sampling molecules with length
         given by the corresponding index (range(1,len(p+1))).
-
-    noise_factor: float, optional
-        Controls the level of randomness added to the SELFIES frequency counts.
-        Defaults to 0.3.
-
-    algorithm : str, optional
-        Select to use 'position' (default) or 'transition' algorithm to compute
-        the probability of sampling different SELFIES symbols.
-
-    return_selfies: bool, optional
-        If True, the ouptut will include both SMILES and SELFIES.
-
-    Returns
-    -------
-    List
-        List containing the molecules generated in SMILES format.
-
-    Notes
-    -----
-    Internally, molecules are generated as SELFIES. The molecules generated
-    are filtered to remove SELFIES mapping to the same SMILES, as well as
-    equivalent SMILES. The molecules returned are canonical SMILES.
-
-    """
+    :type p: str, float or numpy.ndarray, optional
+    :param noise_factor: Controls the level of randomness added to the SELFIES 
+        frequency counts. Defaults to 0.3.
+    :type noise_factor: float, optional
+    :param algorithm: Select to use 'position' (default) or 'transition' 
+        algorithm to compute the probability of sampling different SELFIES 
+        tokens.
+    :type algorithm: str, optional
+    :param return_selfies: If True, the ouptut will include both SMILES and 
+        SELFIES.
+    :type return_selfies: bool, optional
+    :param random_state: Seed to have the same subsampling and choice of
+        landmarks across runs.
+    :type random_state: int, optional
     
+    :return: List containing the molecules generated in SMILES format.
+    :rtype: list
+    
+    .. note:: Internally, molecules are generated as SELFIES. The molecules 
+        generated are filtered to remove synonyms. The molecules returned are 
+        canonical SMILES.
+    """
+
     if random_state is not None:
         np.random.seed(random_state)
-    
+
     if smiles is None:
-        return _random_library_maker( n_gen=n_gen,
-                                    max_len=max_len,
-                                    return_selfies=return_selfies,
-                                    p=p)
-    
+        return _random_library_maker(
+            n_gen=n_gen, max_len=max_len, return_selfies=return_selfies, p=p
+        )
+
     # Let us convert the smiles to selfies onehot
     selfies = []
     lengths = []
@@ -118,11 +111,8 @@ def library_maker(
             # This may be due to the SELFIES encoding not finishing,
             # **MemoryError, which was happening for some symmetric molecules.
 
-    
-    
-    lengths, max_len = __lengths_generator(max_len, n_gen, p, lengths) 
-    
-    
+    lengths, max_len = __lengths_generator(max_len, n_gen, p, lengths)
+
     alphabet = sf.get_alphabet_from_selfies(selfies)
 
     # Remove symbols from alphabet and columns of prob_matrix that
@@ -131,28 +121,28 @@ def library_maker(
     alphabet = alphabet.intersection(robust_symbols)
     alphabet = list(sorted(alphabet))
     len_alphabet = len(alphabet)
-    
+
     symbol_to_idx = {s: i for i, s in enumerate(alphabet)}
 
     idx_list = []
-    
+
     for selfi in selfies:
         try:
             idx = sf.selfies_to_encoding(
                 selfi, vocab_stoi=symbol_to_idx, pad_to_len=0, enc_type="label"
             )
-            if len(idx)>0:
+            if len(idx) > 0:
                 idx_list.append(idx)
         except KeyError:
             print(f"Warning: SELFIES {selfi} is not valid and will be dropped.")
             # This may be due to some symbol missing in the alphabet
-        
+
     manyselfies = [None] * n_gen
 
     if algorithm.lower() == "transition":
 
         trans_mat = np.zeros((len_alphabet, len_alphabet))
-        start_mat = np.zeros((1,len_alphabet))
+        start_mat = np.zeros((1, len_alphabet))
 
         for idx in idx_list:
 
@@ -167,17 +157,15 @@ def library_maker(
         trans_mat = __noise_adder(trans_mat, noise_factor=noise_factor)
         start_mat = __noise_adder(start_mat, noise_factor=noise_factor)
 
-
-        
         range_alphabet = range(len_alphabet)
         for i in range(n_gen):
             if (i + 1) % 10000 == 0:  # progress indicator
                 print(i + 1)
-                
+
             len_i = lengths[i]
             choices = [None] * len_i
-            choices[0] = np.random.choice(range_alphabet, size=1, p=start_mat[0,:])[0]
-            for j in range(1,len_i):
+            choices[0] = np.random.choice(range_alphabet, size=1, p=start_mat[0, :])[0]
+            for j in range(1, len_i):
                 idx = choices[j - 1]  # return the corresponding row of probabilities
                 choices[j] = np.random.choice(
                     range_alphabet, size=1, p=trans_mat[idx, :]
@@ -198,10 +186,8 @@ def library_maker(
             for i in range(min(len(idx), max_len)):
                 prob_matrix[i, idx[i]] += 1
 
-
         # Here we will add some noise to the prob matrix and normalize it
-        prob_matrix = __noise_adder(prob_matrix, 
-                                    noise_factor=noise_factor)
+        prob_matrix = __noise_adder(prob_matrix, noise_factor=noise_factor)
 
         c = prob_matrix.cumsum(axis=1)
         # End of computing the probability matrix c
@@ -211,10 +197,10 @@ def library_maker(
         for i in range(n_gen):
             if (i + 1) % 10000 == 0:  # progress indicator
                 print(i + 1)
-            
+
             len_i = lengths[i]
             u = np.random.rand(len_i, 1)
-            choices = (u < c[:len_i,:]).argmax(axis=1)
+            choices = (u < c[:len_i, :]).argmax(axis=1)
 
             # Let us obtain the corresponding selfies and smiles
             selfies = "".join(
@@ -229,42 +215,40 @@ def library_maker(
 
     # Let us now clean the generated library
     manysmiles, manyselfies = __selfies_to_smiles(manyselfies)
-    
-    print(f'{len(manysmiles)} unique molecules generated.')
-    
+
+    print(f"{len(manysmiles)} unique molecules generated.")
+
     if return_selfies:
         return manysmiles, manyselfies
     else:
         return manysmiles
 
 
-def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, 
-                          p='exp'):
-    """Generates random molecules using robust SELFIES symbols"""
+def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, p="exp"):
+    """Generates random molecules using robust SELFIES tokens"""
     # In order to ensure that we get molecules of all lengths up to max_len
     # I first choose the length of the molecule, and then draw the number of
-    # SELFIES symbols accordingly. We will not be padding the resulting SELFIES
-    
-    # In this case we will randomly sample and append selfies symbols
+    # SELFIES tokens accordingly. We will not be padding the resulting SELFIES
+
+    # In this case we will randomly sample and append SELFIES tokens
     alphabet = sf.get_semantic_robust_alphabet()
     alphabet = list(sorted(alphabet))
 
     # Choose the length of the molecules
-    lengths, max_len = __lengths_generator(max_len,n_gen,p)
-    
-    
-    manyselfies = [None]*n_gen
+    lengths, max_len = __lengths_generator(max_len, n_gen, p)
+
+    manyselfies = [None] * n_gen
     for i in range(n_gen):
         if (i + 1) % 10000 == 0:  # progress indicator
             print(i + 1)
         selfies = np.random.choice(alphabet, size=lengths[i], replace=True)
-        selfies = ''.join(selfies)
+        selfies = "".join(selfies)
         manyselfies[i] = selfies
 
     manysmiles, manyselfies = __selfies_to_smiles(manyselfies)
-    
-    print(f'{len(manysmiles)} unique molecules generated.')
-    
+
+    print(f"{len(manysmiles)} unique molecules generated.")
+
     if return_selfies:
         return manysmiles, manyselfies
     else:
@@ -276,24 +260,23 @@ def __noise_adder(matrix, noise_factor=0.3):
     uniform matrix"""
     # Here we will add some noise to the prob matrix and normalize it
     row_sums = matrix.sum(axis=1, keepdims=True)
-    row_sums[row_sums==0] = 1 # prevent division by zero
+    row_sums[row_sums == 0] = 1  # prevent division by zero
     prob_matrix = matrix / row_sums
-    
-    B = np.ones(prob_matrix.shape) / prob_matrix.shape[1] # uniform matrix
-    prob_matrix = (1-noise_factor)*prob_matrix + noise_factor*B
-    
+
+    B = np.ones(prob_matrix.shape) / prob_matrix.shape[1]  # uniform matrix
+    prob_matrix = (1 - noise_factor) * prob_matrix + noise_factor * B
+
     # normalize prob_matrix row-wise again, although should not be necessary
     row_sums = prob_matrix.sum(axis=1, keepdims=True)
     prob_matrix = prob_matrix / row_sums
-    
-    return prob_matrix
 
+    return prob_matrix
 
 
 def __selfies_to_smiles(manyselfies):
     """Converts an input list of SELFIES into canonical SMILES
     removing duplicates and synonyms"""
-    manysmiles = [None]*len(manyselfies)
+    manysmiles = [None] * len(manyselfies)
     for i, selfies in enumerate(manyselfies):
         smiles = sf.decoder(selfies)
         # Vincent's patches to SELFIES
@@ -321,32 +304,31 @@ def __lengths_generator(max_len, n_gen, p, lengths=None):
             max_len = len(p)
         else:
             max_len = max(lengths)
-        print(f'max_len set to {max_len}.')
-    
+        print(f"max_len set to {max_len}.")
+
     if isinstance(p, (int, float)):
         p = np.power(range(max_len), p)
     elif isinstance(p, str):
         p = p.lower()
-        if p == 'exp':
+        if p == "exp":
             p = np.exp(range(max_len))
-        elif p == 'empirical':
+        elif p == "empirical":
             p = np.zeros(max_len)
             for i in lengths:
-                p[i-1] += 1
-        elif p == 'cumsum':
+                p[i - 1] += 1
+        elif p == "cumsum":
             # This makes drawing longer molecules at least as likely as shorter ones
             p = np.zeros(max_len)
             for i in lengths:
-                p[i-1] += 1
+                p[i - 1] += 1
             p = p.cumsum()
-        
+
         else:
             raise IOError(f"Invalid p input value: {p}.")
-    
-    p = p/sum(p)
-            
-    lengths = np.random.choice(range(1,max_len+1), size=n_gen,
-                               replace=True, p=p)
+
+    p = p / sum(p)
+
+    lengths = np.random.choice(range(1, max_len + 1), size=n_gen, replace=True, p=p)
     return lengths, max_len
 
 
@@ -354,7 +336,7 @@ def library_evolver(
     smiles,
     model,
     mcw=None,
-    spec=0.,
+    spec=0.0,
     k1=2000,
     k2=100,
     n_rounds=8,
@@ -365,73 +347,76 @@ def library_evolver(
     random_state=None,
     **kwargs,
 ):
-    """
-    Recommends a list of molecules close to a desired specification by
+    """ Recommends a list of molecules close to a desired specification by
     evolving increasingly focused libraries.
 
-    ...
-    Parameters
-    ----------
-    smiles : list
-        List of molecules in SMILES format.
-
-    model : function
-        Function that takes as input the features produced by the
+    :param smiles: List of molecules in SMILES format.
+    :type smiles: list
+    :param model: Function that takes as input the features produced by the
         MACAW embedder `mcw` and returns a scalar (predicted property).
         The model may also directly take SMILES as its input, in which case
         no embedder needs to be provided.
-        
-    mcw : MACAW or function, optional
-        Embedder to featurize the `smiles` input into a representation 
+    :type model: function
+    :param mcw: Embedder to featurize the `smiles` input into a representation 
         compatible with `model`. If not provided, it will be
         assigned the unity function, and the model will have to take SMILES
         directly as its input.
-
-    spec : float
-        Target specification that the recommended molecules should be close to.
-
-    k1 : int, optional
-        Target number of molecules to be generated in each intermediate
+    :type mcw: MACAW or function, optional
+    :param spec: Target specification that the recommended molecules should 
+        match.
+    :type spec: float
+    :param k1: Target number of molecules to be generated in each intermediate
         library. Defaults to 3000.
-
-    k2 : int, optional
-        Numer of molecules that should be selected and carried over from an
-        intermediate library to the next round. Defaults to 100.
-
-    n_rounds : int, optional
-        Number of iterations for the library generation and selection process.
-        Defaults to 8.
-
-    n_hits : int, optional
-        Number of recommended molecules to return as output.
-
-    Returns
-    -------
-    list
-        List containing the molecules recommended in SMILES format.
-
-    np. array
-        Array containing the predicted property values for each output
-        molecule according to the model provided.
-
-    Notes
-    -----
-    This function makes extensive use of the `library_maker` function. See
-    the `library_maker` function help for information on additional
-    parameters.
-
+    :type k1: int, optional
+    :param k2: Numer of molecules that should be selected and carried over 
+        from an intermediate library to the next round. Defaults to 100.
+    :type k2: int, optional
+    :param n_rounds: Number of iterations for the library generation and 
+        selection process. Defaults to 8.
+    :type n_rounds: int, optional
+    :param n_hits: Number of recommended molecules to return.
+    :type n_hits: int, optional
+    :param algorithm: Select to use 'position' (default) or 'transition' 
+        algorithm to compute the probability of sampling different SELFIES 
+        tokens.
+    :type algorithm: str, optional
+    :param p: Controls the SELFIES length distribution of molecules being generated.
+        Options include 'exp' (exponential distribution, default), 'empirical' 
+        (observed input distribution), and 'cumsum' (cumulative observed 
+        input distribution). If `p` is numeric, then a potential distribution
+        of degree `p` is used. If `p` is an array, then each element is
+        considered to be a weight for sampling molecules with length
+        given by the corresponding index (range(1,len(p+1))).
+    :type p: str, float or numpy.ndarray, optional
+    :param max_len: Maximum length of the molecules generated in SELFIES 
+        format. If 0 (default), the maximum length seen in the input molecules 
+        will be used.
+    :type max_len: int, optional    
+    :param random_state: Seed to have the same subsampling and choice of
+        landmarks across runs.
+    :type random_state: int, optional
+    
+    :return: A tuple `(list, numpy.ndarray)`. The first element is the list of molecules 
+        recommended in SMILES format. The second element is an array with the predicted property 
+        values for each recommended molecule according to the `model` provided.
+    :rtype: tuple
+    
+    .. seealso:: This function makes extensive use of the `library_maker` 
+        function. See the `library_maker` documentation for 
+        information on additional parameters.
     """
     if random_state is not None:
         np.random.seed(random_state)
-    
+
     if smiles is None:
-        if max_len==0:
-            max_len=15
-        smiles = _random_library_maker(n_gen=20000, max_len=max_len, 
-                                       return_selfies=False, p=p)
-    
+        if max_len == 0:
+            max_len = 15
+        smiles = _random_library_maker(
+            n_gen=20000, max_len=max_len, return_selfies=False, p=p
+        )
+
     smiles = list(smiles)
-    
+
     if mcw is None:
         mcw = lambda x: x
 
@@ -450,7 +435,7 @@ def library_evolver(
     X = mcw(smiles)
     Y_old = model(X)
     smiles_lib_old = smiles
-    
+
     for i in range(n_rounds):
         print(f"\nRound {i+1}")
         smiles_lib = library_maker(
@@ -467,7 +452,7 @@ def library_evolver(
         Y_lib = model(X)
 
         # We want to carry over the best molecules from the previous round
-        
+
         # Append the old molecules and remove duplicates
         smiles_lib += smiles_lib_old  # concatenates lists
         smiles_lib, idx = np.unique(smiles_lib, return_index=True)
@@ -475,21 +460,22 @@ def library_evolver(
 
         Y = np.concatenate((Y_lib, Y_old))
         Y = Y[idx]
-        
-        
+
         # Select k2 best molecules
         idx = __find_Knearest_idx(spec, Y, k=k2)
         smiles_lib_old = [smiles_lib[i] for i in idx]
         Y_old = Y[idx]
-        
+
         # Compute max_len to use in next round
         # For this I take the longest 10 SMILES amongst the k2
         # compute their SELFIES length and add +1 to the longest
-        lengths = [len(smi) for smi in smiles_lib_old] # lengths of smiles
-        idx = np.argpartition(lengths, -10)[-10:] # indices of 10 longest smiles
-        lengths = [sf.len_selfies(sf.encoder(smiles_lib_old[i])) for i in idx] # length of selfies
-        max_len =  max(lengths) + 1
-        
+        lengths = [len(smi) for smi in smiles_lib_old]  # lengths of smiles
+        idx = np.argpartition(lengths, -10)[-10:]  # indices of 10 longest smiles
+        lengths = [
+            sf.len_selfies(sf.encoder(smiles_lib_old[i])) for i in idx
+        ]  # length of selfies
+        max_len = max(lengths) + 1
+
         print(max_len)
 
     # Return best molecules
@@ -505,76 +491,61 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
     Identifies promising hit molecules from a library according to a property
     specification.
 
-    ...
-    Parameters
-    ----------
-    X_lib : numpy.ndarray
-        Array containing the MACAW embedding of a library of molecules.
+    :param X_lib: Array containing the MACAW embeddings of a library of 
+        molecules. It can be generated with the MACAW `transform` method.
+    :type X_lib: numpy.ndarray
+    :param model: Function that predicts property values given instances from `X_lib`.
+    :type model: function
+    :param spec: Desired property value specification.
+    :type spec: float
+    :param X: Array containing the MACAW embedding of known molecules.
         It can be generated with the MACAW `transform` method.
-
-    model : function
-        Function that predicts property values given instances from `X_lib`.
-
-    spec : float
-        Desired property value specification.
-
-    X : numpy.ndarray, optional
-        Array containing the MACAW embedding of known molecules.
-        It can be generated with the MACAW `transform` method.
-
-    Y : numpy.ndarray, optional
-        Array containing the property values for the known molecules.
-
-    n_hits : int, optional
-        Number of desired hit molecules to be output. Defaults to 10.
-
-    k1 : int, optional
-        Number of initial seed molecules to be carried in the search.
+    :type X: numpy.ndarray, optional
+    :param Y: Array containing the property values for the known molecules.
+    :type Y: list or numpy.ndarray, optional
+    :param n_hits: Desired number of hit molecules to be returned. 
+        Defaults to 10.
+    :type n_hits: int, optional
+    :param k1: Number of initial seed molecules to be carried in the search.
         Defaults to 5.
-
-    k2 : int, optional
-        Number of molecules per seed to be retrieved for evaluation.
+    :type k1: int, optional
+    :param k2: Number of molecules per seed to be retrieved for evaluation.
         Defaults to 25.
-
-    p : int or float, optional
-        Minkowski norm to be used in the retrieval of molecules. If 0<`p`<1,
-        then a V-distance is used. Defaults to 1 (Manhattan distance).
-
-    n_rounds: int, optional
-        Number of times the whole search will be iterated over. Defaults to 1.
-
-    Returns
-    -------
-    List
-        List of indices of the promising molecules found in `X_lib`.
-
-    numpy.ndarray
-        Array of property values predicted for the hit molecules using the
-        model supplied.
-
-    Notes
-    -----
-    The function uses an heuristic search to identify molecules close to the
-    desired specification across the library.
-
-    If `X`and `Y` are provided, it first takes the `k1` known
-    molecules closest to the specification to guide the retrieval of the `k2`
-    closest molecules in the MACAW embedding space (according to a `p`-norm).
-    This process is done using a sklearn BallTree structure. The `k1`x`k2`
-    molecules retrieved are then evaluated using the model provided (`model`).
-    If `n_rounds` = 1 (default), the indices of the `n_hits` molecules
-    closest to the specification are finally returned to the user.
-    If `n_rounds` > 1, then the `k1` molecules closest to the specification
-    are used to initiate another retrieval round.
-
-    The actual number of molecules being evaluated can be smaller than
-    `k1`x`k2` if there is overlap between the list of molecules returned from
-    different seeds.
-
-    If a `p` value is provided such that 0 < `p` < 1, then V-distance
-    is used. This can be regarded as a weighted version of Manhattan distance,
-    see publication for details.
+    :type k2: int, optional
+    :param p: Minkowski norm to be used in the retrieval of molecules. 
+        If 0 < `p` < 1, then a V-distance is used. Defaults to 1 (Manhattan distance).
+    :type p: int or float, optional
+    :param n_rounds: Number of times the whole search will be iterated over. 
+        Defaults to 1.
+    :type n_rounds: int, optional
     
+    :return: A tuple `(list,numpy.ndarray)`. The first element is
+        the list of indices of the hit molecules found in `X_lib`. The
+        second element is an array of property values predicted for the 
+        hit molecules using the model supplied.
+    :rtype: tuple
+
+    .. note:: 
+        The function uses an heuristic search to identify molecules close to the
+        desired specification across the library. 
+        
+        If `X`and `Y` are provided, it first takes the `k1` known
+        molecules closest to the specification to guide the retrieval of the `k2`
+        closest molecules in the MACAW embedding space (according to a `p`-norm).
+        This process is done using a sklearn BallTree structure. The `k1` x `k2`
+        molecules retrieved are then evaluated using the model provided (`model`).
+        If `n_rounds` = 1 (default), the indices of the `n_hits` molecules
+        closest to the specification are finally returned to the user.
+        If `n_rounds` > 1, then the `k1` molecules closest to the specification
+        are used to initiate another retrieval round.
+        
+        The actual number of molecules being evaluated can be smaller than
+        `k1` x `k2` if there is overlap between the list of molecules returned from
+        different seeds.
+
+    .. seealso:: If a `p` value is provided such that 0 < `p` < 1, then V-distance
+        is used. This can be regarded as a weighted version of Manhattan distance,
+        see publication for details.
     """
 
     if not callable(model):
@@ -642,64 +613,53 @@ def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
     Identifies promising hit molecules from a library according to a property
     specification. Best suited for smooth embeddings like MACAW.
 
-    ...
-    Parameters
-    ----------
-    X_lib : numpy.ndarray
-        Array containing the MACAW embedding of a library of molecules.
+    :param X_lib: Array containing the MACAW embedding of a library of molecules.
         It can be generated with the MACAW `transform` method.
-
-    model : function
-        Function that predicts property values given instances from `X_lib`.
-
-    spec : float
-        Desired property value specification.
-
-    mcw : MACAW object, optional
-        MACAW object used to embed molecules in `X_lib`.
-
-    n_hits : int, optional
-        Number of desired hit molecules to be output. Defaults to 10.
-
-    k1 : int, optional
-        Number of initial seed molecules to be used in the search.
+    :type X_lib: numpy.ndarray
+    :param model: Function that predicts property values given instances from
+        `X_lib`.
+    :type model: function
+    :param spec: Desired property value specification.
+    :type spec: float
+    :param X: Array containing the MACAW embedding of known molecules.
+        It can be generated with the MACAW `transform` method.
+    :type X: numpy.ndarray, optional
+    :param Y: Array containing the property values for the known molecules.
+    :type Y: list or numpy.ndarray, optional
+    :param n_hits: Number of desired hit molecules to be output. Defaults to 10.
+    :type n_hits: int, optional
+    :param k1: Number of initial seed molecules to be used in the search.
         Defaults to 25.
-
-    k2 : int, optional
-        Number of molecules per seed to be retrieved for evaluation.
+    :type k1: int, optional
+    :param k2: Number of molecules per seed to be retrieved for evaluation.
         Defaults to 5.
+    :type k2: int, optional
+    :param p: Minkowski norm to be used in the retrieval of molecules. 
+        If 0 < `p` < 1, then a V-distance is used. Defaults to 1 (Manhattan distance).
+    :type p: int or float, optional
 
-    p : int or float, optional
-        Minkowski norm to be used in the retrieval of molecules. If 0<`p`<1,
-        then a V-distance is used. Defaults to 1 (Manhattan distance).
-
-
-    Returns
-    -------
-    List
-        List of indices of the promising molecules found in `X_lib`.
-
-    numpy.ndarray
-        Array of property values predicted for the hit molecules.
-
-    Notes
-    -----
-    The function solves the model for the desired specification using
-    Powell's algorithm implemented in scipy's fzero using `k1` starting
-    seeds. Then, it retrieves `k2` molecules in `X_lib` close to each solution
-    using sklearn's BallTree.
-
-    If `mcw` is provided, it will use `k1` landmark molecules as seeds, which
-    may offer better diversity of solutions.
-
-    The actual number of molecules being evaluated can be smaller than
-    `k1`x`k2` if there is overlap between the list of molecules returned from
-    different seeds.
-
-    If a `p` value is provided such that 0 < `p` < 1, then V-distance
-    is used. This can be regarded as a weighted version of Manhattan distance,
-    see publication for details.
+    :return: A tuple `(list,numpy.ndarray)`. The first element is
+        the list of indices of the hit molecules found in `X_lib`. The
+        second element is an array of property values predicted for the 
+        hit molecules using the model supplied.
+    :rtype: tuple
     
+    .. note:: 
+        The function solves the model for the desired specification using
+        Powell's algorithm implemented in scipy's fzero using `k1` starting
+        seeds. Then, it retrieves `k2` molecules in `X_lib` close to each solution
+        using sklearn's BallTree.
+    
+        If `mcw` is provided, it will use `k1` landmark molecules as seeds, which
+        may offer better diversity of solutions.
+    
+        The actual number of molecules being evaluated can be smaller than
+        `k1` x `k2` if there is overlap between the list of molecules returned from
+        different seeds.
+
+    .. seealso:: If a `p` value is provided such that 0 < `p` < 1, then V-distance
+        is used. This can be regarded as a weighted version of Manhattan distance,
+        see publication for details.
     """
 
     if not callable(model):

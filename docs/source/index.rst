@@ -1,6 +1,6 @@
-***********************************
+###################################
 Welcome to the MACAW documentation!
-***********************************
+###################################
 
 **MACAW** (Molecular AutoenCoding Auto-Workaround) is a cheminformatic tool for Python that embeds molecules in a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
 
@@ -11,17 +11,19 @@ MACAW also provides original algorithms to generate molecular libraries and to e
 .. contents::
     :depth: 3
 
+************
 Installation
-============
+************
 
-MACAW requires rdkit 2020.09.4 or later to run, which can be installed using [conda](https://anaconda.org/conda-forge/rdkit):
+MACAW requires rdkit 2020.09.4 or later to run, which can be installed using 
+`conda <https://anaconda.org/conda-forge/rdkit>`_:
 
 .. code-block:: bash
 
     conda install -c conda-forge rdkit
 
 
-.. note:: rdkit has to be installed manually and is not automatically installed by pip as a dependency.
+.. warning:: rdkit has to be installed manually and is not automatically installed by pip as a dependency.
 
 
 Then run the following command to install MACAW:
@@ -30,31 +32,40 @@ Then run the following command to install MACAW:
 
     pip install macaw_py
 
+*****
 Usage
-=====
+*****
+
+The different MACAW functions can be imported in Python using:
+
+.. code-block:: python
+
+    from macaw import *
+
 
 Molecule embedding
-``````````````````
+==================
 
 .. autoclass:: macaw.MACAW
+    :members: fit, transform, fit_transform, set_type_fp, set_metric, set_n_components, set_algorithm
 
 .. autofunction:: macaw.MACAW_optimus
 
 
-Random molecule generation
-``````````````````````````
+Molecule generation
+===================
 
 .. autofunction:: generators.library_maker
 
 
 On-specification molecule evolution
-```````````````````````````````````
+===================================
  
 .. autofunction:: generators.library_evolver
 
 
-Additional functions
-````````````````````
+Other functions
+===============
 
 .. autofunction:: generators.hit_finder
 
@@ -63,13 +74,14 @@ Additional functions
 .. autofunction:: macaw.smiles_cleaner
 
 
+************
 How to cite?
-============
+************
 
 .. code-block:: bib
 
     @article{doi:XX.XXX,
-    author = {Blay, Vincent and Radivojevich, Tijana and Garcia-Martin, Hector},
+    author = {Blay, Vincent and Radivojevich, Tijana and Allen, Jonathan E. and Hudson, Corey M. and Garcia-Martin, Hector},
     title = {MACAW: XXXX},
     journal = {XXXX},
     volume = {0},

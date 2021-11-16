@@ -1,6 +1,13 @@
 # Configuration file for the Sphinx documentation builder.
 
-autodoc_mock_imports = ['rdkit', 'umap', 'sklearn','selfies','scipy', 'numpy']
+autodoc_mock_imports = ['rdkit', 'umap', 'sklearn','selfies','scipy']
+
+# If true, the current module name will be prepended to all description
+# unit titles (such as .. function::).
+add_module_names = False
+
+# This avoids the methods to be presented alphabetically, which is the default
+autodoc_member_order = 'bysource'
 
 # -- Path setup
 

@@ -97,6 +97,6 @@ recommended_smiles = library_evolver(smiles, mcw, f, spec, n_hits=10, n_rounds=8
 
 ## License
 
-MACAW code is distributed under the license specified in the [`Noncomercial_Academic_LA.pdf`](https://github.com/LBLQMM/macaw/Noncomercial_Academic_LA.pdf) file. This license allows free **non-commercial** use for **academic institutions**. Modifications should be fed back to the original repository to benefit all users. 
+MACAW code is distributed under the license specified in the [`Noncommercial_Academic_LA.pdf`](https://github.com/LBLQMM/macaw/Noncomercial_Academic_LA.pdf) file. This license allows free **non-commercial** use for **academic institutions**. Modifications should be fed back to the original repository to benefit all users. 
 
 Separate **evaluation** and **commercial** licenses are available for businesses. Business users, please contact [Jean Haemmerle, LBNL Licensing Associate](mailto:jhaemmerle@lbl.gov).

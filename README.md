@@ -18,7 +18,7 @@ MACAW requires rdkit 2020.09.4 or later to run, which can be installed using [co
 conda install -c conda-forge rdkit
 ```
 
-Alternative methods to install rdkit can be found [here](https://www.rdkit.org/docs/Install.html).
+Alternative methods to install rdkit are given [here](https://www.rdkit.org/docs/Install.html).
 
 
 Then run the following command to install MACAW:
@@ -29,7 +29,7 @@ pip install macaw_py
 
 ### Documentation
 
-Read the documentation on [Read the Docs](https://vinbl-test-docs.readthedocs.io/en/latest/).
+Read the documentation on [Read the Docs](https://vinbl-macaw.readthedocs.io/en/latest/).
 
 ## Usage
 
@@ -52,10 +52,10 @@ mcw.fit(smiles)
 X = mcw.transform(smiles)
 ```
 
-Any list of molecules in SMILES format (`newsmiles`) can be embedded using an existing MACAW object:
+Any list of molecules in SMILES format (`qsmiles`) can be embedded using an existing MACAW object:
 
 ```python
-X_new = mcw.transform(newsmiles)
+X_new = mcw.transform(qsmiles)
 ```
 
 The embedder has a variety of parameters that can be tuned to improve results. These include the dimensionality of the embedding (`n_components`), the number of landmarks used (`n_landmarks`), the type of molecular fingeprint (`type_fp`), and the similarity metric (`metric`). Property values (`y_values`) can also be provided to the argument `Y` to improve landmark choice. The arguments and options available are listed in the class help.
@@ -99,4 +99,4 @@ recommended_smiles = library_evolver(smiles, mcw, f, spec, n_hits=10, n_rounds=8
 
 MACAW code is distributed under the license specified in the [`Noncommercial_Academic_LA.pdf`](https://github.com/LBLQMM/macaw/Noncomercial_Academic_LA.pdf) file. This license allows free **non-commercial** use for **academic institutions**. Modifications should be fed back to the original repository to benefit all users. 
 
-Separate **evaluation** and **commercial** licenses are available for businesses. Business users, please contact [Jean Haemmerle, LBNL Licensing Associate](mailto:jhaemmerle@lbl.gov).
+Separate **evaluation** and **commercial use** licenses are available for businesses. Business users, please contact [Jean Haemmerle, LBNL Licensing Associate](mailto:jhaemmerle@lbl.gov).

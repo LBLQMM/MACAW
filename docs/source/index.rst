@@ -4,9 +4,9 @@ Welcome to the MACAW documentation!
 
 **MACAW** (Molecular AutoenCoding Auto-Workaround) is a cheminformatic tool for Python that embeds molecules in a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
 
-MACAW embeddings can be used as an alternative for conventional molecular descriptors. MACAW embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
+MACAW embeddings can be used as an alternative to conventional molecular descriptors. MACAW embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
 
-MACAW also provides original algorithms to generate molecular libraries and to evolve molecules *in silico* that satisfy a desired specification (inverse molecular design). The design specification can be any property or combination of properties that can be predicted for the molecule, such as its octane number or its binding affinity to a protein.
+MACAW also provides original algorithms to generate molecular libraries and to evolve molecules *in silico* to meet a desired specification (inverse molecular design). The design specification can be any property or combination of properties that can be predicted for the molecule, such as its octane number or its binding affinity to a protein. Details about the algorithms can be found in the `MACAW publication <https://www.nature.com/natmachintell/>`_.
 
 .. contents::
     :depth: 3
@@ -22,6 +22,7 @@ MACAW requires rdkit 2020.09.4 or later to run, which can be installed using
 
     conda install -c conda-forge rdkit
 
+Alternative methods to install rdkit are given `here <https://www.rdkit.org/docs/Install.html>`_.
 
 .. warning:: rdkit has to be installed manually and is not automatically installed by pip as a dependency.
 

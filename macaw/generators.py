@@ -30,48 +30,48 @@ def library_maker(
     return_selfies=False,
     random_state=None,
 ):
-    """ Generates molecules in a probabilistic manner. The molecules generated 
-    can be fully random or be biased around the distribution of input 
+    """Generates molecules in a probabilistic manner. The molecules generated
+    can be fully random or be biased around the distribution of input
     molecules.
 
     :param smiles: List of molecules in SMILES format. If not provided, it
         will generate random molecules using the alphabet of robust SELFIES
         tokens.
     :type smiles: list, optional
-    :param n_gen: Target number of molecules to be generated. The actual 
+    :param n_gen: Target number of molecules to be generated. The actual
         number of molecules returned can be lower. Defaults to 20000.
     :type n_gen: int, optional
-    :param max_len: Maximum length of the molecules generated in SELFIES 
-        format. If 0 (default), the maximum length seen in the input molecules 
+    :param max_len: Maximum length of the molecules generated in SELFIES
+        format. If 0 (default), the maximum length seen in the input molecules
         will be used.
     :type max_len: int, optional
     :param p: Controls the SELFIES length distribution of molecules being generated.
-        Options include 'exp' (exponential distribution, default), 'empirical' 
-        (observed input distribution), and 'cumsum' (cumulative observed 
+        Options include 'exp' (exponential distribution, default), 'empirical'
+        (observed input distribution), and 'cumsum' (cumulative observed
         input distribution). If `p` is numeric, then a potential distribution
         of degree `p` is used. If `p` is an array, then each element is
         considered to be a weight for sampling molecules with length
         given by the corresponding index (range(1,len(p+1))).
     :type p: str, float or numpy.ndarray, optional
-    :param noise_factor: Controls the level of randomness added to the SELFIES 
+    :param noise_factor: Controls the level of randomness added to the SELFIES
         frequency counts. Defaults to 0.3.
     :type noise_factor: float, optional
-    :param algorithm: Select to use 'position' (default) or 'transition' 
-        algorithm to compute the probability of sampling different SELFIES 
+    :param algorithm: Select to use 'position' (default) or 'transition'
+        algorithm to compute the probability of sampling different SELFIES
         tokens.
     :type algorithm: str, optional
-    :param return_selfies: If True, the ouptut will include both SMILES and 
+    :param return_selfies: If True, the ouptut will include both SMILES and
         SELFIES.
     :type return_selfies: bool, optional
     :param random_state: Seed to have the same subsampling and choice of
         landmarks across runs.
     :type random_state: int, optional
-    
+
     :return: List containing the molecules generated in SMILES format.
     :rtype: list
-    
-    .. note:: Internally, molecules are generated as SELFIES. The molecules 
-        generated are filtered to remove synonyms. The molecules returned are 
+
+    .. note:: Internally, molecules are generated as SELFIES. The molecules
+        generated are filtered to remove synonyms. The molecules returned are
         canonical SMILES.
     """
 
@@ -347,7 +347,7 @@ def library_evolver(
     random_state=None,
     **kwargs,
 ):
-    """ Recommends a list of molecules close to a desired specification by
+    """Recommends a list of molecules close to a desired specification by
     evolving increasingly focused libraries.
 
     :param smiles: List of molecules in SMILES format.
@@ -357,52 +357,52 @@ def library_evolver(
         The model may also directly take SMILES as its input, in which case
         no embedder needs to be provided.
     :type model: function
-    :param mcw: Embedder to featurize the `smiles` input into a representation 
+    :param mcw: Embedder to featurize the `smiles` input into a representation
         compatible with `model`. If not provided, it will be
         assigned the unity function, and the model will have to take SMILES
         directly as its input.
     :type mcw: MACAW or function, optional
-    :param spec: Target specification that the recommended molecules should 
+    :param spec: Target specification that the recommended molecules should
         match.
     :type spec: float
     :param k1: Target number of molecules to be generated in each intermediate
         library. Defaults to 3000.
     :type k1: int, optional
-    :param k2: Numer of molecules that should be selected and carried over 
+    :param k2: Numer of molecules that should be selected and carried over
         from an intermediate library to the next round. Defaults to 100.
     :type k2: int, optional
-    :param n_rounds: Number of iterations for the library generation and 
+    :param n_rounds: Number of iterations for the library generation and
         selection process. Defaults to 8.
     :type n_rounds: int, optional
     :param n_hits: Number of recommended molecules to return.
     :type n_hits: int, optional
-    :param algorithm: Select to use 'position' (default) or 'transition' 
-        algorithm to compute the probability of sampling different SELFIES 
+    :param algorithm: Select to use 'position' (default) or 'transition'
+        algorithm to compute the probability of sampling different SELFIES
         tokens.
     :type algorithm: str, optional
     :param p: Controls the SELFIES length distribution of molecules being generated.
-        Options include 'exp' (exponential distribution, default), 'empirical' 
-        (observed input distribution), and 'cumsum' (cumulative observed 
+        Options include 'exp' (exponential distribution, default), 'empirical'
+        (observed input distribution), and 'cumsum' (cumulative observed
         input distribution). If `p` is numeric, then a potential distribution
         of degree `p` is used. If `p` is an array, then each element is
         considered to be a weight for sampling molecules with length
         given by the corresponding index (range(1,len(p+1))).
     :type p: str, float or numpy.ndarray, optional
-    :param max_len: Maximum length of the molecules generated in SELFIES 
-        format. If 0 (default), the maximum length seen in the input molecules 
+    :param max_len: Maximum length of the molecules generated in SELFIES
+        format. If 0 (default), the maximum length seen in the input molecules
         will be used.
-    :type max_len: int, optional    
+    :type max_len: int, optional
     :param random_state: Seed to have the same subsampling and choice of
         landmarks across runs.
     :type random_state: int, optional
-    
-    :return: A tuple `(list, numpy.ndarray)`. The first element is the list of molecules 
-        recommended in SMILES format. The second element is an array with the predicted property 
+
+    :return: A tuple `(list, numpy.ndarray)`. The first element is the list of molecules
+        recommended in SMILES format. The second element is an array with the predicted property
         values for each recommended molecule according to the `model` provided.
     :rtype: tuple
-    
-    .. seealso:: This function makes extensive use of the `library_maker` 
-        function. See the `library_maker` documentation for 
+
+    .. seealso:: This function makes extensive use of the `library_maker`
+        function. See the `library_maker` documentation for
         information on additional parameters.
     """
     if random_state is not None:
@@ -491,7 +491,7 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
     Identifies promising hit molecules from a library according to a property
     specification.
 
-    :param X_lib: Array containing the MACAW embeddings of a library of 
+    :param X_lib: Array containing the MACAW embeddings of a library of
         molecules. It can be generated with the MACAW `transform` method.
     :type X_lib: numpy.ndarray
     :param model: Function that predicts property values given instances from `X_lib`.
@@ -503,7 +503,7 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
     :type X: numpy.ndarray, optional
     :param Y: Array containing the property values for the known molecules.
     :type Y: list or numpy.ndarray, optional
-    :param n_hits: Desired number of hit molecules to be returned. 
+    :param n_hits: Desired number of hit molecules to be returned.
         Defaults to 10.
     :type n_hits: int, optional
     :param k1: Number of initial seed molecules to be carried in the search.
@@ -512,23 +512,23 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
     :param k2: Number of molecules per seed to be retrieved for evaluation.
         Defaults to 25.
     :type k2: int, optional
-    :param p: Minkowski norm to be used in the retrieval of molecules. 
+    :param p: Minkowski norm to be used in the retrieval of molecules.
         If 0 < `p` < 1, then a V-distance is used. Defaults to 1 (Manhattan distance).
     :type p: int or float, optional
-    :param n_rounds: Number of times the whole search will be iterated over. 
+    :param n_rounds: Number of times the whole search will be iterated over.
         Defaults to 1.
     :type n_rounds: int, optional
-    
+
     :return: A tuple `(list,numpy.ndarray)`. The first element is
         the list of indices of the hit molecules found in `X_lib`. The
-        second element is an array of property values predicted for the 
+        second element is an array of property values predicted for the
         hit molecules using the model supplied.
     :rtype: tuple
 
-    .. note:: 
+    .. note::
         The function uses an heuristic search to identify molecules close to the
-        desired specification across the library. 
-        
+        desired specification across the library.
+
         If `X`and `Y` are provided, it first takes the `k1` known
         molecules closest to the specification to guide the retrieval of the `k2`
         closest molecules in the MACAW embedding space (according to a `p`-norm).
@@ -538,7 +538,7 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
         closest to the specification are finally returned to the user.
         If `n_rounds` > 1, then the `k1` molecules closest to the specification
         are used to initiate another retrieval round.
-        
+
         The actual number of molecules being evaluated can be smaller than
         `k1` x `k2` if there is overlap between the list of molecules returned from
         different seeds.
@@ -634,25 +634,25 @@ def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
     :param k2: Number of molecules per seed to be retrieved for evaluation.
         Defaults to 5.
     :type k2: int, optional
-    :param p: Minkowski norm to be used in the retrieval of molecules. 
+    :param p: Minkowski norm to be used in the retrieval of molecules.
         If 0 < `p` < 1, then a V-distance is used. Defaults to 1 (Manhattan distance).
     :type p: int or float, optional
 
     :return: A tuple `(list,numpy.ndarray)`. The first element is
         the list of indices of the hit molecules found in `X_lib`. The
-        second element is an array of property values predicted for the 
+        second element is an array of property values predicted for the
         hit molecules using the model supplied.
     :rtype: tuple
-    
-    .. note:: 
+
+    .. note::
         The function solves the model for the desired specification using
         Powell's algorithm implemented in scipy's fzero using `k1` starting
         seeds. Then, it retrieves `k2` molecules in `X_lib` close to each solution
         using sklearn's BallTree.
-    
+
         If `mcw` is provided, it will use `k1` landmark molecules as seeds, which
         may offer better diversity of solutions.
-    
+
         The actual number of molecules being evaluated can be smaller than
         `k1` x `k2` if there is overlap between the list of molecules returned from
         different seeds.

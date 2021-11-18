@@ -39,22 +39,22 @@ class MACAW:
         Distrance metric used to measure similarity between molecular
         fingerprints. Options include 'Tanimoto', 'dice', 'cosine',
         'Sokal', 'Kulczynski', 'Mcconnaughey', 'Braun-Blanquet',
-        'Rogot-Goldberg', 'asymmetric', 'Manhattan', and 'Blay-Roger'. 
+        'Rogot-Goldberg', 'asymmetric', 'Manhattan', and 'Blay-Roger'.
         Defaults to 'Tanimoto'.
     :type metric: str, optional
     :param n_components: Number of dimensions for the embedding. Defaults to 15.
     :type n_components: int, optional
-    :param algorithm: Algorithm to use for the projection. Options available 
+    :param algorithm: Algorithm to use for the projection. Options available
         are 'MDS', 'isomap', 'PCA', ICA', 'FA', and 'umap'. Defaults to 'MDS'.
     :type algorithm: str, optional
-    :param n_landmarks: Desired number of landmark molecules to use. 
+    :param n_landmarks: Desired number of landmark molecules to use.
         Defaults to 50.
     :type n_landmarks: int, optional
     :param Yset: Specifies how to use the input in `Y` during fitting, if provided.
         Options include 'highest' and 'lowest'. If an integer is provided,
         it will use uniform sampling of landmarks after splitting the
         molecules in `Yset` bins. Defaults to 10.
-    :param idx_landmarks: List indicating the indices of the molecules to be 
+    :param idx_landmarks: List indicating the indices of the molecules to be
         used as landmarks.
     :type idx_landmarks: list, optional
     :type Yset: str or int, optional
@@ -69,7 +69,7 @@ class MACAW:
         from the bins with equal probability. If `Yset` is set to 'highest' or
         'lowest', then the landmarks will be the `n_landmarks` molecules with
         the highest or lowest `Y` values, respectively.
-    
+
     .. warning::
         No attribute should be modified directly. Instead, setter methods are
         available for the modifiable attributes: `set_type_fp()`,
@@ -177,18 +177,18 @@ class MACAW:
     ):
         """Method to select the landmarks and initialize the MACAW embedding
         space.
-        
+
         :param smiles: List of molecules given in SMILES format.
         :type smiles: list
         :param Y: List of property values of interest, one for each molecule in
-            `smiles`. If provided, it may help choosing a more diverse 
+            `smiles`. If provided, it may help choosing a more diverse
             set of landmark molecules.
-        
+
         .. note::
             Some parameters like `idx_landmarks`, `random_state`, `n_landmarks`,
             and `Yset` may be provided here as well if they were not
             input when the MACAW object was created.
-        
+
         """
 
         smiles = list(smiles)
@@ -235,15 +235,15 @@ class MACAW:
 
     def transform(self, qsmiles):
         """Method to embed a list of molecules in an existing MACAW space.
-        
-        :param qsmiles: List of query molecules to be embedded given in SMILES 
+
+        :param qsmiles: List of query molecules to be embedded given in SMILES
             format.
         :type qsmiles: list
-        
+
         :return: A 2D array such that each row is the embedding of each `qsmiles`
             molecule.
         :rtype: numpy.ndarray
-        
+
         .. note::
             If any invalid SMILES is encountered in the input, the corresponding
             row in the output will be filled with nan's.
@@ -258,13 +258,28 @@ class MACAW:
 
         qsmiles = list(qsmiles)
 
-        mols, bad_idx = self._smiles_to_mols(qsmiles, bad_idx=True)
+        # We will split the query smiles into batches to reduce memory needs
+        batch_size = 50000  # max number of molecules per batch
 
-        # We compute the fingerprints and distances for the query smiles
-        qfps = self.__fps_maker(mols)
-        D = self.__fps_distance_to_refps(qfps)
+        L = len(qsmiles)
+        X = np.zeros((L, self._n_components))
 
-        return self.__project(D, bad_idx)
+        for lb in range(0, L, batch_size):
+            if lb > 0:
+                print(lb)
+            ub = lb + batch_size
+            batch = qsmiles[lb:ub]
+
+            # We compute the fingerprints and distances for the query smiles
+            mols, bad_idx = self._smiles_to_mols(batch, bad_idx=True)
+            qfps = self.__fps_maker(mols)
+            D = self.__fps_distance_to_refps(qfps)
+
+            x_batch = self.__project(D, bad_idx)
+
+            X[lb:ub, :] = x_batch
+
+        return X
 
     def fit_transform(
         self,
@@ -275,8 +290,7 @@ class MACAW:
         n_landmarks=None,
         Yset=None,
     ):
-        """A combination of the `fit` and `transform` methods.
-        """
+        """A combination of the `fit` and `transform` methods."""
 
         qsmiles = list(qsmiles)
         self.fit(
@@ -661,14 +675,14 @@ def MACAW_optimus(
 
     :param smiles: List of molecules in SMILES format.
     :type smiles: list
-    :param y: List containing the property of interest for each molecule in 
+    :param y: List containing the property of interest for each molecule in
         `smiles`.
     :type y: list or numpy.ndarray
     :param exhaustiveness: int, optional
         Controls how many combinations of fingeprint types and distance
-        metrics to explore. If set to 1, it will only explore individual 
-        fingeprints. If set to 2, it will explore individual fingeprints and 
-        combinations of two fingeprints. If set to 3, it will explore 
+        metrics to explore. If set to 1, it will only explore individual
+        fingeprints. If set to 2, it will explore individual fingeprints and
+        combinations of two fingeprints. If set to 3, it will explore
         additional metrics and perform a slower cross-validation.
     :type exhaustiveness: int, optional
     :param C: Regularization hyperparameter for the SVM. Defaults to 20.
@@ -896,22 +910,22 @@ def __scores_getter(
 
 def smiles_cleaner(smiles, return_idx=False):
     """Function to remove invalid SMILES from a list.
-    
+
     :param smiles: List of molecules in SMILES format.
     :type smiles: list
     :param return_idx: Specifies whether to return indices or not.
         Defaults to False.
     :type return_idx: bool, optional
-    
+
     :return: Returns a list containing only the valid SMILES, in the same order
-        as the input. 
+        as the input.
         If `return_idx` is set to True, the return will be a tuple
         `(list, list, list)`: the first element contains the valid SMILES,
         the second element contains the indices of the valid SMILES,
         and the third element contains the indices of the invalid SMILES in the
         input.
     :rtype: list or tuple
-    
+
     """
     smiles = list(smiles)
     idx = []

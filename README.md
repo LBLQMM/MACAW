@@ -60,7 +60,7 @@ Any list of molecules in SMILES format (`qsmiles`) can be embedded using an exis
 X_new = mcw.transform(qsmiles)
 ```
 
-The embedder has a variety of parameters that can be tuned to improve results. These include the dimensionality of the embedding (`n_components`), the number of landmarks used (`n_landmarks`), the type of molecular fingeprint (`type_fp`), and the similarity metric (`metric`). Property values (`y_values`) can also be provided to the argument `Y` to improve landmark choice. The arguments and options available are listed in the class help.
+The embedder has a variety of parameters that can be tuned to improve results. These include the dimensionality of the embedding (`n_components`), the number of landmarks used (`n_landmarks`), the type of molecular fingeprint (`type_fp`), and the similarity metric (`metric`). Property values (`y_values`) can also be provided to the argument `Y` to improve landmark choice. Other arguments and options available are explained in the documentation.
 
 ```python
 mcw = MACAW(n_components=20, type_fp='rdk5', metric='Dice', n_landmarks=60)
@@ -101,6 +101,6 @@ recommended_smiles = library_evolver(smiles, mcw, f, spec, n_hits=10, n_rounds=8
 
 ## License
 
-MACAW code is distributed under the license specified in the [`Noncommercial_Academic_LA.pdf`](https://github.com/LBLQMM/macaw/Noncomercial_Academic_LA.pdf) file. This license allows free **non-commercial** use for **academic institutions**. Modifications should be fed back to the original repository to benefit all users. 
+MACAW code is distributed under the license specified in the [`Noncommercial_Academic_LA.pdf`](https://github.com/LBLQMM/macaw/Noncommercial_Academic_LA.pdf) file. This license allows free **non-commercial** use for **academic institutions**. Modifications should be fed back to the original repository to benefit all users. 
 
 Separate **evaluation** and **commercial use** licenses are available for businesses. Business users, please contact [LBNL Licensing](mailto:jhaemmerle@lbl.gov).

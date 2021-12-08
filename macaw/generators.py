@@ -106,10 +106,12 @@ def library_maker(
             else:
                 selfies.append(selfie)
                 lengths.append(sf.len_selfies(selfie))
-        except MemoryError:
+        except:
             print(f"Warning: SMILES {smi} could not be encoded as SELFIES.")
             # This may be due to the SELFIES encoding not finishing,
             # **MemoryError, which was happening for some symmetric molecules.
+	    # It may also be due to the input SMILES violating some semantic 
+	    # constraint, e.g. a Cl with two bonds.
 
     lengths, max_len = __lengths_generator(max_len, n_gen, p, lengths)
 

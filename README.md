@@ -1,13 +1,12 @@
 # MACAW
 
-**MACAW** (Molecular AutoenCoding Auto-Workaround) is a cheminformatic tool for Python that embeds molecules in a low-dimensional, continuous numeric space. The embeddings are molecular features that can be used as inputs in mathematical and machine-learning models.
+**MACAW** (Molecular AutoenCoding Auto-Workaround) is a cheminformatic tool for Python that embeds molecules in a low-dimensional, continuous numeric space. It also enables the generation of new molecules on-specification.
 
-MACAW embeddings can be used as an alternative for conventional molecular descriptors. MACAW embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
+MACAW embeddings are molecular features that can be used as inputs in mathematical and machine-learning models. MACAW embeddings can be used as an alternative for conventional molecular descriptors. The embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
 
-MACAW also provides original algorithms to generate molecular libraries and to evolve molecules *in silico* that satisfy a desired specification (inverse molecular design). The design specification can be any property or combination of properties that can be predicted for the molecule, such as its octane number or its binding affinity to a protein.
+MACAW also provides original algorithms to generate molecular libraries and to evolve molecules *in silico* that meet a desired specification (inverse molecular design). The design specification can be any property or combination of properties that can be predicted for the molecule, such as its octane number or its binding affinity to a protein.
 
 Details about the different algorithms are explained in the [MACAW publication]().
-
 
 
 ## Installation
@@ -68,7 +67,7 @@ mcw = MACAW(n_components=20, type_fp='rdk5', metric='Dice', n_landmarks=60)
 mcw.fit_transform(smiles, Y=y_values)
 ```
 
-The function `MACAW_optimus` automatically explores a variety of fingeprint type (`type_fp`) and similarity metric (`metric`) combinations and returns a recommended embedder ready to use:
+The function `MACAW_optimus` automatically explores a variety of fingeprint type (`type_fp`) and similarity metric (`metric`) combinations and returns a recommended embedder ready for use:
 
 ```python
 mcw = MACAW_optimus(smiles, n_components=20, y=y_values, verbose=True)

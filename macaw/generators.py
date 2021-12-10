@@ -25,7 +25,7 @@ def library_maker(
     n_gen=20000,
     max_len=0,
     p="exp",
-    noise_factor=0.3,
+    noise_factor=0.1,
     algorithm="position",
     return_selfies=False,
     random_state=None,
@@ -110,8 +110,8 @@ def library_maker(
             print(f"Warning: SMILES {smi} could not be encoded as SELFIES.")
             # This may be due to the SELFIES encoding not finishing,
             # **MemoryError, which was happening for some symmetric molecules.
-	    # It may also be due to the input SMILES violating some semantic 
-	    # constraint, e.g. a Cl with two bonds.
+	        # It may also be due to the input SMILES violating some semantic 
+	        # constraint, e.g. a Cl with two bonds.
 
     lengths, max_len = __lengths_generator(max_len, n_gen, p, lengths)
 
@@ -257,7 +257,7 @@ def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, p="exp"
         return manysmiles
 
 
-def __noise_adder(matrix, noise_factor=0.3):
+def __noise_adder(matrix, noise_factor=0.1):
     """Normalizes the input matrix row-wise and mixes it linearly with a
     uniform matrix"""
     # Here we will add some noise to the prob matrix and normalize it
@@ -292,8 +292,17 @@ def __selfies_to_smiles(manyselfies):
         manysmiles[i] = Chem.CanonSmiles(smiles)
 
     manysmiles, idx = np.unique(manysmiles, return_index=True)
-    manysmiles = list(manysmiles)
+    
     manyselfies = [manyselfies[i] for i in idx]
+    
+    # It is possible that the empty string '' makes it through
+    # given that, e.g., sf.decoder('[Ring1]') returns ''. Let us remove it:
+    idx = np.where(manysmiles=='')[0]
+    manysmiles = list(manysmiles)
+    if len(idx)>0:
+        del manysmiles[idx[0]]
+        del manyselfies[idx[0]]
+    
     return manysmiles, manyselfies
 
 
@@ -344,10 +353,9 @@ def library_evolver(
     n_rounds=8,
     n_hits=10,
     algorithm="transition",
-    p="cumsum",
     max_len=0,
     random_state=None,
-    **kwargs,
+    **kwargs
 ):
     """Recommends a list of molecules close to a desired specification by
     evolving increasingly focused libraries.
@@ -357,7 +365,9 @@ def library_evolver(
     :param model: Function that takes as input the features produced by the
         MACAW embedder `mcw` and returns a scalar (predicted property).
         The model may also directly take SMILES as its input, in which case
-        no embedder needs to be provided.
+        no embedder needs to be provided. The model must be able to take a 
+        list of multiple inputs and produce the corresponding list of 
+        predictions.
     :type model: function
     :param mcw: Embedder to featurize the `smiles` input into a representation
         compatible with `model`. If not provided, it will be
@@ -382,14 +392,6 @@ def library_evolver(
         algorithm to compute the probability of sampling different SELFIES
         tokens.
     :type algorithm: str, optional
-    :param p: Controls the SELFIES length distribution of molecules being generated.
-        Options include 'exp' (exponential distribution, default), 'empirical'
-        (observed input distribution), and 'cumsum' (cumulative observed
-        input distribution). If `p` is numeric, then a potential distribution
-        of degree `p` is used. If `p` is an array, then each element is
-        considered to be a weight for sampling molecules with length
-        given by the corresponding index (range(1,len(p+1))).
-    :type p: str, float or numpy.ndarray, optional
     :param max_len: Maximum length of the molecules generated in SELFIES
         format. If 0 (default), the maximum length seen in the input molecules
         will be used.
@@ -414,7 +416,7 @@ def library_evolver(
         if max_len == 0:
             max_len = 15
         smiles = _random_library_maker(
-            n_gen=20000, max_len=max_len, return_selfies=False, p=p
+            n_gen=20000, max_len=max_len, return_selfies=False, **kwargs
         )
 
     smiles = list(smiles)
@@ -445,9 +447,8 @@ def library_evolver(
             n_gen=k1,
             algorithm=algorithm,
             max_len=max_len,
-            p=p,
             return_selfies=False,
-            **kwargs,
+            **kwargs
         )
 
         X = mcw(smiles_lib)
@@ -477,8 +478,7 @@ def library_evolver(
             sf.len_selfies(sf.encoder(smiles_lib_old[i])) for i in idx
         ]  # length of selfies
         max_len = max(lengths) + 1
-
-        print(max_len)
+        print(f"max_len set to {max_len}.")
 
     # Return best molecules
     idx = __find_Knearest_idx(spec, Y_old, k=n_hits)

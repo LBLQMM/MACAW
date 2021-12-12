@@ -13,6 +13,7 @@ import numpy as np
 from operator import itemgetter
 from queue import PriorityQueue
 from rdkit import Chem
+import re
 from scipy.optimize import minimize
 import selfies as sf
 from sklearn.neighbors import BallTree, DistanceMetric
@@ -86,28 +87,28 @@ def library_maker(
     # Let us convert the smiles to selfies onehot
     selfies = []
     lengths = []
-    for smi in smiles:
-        smi = smi.replace(" ", "")
+    for s in smiles:
+        smi = s.replace(" ", "")
         smi = smi.replace(".", "")
-        smi = smi.replace("[C@H]", "C")
-        smi = smi.replace("[C@@H]", "C")
+        # This deals with SMILES atoms in brackets, like [C@H]
+        for m in re.findall("\[.*?\]", s):
+            smi = smi.replace(m, m[1].upper())
         smi = smi.replace("/C", "C")
         smi = smi.replace("\\C", "C")
         smi = smi.replace("/c", "c")
         smi = smi.replace("\\c", "c")
-
         try:
             selfie = sf.encoder(smi)
             if selfie is None:
                 print(
-                    f"Warning: SMILES {smi} is encoded as `None` and "
+                    f"Warning: SMILES {s} is encoded as `None` and "
                     "will be dropped."
                 )
             else:
                 selfies.append(selfie)
                 lengths.append(sf.len_selfies(selfie))
         except:
-            print(f"Warning: SMILES {smi} could not be encoded as SELFIES.")
+            print(f"Warning: SMILES {s} could not be encoded as SELFIES.")
             # This may be due to the SELFIES encoding not finishing,
             # **MemoryError, which was happening for some symmetric molecules.
 	        # It may also be due to the input SMILES violating some semantic 
@@ -127,7 +128,7 @@ def library_maker(
     symbol_to_idx = {s: i for i, s in enumerate(alphabet)}
 
     idx_list = []
-
+    
     for selfi in selfies:
         try:
             idx = sf.selfies_to_encoding(
@@ -138,7 +139,6 @@ def library_maker(
         except KeyError:
             print(f"Warning: SELFIES {selfi} is not valid and will be dropped.")
             # This may be due to some symbol missing in the alphabet
-
     manyselfies = [None] * n_gen
 
     if algorithm.lower() == "transition":
@@ -224,6 +224,7 @@ def library_maker(
         return manysmiles, manyselfies
     else:
         return manysmiles
+
 
 
 def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, p="exp"):

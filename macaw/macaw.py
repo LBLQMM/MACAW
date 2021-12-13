@@ -17,6 +17,7 @@ from rdkit.Avalon import pyAvalonTools
 from rdkit.Chem import rdMolDescriptors
 from rdkit.Chem import rdMHFPFingerprint
 from rdkit.Chem.rdmolops import LayeredFingerprint
+import re
 from sklearn.manifold import Isomap
 from sklearn.decomposition import PCA, FastICA, FactorAnalysis
 from sklearn.svm import SVR, SVC
@@ -908,7 +909,7 @@ def __scores_getter(
     return scores_dict
 
 
-def smiles_cleaner(smiles, return_idx=False):
+def smiles_cleaner(smiles, return_idx=False, deep_clean=False):
     """Function to remove invalid SMILES from a list.
 
     :param smiles: List of molecules in SMILES format.
@@ -916,6 +917,9 @@ def smiles_cleaner(smiles, return_idx=False):
     :param return_idx: Specifies whether to return indices or not.
         Defaults to False.
     :type return_idx: bool, optional
+    :param deep_clean: Applies certain string replacements to the SMILES
+        to improve their compatibility with SELFIES. Defaults to False.
+    :type deep_clean: bool, optional
 
     :return: Returns a list containing only the valid SMILES, in the same order
         as the input.
@@ -925,25 +929,43 @@ def smiles_cleaner(smiles, return_idx=False):
         and the third element contains the indices of the invalid SMILES in the
         input.
     :rtype: list or tuple
+    
+    .. note::
+        We recommend to set `deep_clean=True` if preparing an input library
+        for the `library_evolver` function.
 
     """
     smiles = list(smiles)
     idx = []
     idx_bad = []
     clean_smiles = []
-    for i in range(len(smiles)):
+    for i, s in enumerate(smiles):
+        if deep_clean:
+            smi = s.replace(" ", "")
+            smi = smi.replace(".", "")
+            # This deals with SMILES atoms in brackets, like [C@H]
+            # The only exceptions allowed are for tokens of the nitro group
+            # which are now robust in SELFIES 2.0
+            for m in re.findall("\[.*?\]", smi):
+                if m not in ['[N+]', '[O-]']:
+                    smi = smi.replace(m, m[1].upper())
+            smi = smi.replace("/C", "C")
+            smi = smi.replace("\\C", "C")
+            smi = smi.replace("/c", "c")
+            smi = smi.replace("\\c", "c")
+            
+        else:
+            smi = s
         try:
-            smi = smiles[i]
-
             m = Chem.MolFromSmiles(smi, sanitize=True)
             if m is not None:
                 idx.append(i)
                 clean_smiles.append(smi)
             else:
                 idx_bad.append(i)
-                print(f"Warning: invalid SMILES in position {i}: {smiles[i]}")
+                print(f"Warning: invalid SMILES in position {i}: {s}")
         except:
-            print(f"Warning: invalid SMILES in position {i}: {smiles[i]}")
+            print(f"Warning: invalid SMILES in position {i}: {s}")
             idx_bad.append(i)
 
     if return_idx:

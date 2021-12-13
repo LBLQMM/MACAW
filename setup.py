@@ -32,7 +32,7 @@ setup(
           'numpy >= 1.8.0',
           'scikit-learn >= 0.24.1',
           'scipy >= 1.6.1',
-          'selfies >= 1.0.4',
+          'selfies >= 2.0.0',
           'umap-learn >= 0.5.2',
           ],
       )

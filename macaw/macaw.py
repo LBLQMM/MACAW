@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jun 13 13:22:31 2021
-
 Part of the MACAW project.
 Contains the MACAW class, the MACAW_optimus function, and the smiles_cleaner
 function.
 
-@author: Vincent
+@author: Vincent Blay, 2021
 """
-
 
 import numpy as np
 from rdkit import Chem, DataStructs
@@ -923,10 +920,10 @@ def smiles_cleaner(smiles, return_idx=False, deep_clean=False):
 
     :return: Returns a list containing only the valid SMILES, in the same order
         as the input.
-        If `return_idx` is set to True, the return will be a tuple
-        `(list, list, list)`: the first element contains the valid SMILES,
-        the second element contains the indices of the valid SMILES,
-        and the third element contains the indices of the invalid SMILES in the
+        If `return_idx` is set to True, the return will be a tuple with three
+        lists. The first list contains the valid SMILES,
+        the second list contains the indices of the valid SMILES,
+        and the third list contains the indices of the invalid SMILES in the
         input.
     :rtype: list or tuple
     

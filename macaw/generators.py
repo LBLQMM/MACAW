@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Jun 13 13:27:53 2021
-
 Part of the MACAW project.
-Contains the library_maker and library_evolver functions, the hit_finder
-and hit_finder2 functions.
+Contains the library_maker, the library_evolver functions, the hit_finder,
+and the hit_finder2 functions.
 
-@author: Vincent
+@author: Vincent Blay, 2021
 """
 
 import numpy as np
@@ -18,8 +16,8 @@ from scipy.optimize import minimize
 import selfies as sf
 from sklearn.neighbors import BallTree, DistanceMetric
 
-# ----- Molecular library generation functions -----
 
+# ----- Molecular library generation functions -----
 
 def library_maker(
     smiles=None,
@@ -55,7 +53,7 @@ def library_maker(
         given by the corresponding index (range(1,len(p+1))).
     :type p: str, float or numpy.ndarray, optional
     :param noise_factor: Controls the level of randomness added to the SELFIES
-        frequency counts. Defaults to 0.3.
+        frequency counts. Defaults to 0.1.
     :type noise_factor: float, optional
     :param algorithm: Select to use 'position' (default) or 'transition'
         algorithm to compute the probability of sampling different SELFIES
@@ -68,8 +66,10 @@ def library_maker(
         landmarks across runs.
     :type random_state: int, optional
 
-    :return: List containing the molecules generated in SMILES format.
-    :rtype: list
+    :return: List containing the molecules generated in SMILES format. If
+        `return_selfies` is set to True, it will return a tuple with two 
+        lists containing the SMILES and SELFIES, respectively.
+    :rtype: list or tuple
 
     .. note:: Internally, molecules are generated as SELFIES. The molecules
         generated are filtered to remove synonyms. The molecules returned are
@@ -358,6 +358,8 @@ def library_evolver(
     n_hits=10,
     algorithm="transition",
     max_len=0,
+    max_len_inc=2,
+    force_new=False,
     random_state=None,
     **kwargs
 ):
@@ -400,6 +402,12 @@ def library_evolver(
         format. If 0 (default), the maximum length seen in the input molecules
         will be used.
     :type max_len: int, optional
+    :param max_len_inc: Maximum increment in SELFIES length from one round
+        to the next. Defaults to 2.
+    :type max_len_inc: int, optional
+    :param force_new: Forces to return only SMILES not present in the `smiles` 
+        input. Defaults to False.
+    :type force_new: book, optional
     :param random_state: Seed to have the same subsampling and choice of
         landmarks across runs.
     :type random_state: int, optional
@@ -481,9 +489,15 @@ def library_evolver(
         lengths = [
             sf.len_selfies(sf.encoder(smiles_lib_old[i])) for i in idx
         ]  # length of selfies
-        max_len = max(lengths) + 1
+        max_len = max(lengths) + max_len_inc
         print(f"max_len set to {max_len}.")
-
+        
+    # Remove molecules already in the input, if requested
+    if force_new:
+        idx = [i for i, smi in enumerate(smiles_lib_old) if smi not in smiles]
+        smiles_lib_old = [smiles_lib_old[i] for i in idx]
+        Y_old = Y_old[idx]
+    
     # Return best molecules
     idx = __find_Knearest_idx(spec, Y_old, k=n_hits)
     smiles = [smiles_lib_old[i] for i in idx]  # Access multiple elements of a list
@@ -738,15 +752,11 @@ def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
 
 # ----- AUXILIARY FUNCTIONS -----
 
-
 def __find_Knearest_idx(x, arr, k=1):
     """
     Finds the `k` nearest values to number `x` in unsorted array `arr` using a
     heap data structue.
-
-    Adapted from
-    https://www.geeksforgeeks.org/find-k-closest-numbers-in-an-unsorted-array/
-
+    
     """
 
     n = len(arr)
@@ -776,7 +786,7 @@ def __find_Knearest_idx(x, arr, k=1):
             # Else remove root and insert
             pq.put((-diff, i))
 
-    # Print contents of heap.
+    # Print contents of heap
     while not pq.empty():
         p, q = pq.get()
         idx.append(q)

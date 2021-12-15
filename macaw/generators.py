@@ -201,7 +201,7 @@ def library_maker(
 
         for i in range(n_gen):
             if (i + 1) % 10000 == 0:  # progress indicator
-                print(i + 1)
+                print(f'{i+1} molecules generated.')
 
             len_i = lengths[i]
             u = np.random.rand(len_i, 1)
@@ -246,7 +246,7 @@ def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, p="exp"
     manyselfies = [None] * n_gen
     for i in range(n_gen):
         if (i + 1) % 10000 == 0:  # progress indicator
-            print(i + 1)
+            print(f'{i+1} molecules generated.')
         selfies = np.random.choice(alphabet, size=lengths[i], replace=True)
         selfies = "".join(selfies)
         manyselfies[i] = selfies
@@ -480,23 +480,27 @@ def library_evolver(
         idx = __find_Knearest_idx(spec, Y, k=k2)
         smiles_lib_old = [smiles_lib[i] for i in idx]
         Y_old = Y[idx]
-
-        # Compute max_len to use in next round
-        # For this I take the longest 10 SMILES amongst the k2
-        # compute their SELFIES length and add +1 to the longest
-        lengths = [len(smi) for smi in smiles_lib_old]  # lengths of smiles
-        idx = np.argpartition(lengths, -10)[-10:]  # indices of 10 longest smiles
-        lengths = [
-            sf.len_selfies(sf.encoder(smiles_lib_old[i])) for i in idx
-        ]  # length of selfies
-        max_len = max(lengths) + max_len_inc
-        print(f"max_len set to {max_len}.")
         
-    # Remove molecules already in the input, if requested
-    if force_new:
-        idx = [i for i, smi in enumerate(smiles_lib_old) if smi not in smiles]
-        smiles_lib_old = [smiles_lib_old[i] for i in idx]
-        Y_old = Y_old[idx]
+        if i < n_rounds-1:
+
+            # Compute max_len to use in next round
+            # For this I take the longest 10 SMILES amongst the k2
+            # compute their SELFIES length and add +1 to the longest
+            lengths = [len(smi) for smi in smiles_lib_old]  # lengths of smiles
+            idx = np.argpartition(lengths, -10)[-10:]  # indices of 10 longest smiles
+            lengths = [
+                sf.len_selfies(sf.encoder(smiles_lib_old[i])) for i in idx
+            ]  # length of selfies
+            max_len = max(lengths) + max_len_inc
+            print(f"max_len set to {max_len}.")
+            
+        else: # This is the last round
+            
+            # Remove molecules already in the input, if requested
+            if force_new:
+                idx = [i for i, smi in enumerate(smiles_lib_old) if smi not in smiles]
+                smiles_lib_old = [smiles_lib_old[i] for i in idx]
+                Y_old = Y_old[idx]
     
     # Return best molecules
     idx = __find_Knearest_idx(spec, Y_old, k=n_hits)

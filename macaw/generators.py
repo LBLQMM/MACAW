@@ -26,6 +26,7 @@ def library_maker(
     p="exp",
     noise_factor=0.1,
     algorithm="position",
+    full_alphabet="False",
     return_selfies=False,
     random_state=None,
 ):
@@ -59,6 +60,10 @@ def library_maker(
         algorithm to compute the probability of sampling different SELFIES
         tokens.
     :type algorithm: str, optional
+    :param full_alphabet: Enables the use of all robust tokens in the SELFIES
+        package. If False (default), only makes use of the tokens present
+        in the input `smiles`.
+    :type full_alphabet: bool, optional
     :param return_selfies: If True, the ouptut will include both SMILES and
         SELFIES.
     :type return_selfies: bool, optional
@@ -96,10 +101,9 @@ def library_maker(
         for m in re.findall("\[.*?\]", s):
             if m not in ['[N+]', '[O-]']:
                 smi = smi.replace(m, m[1].upper())
-        smi = smi.replace("/C", "C")
-        smi = smi.replace("\\C", "C")
-        smi = smi.replace("/c", "c")
-        smi = smi.replace("\\c", "c")
+        smi = smi.replace("/", "")
+        smi = smi.replace("\\", "") # cis/trans isomery
+        
         try:
             selfie = sf.encoder(smi)
             if selfie is None:
@@ -118,13 +122,13 @@ def library_maker(
 	        # constraint, e.g. a Cl with two bonds.
 
     lengths, max_len = __lengths_generator(max_len, n_gen, p, lengths)
-
-    alphabet = sf.get_alphabet_from_selfies(selfies)
-
-    # Remove symbols from alphabet and columns of prob_matrix that
-    # do not have a state-dependent derivation rule in the SELFIES package
-    robust_symbols = sf.get_semantic_robust_alphabet()
-    alphabet = alphabet.intersection(robust_symbols)
+    
+    alphabet = sf.get_semantic_robust_alphabet()
+    if not full_alphabet:
+        custom_alphabet = sf.get_alphabet_from_selfies(selfies)
+        # Remove symbols from alphabet and columns of prob_matrix that
+        # do not have a state-dependent derivation rule in the SELFIES package
+        alphabet = alphabet.intersection(custom_alphabet)
     alphabet = list(sorted(alphabet))
     len_alphabet = len(alphabet)
 
@@ -356,7 +360,6 @@ def library_evolver(
     k2=100,
     n_rounds=8,
     n_hits=10,
-    algorithm="transition",
     max_len=0,
     max_len_inc=2,
     force_new=False,
@@ -394,10 +397,6 @@ def library_evolver(
     :type n_rounds: int, optional
     :param n_hits: Number of recommended molecules to return.
     :type n_hits: int, optional
-    :param algorithm: Select to use 'position' (default) or 'transition'
-        algorithm to compute the probability of sampling different SELFIES
-        tokens.
-    :type algorithm: str, optional
     :param max_len: Maximum length of the molecules generated in SELFIES
         format. If 0 (default), the maximum length seen in the input molecules
         will be used.

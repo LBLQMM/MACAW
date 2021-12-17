@@ -456,7 +456,6 @@ def library_evolver(
         smiles_lib = library_maker(
             smiles_lib_old,
             n_gen=k1,
-            algorithm=algorithm,
             max_len=max_len,
             return_selfies=False,
             **kwargs
@@ -492,19 +491,18 @@ def library_evolver(
             ]  # length of selfies
             max_len = max(lengths) + max_len_inc
             print(f"max_len set to {max_len}.")
+        
             
-        else: # This is the last round
-            
-            # Remove molecules already in the input, if requested
-            if force_new:
-                idx = [i for i, smi in enumerate(smiles_lib_old) if smi not in smiles]
-                smiles_lib_old = [smiles_lib_old[i] for i in idx]
-                Y_old = Y_old[idx]
+    # Remove molecules already in the input, if requested
+    if force_new:
+        idx = [i for i, smi in enumerate(smiles_lib) if smi not in smiles]
+        smiles_lib = [smiles_lib[i] for i in idx]
+        Y = Y[idx]
     
     # Return best molecules
-    idx = __find_Knearest_idx(spec, Y_old, k=n_hits)
-    smiles = [smiles_lib_old[i] for i in idx]  # Access multiple elements of a list
-    Y = Y_old[idx]
+    idx = __find_Knearest_idx(spec, Y, k=n_hits)
+    smiles = [smiles_lib[i] for i in idx]  # Access multiple elements of a list
+    Y = Y[idx]
 
     return smiles, Y
 

@@ -133,7 +133,7 @@ class MACAW:
     def set_type_fp(self, type_fp):
         """Method to change the `type_fp` used in an existing MACAW object."""
         self._type_fp = type_fp.lower().replace(" ", "")
-        if self._n_landmarks is not None:
+        if self._isfitted(): 
             self.__refps_update()
             self.__refD_update()
             self.__safe_lndmk_embed()
@@ -142,14 +142,14 @@ class MACAW:
         """Method to change the `metric` used in an existing MACAW object."""
         self._metric = metric.lower().replace(" ", "")
         # self.__refps_update()
-        if self._n_landmarks is not None:
+        if self._isfitted():
             self.__refD_update()
             self.__safe_lndmk_embed()
 
     def set_n_components(self, n_components):
         """Method to change the `n_components` used in an existing MACAW object."""
         self._n_components = n_components
-        if len(self._resmiles) > 0:
+        if self._isfitted():
             self.__safe_lndmk_embed()
 
     def set_algorithm(self, algorithm):
@@ -159,7 +159,7 @@ class MACAW:
             raise IOError(f"Unknown algorithm {algorithm}.")
         self._algorithm = algorithm
 
-        if self._n_landmarks is not None:
+        if self._isfitted():
             self.__safe_lndmk_embed()
 
     # Main functions for the embedding
@@ -251,7 +251,7 @@ class MACAW:
             row in the output will be filled with nan's.
         """
 
-        if self._n_landmarks is None:
+        if not self._isfitted(): 
             raise RuntimeError(
                 "MACAW instance not fitted. Call "
                 "'fit' with appropriate arguments before using"
@@ -655,6 +655,9 @@ class MACAW:
         v2 = DataStructs.RusselSimilarity(y, x, False)
         s = (a * v1 + b * v2) / (a + b)
         return s
+    
+    def _isfitted(self): 
+        return bool(self._resmiles) # equivalent to len(self._resmiles) == 0
 
 
 # ----- End of MACAW class -----

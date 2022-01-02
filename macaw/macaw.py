@@ -149,7 +149,7 @@ class MACAW:
     def set_n_components(self, n_components):
         """Method to change the `n_components` used in an existing MACAW object."""
         self._n_components = n_components
-        if self._n_landmarks is not None:
+        if len(self._resmiles) > 0:
             self.__safe_lndmk_embed()
 
     def set_algorithm(self, algorithm):
@@ -171,6 +171,7 @@ class MACAW:
         idx_landmarks=None,
         random_state=None,
         n_landmarks=None,
+        n_components=None,
         Yset=None,
     ):
         """Method to select the landmarks and initialize the MACAW embedding
@@ -183,9 +184,9 @@ class MACAW:
             set of landmark molecules.
 
         .. note::
-            Some parameters like `idx_landmarks`, `random_state`, `n_landmarks`,
-            and `Yset` may be provided here as well if they were not
-            input when the MACAW object was created.
+            Parameters `idx_landmarks`, `random_state`, `n_landmarks`,
+            `n_components`, and `Yset` may be provided here if they were not
+            provided when the MACAW object was created.
 
         """
 
@@ -213,6 +214,9 @@ class MACAW:
 
         if idx_landmarks is None:
             idx_landmarks = self.__lndmk_choice(smiles, Y)
+            
+        if n_components is not None:
+            self._n_components = n_components
 
         resmiles = [smiles[i] for i in idx_landmarks]
         remols, bad_idx = self._smiles_to_mols(resmiles, bad_idx=True)
@@ -286,6 +290,7 @@ class MACAW:
         idx_landmarks=None,
         random_state=None,
         n_landmarks=None,
+        n_components=None,
         Yset=None,
     ):
         """A combination of the `fit` and `transform` methods."""
@@ -293,11 +298,12 @@ class MACAW:
         qsmiles = list(qsmiles)
         self.fit(
             smiles=qsmiles,
-            n_landmarks=n_landmarks,
             Y=Y,
-            Yset=Yset,
             idx_landmarks=idx_landmarks,
             random_state=random_state,
+            n_landmarks=n_landmarks,
+            n_components=n_components,
+            Yset=Yset
         )
 
         idx_landmarks = self._idx_landmarks

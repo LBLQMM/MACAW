@@ -86,7 +86,7 @@ class MACAW:
         n_landmarks=50,
         Yset=10,
         idx_landmarks=None,
-        random_state=None,
+        random_state=None
     ):
         """Constructor method"""
 
@@ -108,6 +108,7 @@ class MACAW:
 
         self._idx_landmarks = idx_landmarks
         self._resmiles = []
+        self._isfitted = False
 
         # These attributes need not be visible or modified by the user,
         # we make them private
@@ -133,7 +134,7 @@ class MACAW:
     def set_type_fp(self, type_fp):
         """Method to change the `type_fp` used in an existing MACAW object."""
         self._type_fp = type_fp.lower().replace(" ", "")
-        if self._isfitted(): 
+        if self._isfitted: 
             self.__refps_update()
             self.__refD_update()
             self.__safe_lndmk_embed()
@@ -142,14 +143,14 @@ class MACAW:
         """Method to change the `metric` used in an existing MACAW object."""
         self._metric = metric.lower().replace(" ", "")
         # self.__refps_update()
-        if self._isfitted():
+        if self._isfitted:
             self.__refD_update()
             self.__safe_lndmk_embed()
 
     def set_n_components(self, n_components):
         """Method to change the `n_components` used in an existing MACAW object."""
         self._n_components = n_components
-        if self._isfitted():
+        if self._isfitted:
             self.__safe_lndmk_embed()
 
     def set_algorithm(self, algorithm):
@@ -159,7 +160,7 @@ class MACAW:
             raise IOError(f"Unknown algorithm {algorithm}.")
         self._algorithm = algorithm
 
-        if self._isfitted():
+        if self._isfitted:
             self.__safe_lndmk_embed()
 
     # Main functions for the embedding
@@ -167,12 +168,7 @@ class MACAW:
     def fit(
         self,
         smiles,
-        Y=None,
-        idx_landmarks=None,
-        random_state=None,
-        n_landmarks=None,
-        n_components=None,
-        Yset=None,
+        Y=None
     ):
         """Method to select the landmarks and initialize the MACAW embedding
         space.
@@ -183,40 +179,21 @@ class MACAW:
             `smiles`. If provided, it may help choosing a more diverse
             set of landmark molecules.
 
-        .. note::
-            Parameters `idx_landmarks`, `random_state`, `n_landmarks`,
-            `n_components`, and `Yset` may be provided here if they were not
-            provided when the MACAW object was created.
-
         """
 
         smiles = list(smiles)
-
-        if Yset is not None:
-            self.__Yset = Yset
-
-        if random_state is not None:
-            self.__random_state = random_state
-
-        if n_landmarks is not None:
-            self._n_landmarks = n_landmarks
         n_landmarks = self._n_landmarks
 
-        if self._n_landmarks > len(smiles):
+        if n_landmarks > len(smiles):
             print(
                 f"Warning: requested n_landmarks={n_landmarks} but only "
                 f"{len(smiles)} smiles provided. n_landmarks will be lower."
             )
-
-        if idx_landmarks is not None:
-            self._idx_landmarks = idx_landmarks
+        
         idx_landmarks = self._idx_landmarks
 
         if idx_landmarks is None:
             idx_landmarks = self.__lndmk_choice(smiles, Y)
-            
-        if n_components is not None:
-            self._n_components = n_components
 
         resmiles = [smiles[i] for i in idx_landmarks]
         remols, bad_idx = self._smiles_to_mols(resmiles, bad_idx=True)
@@ -234,6 +211,7 @@ class MACAW:
         self.__refps_update()
         self.__refD_update()
         self.__safe_lndmk_embed()
+        self._isfitted = True
 
     def transform(self, qsmiles):
         """Method to embed a list of molecules in an existing MACAW space.
@@ -251,7 +229,7 @@ class MACAW:
             row in the output will be filled with nan's.
         """
 
-        if not self._isfitted(): 
+        if not self._isfitted: 
             raise RuntimeError(
                 "MACAW instance not fitted. Call "
                 "'fit' with appropriate arguments before using"
@@ -286,24 +264,14 @@ class MACAW:
     def fit_transform(
         self,
         qsmiles,
-        Y=None,
-        idx_landmarks=None,
-        random_state=None,
-        n_landmarks=None,
-        n_components=None,
-        Yset=None,
+        Y=None
     ):
-        """A combination of the `fit` and `transform` methods."""
+        """Combination of the `fit` and `transform` methods."""
 
         qsmiles = list(qsmiles)
         self.fit(
             smiles=qsmiles,
-            Y=Y,
-            idx_landmarks=idx_landmarks,
-            random_state=random_state,
-            n_landmarks=n_landmarks,
-            n_components=n_components,
-            Yset=Yset
+            Y=Y
         )
 
         idx_landmarks = self._idx_landmarks
@@ -655,9 +623,6 @@ class MACAW:
         v2 = DataStructs.RusselSimilarity(y, x, False)
         s = (a * v1 + b * v2) / (a + b)
         return s
-    
-    def _isfitted(self): 
-        return bool(self._resmiles) # equivalent to len(self._resmiles) == 0
 
 
 # ----- End of MACAW class -----
@@ -670,8 +635,6 @@ def MACAW_optimus(
     C=20.0,
     problem="auto",
     verbose=False,
-    n_components=15,
-    algorithm="MDS",
     random_state=None,
     **kwargs,
 ):
@@ -701,11 +664,14 @@ def MACAW_optimus(
     :param verbose: Prints intermediate scores for the different `type_fp` and `metric`
         combinations.
     :type verbose: bool, optional
+    :param random_state: Seed to have the same downsampling and choice of 
+        landmarks across runs.
+    :type random_state: int, optional
     :param kwargs: optional
-        Allows to pass additional parameters to the MACAW class (other than
-        `type_fp` and `metric`).
+        Allows to pass additional parameters to the MACAW class constructor 
+        (other than `type_fp` and `metric`).
 
-    :return: MACAW object with the optimal settings identified.
+    :return: MACAW object with the best settings identified.
     :rtype: MACAW
     """
     smiles = list(smiles)
@@ -724,37 +690,13 @@ def MACAW_optimus(
             problem = "classification"
         print(f"Problem type identified as {problem}")
 
-    # If not specified, we will use the same Y argument for the individual
+    # We will use the same Y argument for the individual
     # MACAW calls as the MACAW_optimus y argument.
     # In the case of classification, this will amount to using a 'balanced'
     # number of landmarks. I could set `Yset` equal to 2, but it is not necessary.
-    if "Y" not in kwargs:
-        kwargs["Y"] = y.copy()
-
-    else:  # just checking that if Y is specified it matches len(smiles)
-        if (len(kwargs["Y"]) != 0) and (len(smiles) != len(kwargs["Y"])):
-            raise IOError(
-                f"len(smiles) = {leny} does not match " f"len(Y) = {len(kwargs['Y'])}"
-            )
-
-    metrics = [
-        "tanimoto",
-        "cosine",
-        "dice",
-        "sokal",
-        "kulczynski",
-        "mcconnaughey",
-        "braun-blanquet",
-        "rogot-goldberg",
-        "asymmetric",
-        "manhattan",
-        "blay-roger",
-    ]
-
-    mcw = MACAW(
-        n_components=n_components, algorithm=algorithm, random_state=random_state
-    )
-    mcw.fit(smiles, **kwargs)  # Landmark selection
+    
+    mcw = MACAW( **kwargs )
+    mcw.fit(smiles, y)  # Landmark selection
 
     if problem == "regression":
         epsilon = np.ptp(y) / 25.0
@@ -824,6 +766,21 @@ def MACAW_optimus(
         max_type_fp = max_key.split(" & ")[0]
 
     # Finally, explore all distance metrics
+    
+    metrics = [
+        "tanimoto",
+        "cosine",
+        "dice",
+        "sokal",
+        "kulczynski",
+        "mcconnaughey",
+        "braun-blanquet",
+        "rogot-goldberg",
+        "asymmetric",
+        "manhattan",
+        "blay-roger",
+    ]
+    
     scores_dict = __scores_getter(
         f,
         mcw,
@@ -951,7 +908,7 @@ def smiles_cleaner(smiles, return_idx=False, deep_clean=False):
             smi = smi.replace(".", "")
             # This deals with SMILES atoms in brackets, like [C@H]
             # The only exceptions allowed are for tokens of the nitro group
-            # which are now robust in SELFIES 2.0
+            # which are robust in SELFIES 2.0
             for m in re.findall("\[.*?\]", smi):
                 if m not in ['[N+]', '[O-]']:
                     smi = smi.replace(m, m[1].upper())

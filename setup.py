@@ -35,4 +35,6 @@ setup(
           'selfies >= 2.0.0',
           'umap-learn >= 0.5.2',
           ],
+      keywords=['cheminformatics','molecular design',
+                'drug discovery', 'synthetic biology']
       )

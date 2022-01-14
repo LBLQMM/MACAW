@@ -921,15 +921,15 @@ def smiles_cleaner(smiles, return_idx=False, deep_clean=False):
             smi = s
         try:
             m = Chem.MolFromSmiles(smi, sanitize=True)
-            if m is not None:
-                idx.append(i)
-                clean_smiles.append(smi)
-            else:
-                idx_bad.append(i)
-                print(f"Warning: invalid SMILES in position {i}: {s}")
         except:
-            print(f"Warning: invalid SMILES in position {i}: {s}")
+            m = None
+
+        if m is not None:
+            idx.append(i)
+            clean_smiles.append(smi)
+        else:
             idx_bad.append(i)
+            print(f"Warning: invalid SMILES in position {i}: {s}")
 
     if return_idx:
         return clean_smiles, idx, idx_bad

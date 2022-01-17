@@ -903,23 +903,24 @@ def smiles_cleaner(smiles, return_idx=False, deep_clean=False):
     idx_bad = []
     clean_smiles = []
     for i, s in enumerate(smiles):
-        if deep_clean:
-            smi = s.replace(" ", "")
-            smi = smi.replace(".", "")
-            # This deals with SMILES atoms in brackets, like [C@H]
-            # The only exceptions allowed are for tokens of the nitro group
-            # which are robust in SELFIES 2.0
-            for m in re.findall("\[.*?\]", smi):
-                if m not in ['[N+]', '[O-]']:
-                    smi = smi.replace(m, m[1].upper())
-            smi = smi.replace("/C", "C")
-            smi = smi.replace("\\C", "C")
-            smi = smi.replace("/c", "c")
-            smi = smi.replace("\\c", "c")
-            
-        else:
-            smi = s
         try:
+            if deep_clean:
+                smi = s.replace(" ", "")
+                smi = smi.replace(".", "")
+                # This deals with SMILES atoms in brackets, like [C@H]
+                # The only exceptions allowed are for tokens of the nitro group
+                # which are robust in SELFIES 2.0
+                for m in re.findall("\[.*?\]", smi):
+                    if m not in ['[N+]', '[O-]']:
+                        smi = smi.replace(m, m[1].upper())
+                smi = smi.replace("/C", "C")
+                smi = smi.replace("\\C", "C")
+                smi = smi.replace("/c", "c")
+                smi = smi.replace("\\c", "c")
+                
+            else:
+                smi = s
+            
             m = Chem.MolFromSmiles(smi, sanitize=True)
         except:
             m = None

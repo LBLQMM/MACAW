@@ -39,7 +39,7 @@ The following illustrates some of the main commands in MACAW. Detailed use examp
 
 
 <p align="center">
-  <img src="/results/Figure_readme1.png" alt="MACAW embedder" width="75%"/>
+  <img src="/docs/Figure_readme1.png" alt="MACAW embedder" width="75%"/>
 </p>
 
 
@@ -86,7 +86,7 @@ smiles_lib = library_maker(smiles, n_gen=50000, noise_factor=0.3)
 
 
 <p align="center">
-  <img src="/results/Figure_readme2.png" alt="MACAW evolver" width="75%"/>
+  <img src="/docs/Figure_readme2.png" alt="MACAW evolver" width="75%"/>
 </p>
 
 

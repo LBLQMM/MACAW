@@ -906,7 +906,7 @@ def smiles_cleaner(smiles, return_idx=False, deep_clean=False):
         try:
             if deep_clean:
                 smi = s.replace(" ", "")
-                smi = smi.replace(".", "")
+                smi = max(smi.split("."), key=len)
                 # This deals with SMILES atoms in brackets, like [C@H]
                 # The only exceptions allowed are for tokens of the nitro group
                 # which are robust in SELFIES 2.0

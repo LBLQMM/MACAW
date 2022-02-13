@@ -2,7 +2,7 @@
 """
 Part of the MACAW project.
 Contains the library_maker, the library_evolver functions, the hit_finder,
-and the hit_finder_grad functions.
+and the hit_finder2 functions.
 
 @author: Vincent Blay, 2021
 """
@@ -56,9 +56,9 @@ def library_maker(
     :param noise_factor: Controls the level of randomness added to the SELFIES
         frequency counts. Defaults to 0.1.
     :type noise_factor: float, optional
-    :param algorithm: Select to use 'position' (default) or 'transition'
+    :param algorithm: Select to use 'position', 'transition' or 'dual'
         algorithm to compute the probability of sampling different SELFIES
-        tokens.
+        tokens. Defaults to 'position'.
     :type algorithm: str, optional
     :param full_alphabet: Enables the use of all robust tokens in the SELFIES
         package. If False (default), only makes use of the tokens present
@@ -89,13 +89,13 @@ def library_maker(
             n_gen=n_gen, max_len=max_len, return_selfies=return_selfies, p=p
         )
 
-    # Let us convert the smiles to selfies onehot
+    # Let us convert the SMILES to SELFIES
     selfies = []
     lengths = []
     for s in smiles:
         smi = s.replace(" ", "")
         smi = smi.replace(".", "")
-        # This deals with SMILES atoms in brackets, like [C@H]
+        # The following deals with SMILES atoms in brackets, like [C@H]
         # The only exceptions allowed are for tokens of the nitro group
         # which are now robust in SELFIES 2.0
         for m in re.findall("\[.*?\]", s):
@@ -123,6 +123,7 @@ def library_maker(
 
     lengths, max_len = __lengths_generator(max_len, n_gen, p, lengths)
     
+    # Let us obtain the relevant alphabet of SELFIES tokens
     alphabet = sf.get_semantic_robust_alphabet()
     if not full_alphabet:
         custom_alphabet = sf.get_alphabet_from_selfies(selfies)
@@ -131,11 +132,12 @@ def library_maker(
         alphabet = alphabet.intersection(custom_alphabet)
     alphabet = list(sorted(alphabet))
     len_alphabet = len(alphabet)
-
+    
+    
+    # Let us onehot-encode the SELFIES
     symbol_to_idx = {s: i for i, s in enumerate(alphabet)}
 
     idx_list = []
-    
     for selfi in selfies:
         try:
             idx = sf.selfies_to_encoding(
@@ -146,62 +148,84 @@ def library_maker(
         except KeyError:
             print(f"Warning: SELFIES {selfi} is not valid and will be dropped.")
             # This may be due to some symbol missing in the alphabet
-    manyselfies = [None] * n_gen
+    
+    # Now we have the onehot SELFIES as a list of lists in idx_list
+    
+    # Let us now generate the prob_matrix
+    
+    algorithm = algorithm.lower()
 
-    if algorithm.lower() == "transition":
+    if algorithm == "transition":
 
-        trans_mat = np.zeros((len_alphabet, len_alphabet))
-        start_mat = np.zeros((1, len_alphabet))
-
+        prob_matrix = np.zeros((len_alphabet+1, len_alphabet))
+        # I add an extra row for the probabilities of the first token (last row)
+        
         for idx in idx_list:
+            k = len_alphabet
+            for i in idx:
+                prob_matrix[k, i] += 1
+                k = i
 
-            i_old = idx[0]
-            start_mat[0, i_old] += 1
-
-            for i in idx[1:]:
-                trans_mat[i_old, i] += 1
-                i_old = i
-
-        # Here we will add some noise to the prob matrix and normalize it
-        trans_mat = __noise_adder(trans_mat, noise_factor=noise_factor)
-        start_mat = __noise_adder(start_mat, noise_factor=noise_factor)
-
-        range_alphabet = range(len_alphabet)
-        for i in range(n_gen):
-            if (i + 1) % 10000 == 0:  # progress indicator
-                print(i + 1)
-
-            len_i = lengths[i]
-            choices = [None] * len_i
-            choices[0] = np.random.choice(range_alphabet, size=1, p=start_mat[0, :])[0]
-            for j in range(1, len_i):
-                idx = choices[j - 1]  # return the corresponding row of probabilities
-                choices[j] = np.random.choice(
-                    range_alphabet, size=1, p=trans_mat[idx, :]
-                )[0]
-
-            # Let us obtain the corresponding selfies and smiles
-            selfies = "".join(itemgetter(*choices)(alphabet))
-            # Equivalent to selfies = ''.join([alphabet[i] for i in choices])
-
-            # And let us save the molecule
-            manyselfies[i] = selfies
-
-    elif algorithm.lower() == "position":
+    elif algorithm == "position":
 
         prob_matrix = np.zeros((max_len, len_alphabet))
 
         for idx in idx_list:
             for i in range(min(len(idx), max_len)):
                 prob_matrix[i, idx[i]] += 1
-
-        # Here we will add some noise to the prob matrix and normalize it
-        prob_matrix = __noise_adder(prob_matrix, noise_factor=noise_factor)
+        
+    elif algorithm == "dual":
+        
+        # Here prob_matrix is a 3D matrix
+        # The dimensions indicate the position in the SELFIES word,
+        # the previous SELFIES token (0 at the beginning),
+        # and the current SELFIES token
+        prob_matrix = np.zeros((max_len, len_alphabet, len_alphabet))
+        
+        for idx in idx_list:
+            k = 0
+            for i in range(min(len(idx), max_len)):
+                prob_matrix[i, k, idx[i]] += 1
+                k = idx[i]           
+            
+    else:
+        raise IOError(f'Invalid algorithm: {algorithm}.')
+    
+    # So far we have generated prob_matrix containing counts
+    
+    # Here we add some noise to prob matrix and normalize it
+    prob_matrix = __noise_adder(prob_matrix, noise_factor=noise_factor)
+    
+    # Next we will sample SELFIES using prob_matrix
+    manyselfies = [None] * n_gen
+    
+    if algorithm == 'transition':
+        range_alphabet = range(len_alphabet)
+        for i in range(n_gen):
+            if (i + 1) % 10000 == 0:  # progress indicator
+                print(f'{i+1} molecules generated.')
+    
+            len_i = lengths[i]
+            choices = [None] * len_i
+            
+            idx = len_alphabet # initial token is sampled from last row
+            for j in range(len_i):
+                prob_vector = prob_matrix[idx, :]
+                choices[j] = np.random.choice(range_alphabet, size=1, 
+                                              p=prob_vector)[0]
+                idx = choices[j]
+    
+            # Let us obtain the corresponding SELFIES
+            selfies = "".join(itemgetter(*choices)(alphabet))
+            # Equivalent to selfies = ''.join([alphabet[i] for i in choices])
+    
+            # And let us save it
+            manyselfies[i] = selfies
+        
+    elif algorithm == 'position':
 
         c = prob_matrix.cumsum(axis=1)
-        # End of computing the probability matrix c
-
-        # Let us now start generating random molecules based on c
+        # Let us now start generating molecules based on c
 
         for i in range(n_gen):
             if (i + 1) % 10000 == 0:  # progress indicator
@@ -211,18 +235,37 @@ def library_maker(
             u = np.random.rand(len_i, 1)
             choices = (u < c[:len_i, :]).argmax(axis=1)
 
-            # Let us obtain the corresponding selfies and smiles
-            selfies = "".join(
-                itemgetter(*choices)(alphabet)
-            )  # Equivalent to selfies = ''.join([alphabet[i] for i in choices])
+            # Let us obtain the corresponding SELFIES
+            selfies = "".join(itemgetter(*choices)(alphabet))  
+            # Equivalent to selfies = ''.join([alphabet[i] for i in choices])
 
-            # And let us save the molecule
+            # And let us save it
             manyselfies[i] = selfies
-
-    else:
-        raise IOError("Invalid algorithm input value: {algorithm}.")
-
-    # Let us now clean the generated library
+    
+    elif algorithm == 'dual':
+        
+        range_alphabet = range(len_alphabet)
+        for i in range(n_gen):
+            if (i + 1) % 10000 == 0:  # progress indicator
+                print(f'{i+1} molecules generated.')
+                
+            len_i = lengths[i]
+            choices = [None] * len_i
+            k = 0
+            for j in range(len_i):
+               prob_vector = prob_matrix[j,k,:]
+               choices[j] = np.random.choice(range_alphabet, size=1, p=prob_vector)[0]
+               k = choices[j]
+               
+            # Let us obtain the corresponding SELFIES
+            selfies = "".join(itemgetter(*choices)(alphabet))  
+            # Equivalent to selfies = ''.join([alphabet[i] for i in choices])
+            
+            # And let us save it
+            manyselfies[i] = selfies
+    
+    
+    # Let us now convert to SMILES and clean the generated library
     manysmiles, manyselfies = __selfies_to_smiles(manyselfies)
 
     print(f"{len(manysmiles)} unique molecules generated.")
@@ -231,7 +274,6 @@ def library_maker(
         return manysmiles, manyselfies
     else:
         return manysmiles
-
 
 
 def _random_library_maker(n_gen=20000, max_len=15, return_selfies=False, p="exp"):
@@ -269,15 +311,16 @@ def __noise_adder(matrix, noise_factor=0.1):
     """Normalizes the input matrix row-wise and mixes it linearly with a
     uniform matrix"""
     # Here we will add some noise to the prob matrix and normalize it
-    row_sums = matrix.sum(axis=1, keepdims=True)
+    k = matrix.ndim-1
+    row_sums = matrix.sum(axis=k, keepdims=True)
     row_sums[row_sums == 0] = 1  # prevent division by zero
     prob_matrix = matrix / row_sums
 
-    B = np.ones(prob_matrix.shape) / prob_matrix.shape[1]  # uniform matrix
+    B = np.ones(prob_matrix.shape) / prob_matrix.shape[k]  # uniform matrix
     prob_matrix = (1 - noise_factor) * prob_matrix + noise_factor * B
 
     # normalize prob_matrix row-wise again, although should not be necessary
-    row_sums = prob_matrix.sum(axis=1, keepdims=True)
+    row_sums = prob_matrix.sum(axis=k, keepdims=True)
     prob_matrix = prob_matrix / row_sums
 
     return prob_matrix
@@ -629,7 +672,7 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
     return idx, Y_hits_pred
 
 
-def hit_finder_grad(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
+def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
     """
     Identifies promising hit molecules from a library according to a property
     specification. Best suited for smooth embeddings like MACAW.

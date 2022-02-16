@@ -14,8 +14,11 @@ from rdkit import Chem
 import re
 from scipy.optimize import minimize
 import selfies as sf
-from sklearn.neighbors import BallTree, DistanceMetric
-
+from sklearn.neighbors import BallTree
+try:
+    from sklearn.metrics import DistanceMetric
+except:
+    from sklearn.neighbors import DistanceMetric
 
 # ----- Molecular library generation functions -----
 
@@ -26,7 +29,7 @@ def library_maker(
     p="exp",
     noise_factor=0.1,
     algorithm="position",
-    full_alphabet="False",
+    full_alphabet=False,
     return_selfies=False,
     random_state=None,
 ):
@@ -253,9 +256,9 @@ def library_maker(
             choices = [None] * len_i
             k = 0
             for j in range(len_i):
-               prob_vector = prob_matrix[j,k,:]
-               choices[j] = np.random.choice(range_alphabet, size=1, p=prob_vector)[0]
-               k = choices[j]
+                prob_vector = prob_matrix[j,k,:]
+                choices[j] = np.random.choice(range_alphabet, size=1, p=prob_vector)[0]
+                k = choices[j]
                
             # Let us obtain the corresponding SELFIES
             selfies = "".join(itemgetter(*choices)(alphabet))  
@@ -468,7 +471,7 @@ def library_evolver(
 
     if smiles is None:
         if max_len == 0:
-            max_len = 15
+            max_len = 20
         smiles = _random_library_maker(
             n_gen=20000, max_len=max_len, return_selfies=False, **kwargs
         )
@@ -493,7 +496,19 @@ def library_evolver(
     X = mcw(smiles)
     Y_old = model(X)
     smiles_lib_old = smiles
+    
+    # Let us now deal with noise_factor
+    # A list can be provided to have variable noise_factor in each round
+    # if noise_factor is not provided, it will default to 0.1 from library_maker
+    noise_factor = kwargs.pop('noise_factor', library_maker.__defaults__[4])
+    if isinstance(noise_factor, (int, float)):
+        noise_factors = [noise_factor]*n_rounds
+    else:
+        if len(noise_factor) != n_rounds:
+            raise IOError("noise_factor must have length 1 or `n_rounds`.")
+        noise_factors = noise_factor
 
+    # Main loop
     for i in range(n_rounds):
         print(f"\nRound {i+1}")
         smiles_lib = library_maker(
@@ -501,13 +516,14 @@ def library_evolver(
             n_gen=k1,
             max_len=max_len,
             return_selfies=False,
+            noise_factor=noise_factors[i],
             **kwargs
         )
 
         X = mcw(smiles_lib)
         Y_lib = model(X)
 
-        # We want to carry over the best molecules from the previous round
+        # We want to carry over the k2 best molecules from the previous round
 
         # Append the old molecules and remove duplicates
         smiles_lib += smiles_lib_old  # concatenates lists
@@ -516,13 +532,14 @@ def library_evolver(
 
         Y = np.concatenate((Y_lib, Y_old))
         Y = Y[idx]
-
-        # Select k2 best molecules
-        idx = __find_Knearest_idx(spec, Y, k=k2)
-        smiles_lib_old = [smiles_lib[i] for i in idx]
-        Y_old = Y[idx]
+        
         
         if i < n_rounds-1:
+            
+            # Select k2 best molecules
+            idx = __find_Knearest_idx(spec, Y, k=k2)
+            smiles_lib_old = [smiles_lib[i] for i in idx]
+            Y_old = Y[idx]
 
             # Compute max_len to use in next round
             # For this I take the longest 10 SMILES amongst the k2

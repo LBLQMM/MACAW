@@ -2,7 +2,7 @@
 """
 Part of the MACAW project.
 Contains the library_maker, the library_evolver functions, the hit_finder,
-and the hit_finder2 functions.
+and the hit_finder_grad functions.
 
 @author: Vincent Blay, 2021
 """

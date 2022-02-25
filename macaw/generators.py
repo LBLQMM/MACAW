@@ -689,7 +689,7 @@ def hit_finder(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=5, k2=25, p=1, n_ro
     return idx, Y_hits_pred
 
 
-def hit_finder2(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
+def hit_finder_grad(X_lib, model, spec, X=[], Y=[], n_hits=10, k1=25, k2=5, p=2):
     """
     Identifies promising hit molecules from a library according to a property
     specification. Best suited for smooth embeddings like MACAW.

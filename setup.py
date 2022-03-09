@@ -24,7 +24,6 @@ setup(
         'Programming Language :: Python :: 3 :: Only',
         'Operating System :: OS Independent',
         'Topic :: Scientific/Engineering :: Chemistry',
-        'License :: OSI Approved :: MIT License',
         'Intended Audience :: Science/Research',
         'Natural Language :: English'
           ],

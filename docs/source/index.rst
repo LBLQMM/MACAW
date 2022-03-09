@@ -6,7 +6,7 @@ Welcome to the MACAW documentation!
 
 MACAW embeddings can be used as an alternative to conventional molecular descriptors. MACAW embeddings are fast and easy to compute, variable selection is not needed, and they may enable more accuracte predictive models than conventional molecular descriptors.
 
-MACAW also provides original algorithms to generate molecular libraries and to evolve molecules *in silico* to meet a desired specification (inverse molecular design). The design specification can be any property or combination of properties that can be predicted for the molecule, such as its octane number or its binding affinity to a protein. Details about the algorithms can be found in the `MACAW publication <https://www.nature.com/natmachintell/>`_.
+MACAW also provides original algorithms to generate molecular libraries and to evolve molecules *in silico* to meet a desired specification (inverse molecular design). The design specification can be any property or combination of properties that can be predicted for the molecule, such as its octane number or its binding affinity to a protein. Details about the algorithms can be found in the `MACAW publication <https://doi.org/10.26434/chemrxiv-2022-x647j>`_.
 
 .. contents::
     :depth: 3
@@ -81,17 +81,15 @@ How to cite?
 
 .. code-block:: bib
 
-    @article{doi:XX.XXX,
+    @article{doi:10.26434/chemrxiv-2022-x647j,
     author = {Blay, Vincent and Radivojevich, Tijana and Allen, Jonathan E. and Hudson, Corey M. and Garcia-Martin, Hector},
-    title = {MACAW: XXXX},
-    journal = {XXXX},
+    title = {MACAW: an accessible tool for molecular embedding and inverse molecular design},
+    journal = {ChemRxiv},
     volume = {0},
     number = {ja},
     pages = {null},
-    year = {0},
-    doi = {XX.XXX},
-
-    URL = {http://dx.doi.org/XX.XXXX},
-    eprint = {http://dx.doi.org/XX.XXXX}
+    year = {2022},
+    URL = {https://doi.org/10.26434/chemrxiv-2022-x647j},
+    eprint = {https://doi.org/10.26434/chemrxiv-2022-x647j}
     }
 

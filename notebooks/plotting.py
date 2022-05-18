@@ -10,7 +10,7 @@ Contains plotting functions for MACAW project.
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from sklearn.metrics import auc
 
 from matplotlib import rc
@@ -74,8 +74,12 @@ def parity_plot(
         plt.gca().text(0.05, 0.85, text2, transform=plt.gca().transAxes, fontsize=9., c='red')
 
     else:
-        text1 = f"$R^2= {r2_score(x,y):0.2f}$"
-        plt.gca().text(0.05, 0.93, text1, transform=plt.gca().transAxes, fontsize=9.)
+        r2_text = f"$R^2 = {r2_score(x, y):0.2f}$"
+        rmse_text = f"RMSE = {mean_squared_error(x, y, squared=False):0.1f}"
+        mae_text = f"MAE = {mean_absolute_error(x, y):0.1f}"
+        plt.gca().text(0.05, 0.93, r2_text, transform=plt.gca().transAxes, fontsize=9.)
+        plt.gca().text(0.05, 0.87, mae_text, transform=plt.gca().transAxes, fontsize=9.)
+        plt.gca().text(0.05, 0.81, rmse_text, transform=plt.gca().transAxes, fontsize=9.)
 
     # Title and labels
     if title:

@@ -33,6 +33,7 @@ setup(
           'scipy >= 1.6.1',
           'selfies >= 2.0.0',
           'umap-learn >= 0.5.2',
+          'sklearn-rvm >= 0.1.1',
           ],
       keywords=['cheminformatics','molecular design',
                 'drug discovery', 'synthetic biology']

@@ -36,6 +36,6 @@ def test_RON_transform(basic_macaw, RON_data):
     X_train = mcw.transform(smi_train)
 
     # Loads frozen demo X_train to compare with
-    X_train_frozen = np.load("macaw/integration_tests/files/X_train.npy")  
+    X_train_frozen = np.load("tests/testdata/X_train.npy")  
 
     assert np.isclose(X_train,X_train_frozen,rtol=1e-03).all()

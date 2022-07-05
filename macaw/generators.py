@@ -101,7 +101,7 @@ def library_maker(
         # The following deals with SMILES atoms in brackets, like [C@H]
         # The only exceptions allowed are for tokens of the nitro group
         # which are now robust in SELFIES 2.0
-        for m in re.findall("\[.*?\]", s):
+        for m in re.findall("\[.*?\]", smi):
             if m not in ['[N+]', '[O-]']:
                 smi = smi.replace(m, m[1].upper())
         smi = smi.replace("/", "")

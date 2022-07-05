@@ -14,7 +14,7 @@ from rdkit.Avalon import pyAvalonTools
 from rdkit.Chem import rdMolDescriptors
 from rdkit.Chem import rdMHFPFingerprint
 from rdkit.Chem.rdmolops import LayeredFingerprint
-import re
+#import re
 from sklearn.manifold import Isomap
 from sklearn.decomposition import PCA, FastICA, FactorAnalysis
 from sklearn.svm import SVR, SVC
@@ -910,9 +910,10 @@ def smiles_cleaner(smiles, return_idx=False, deep_clean=False):
                 # This deals with SMILES atoms in brackets, like [C@H]
                 # The only exceptions allowed are for tokens of the nitro group
                 # which are robust in SELFIES 2.0
-                for m in re.findall("\[.*?\]", smi):
-                    if m not in ['[N+]', '[O-]']:
-                        smi = smi.replace(m, m[1].upper())
+                #for m in re.findall("\[.*?\]", smi):
+                #    if m not in ['[N+]', '[O-]']:
+                #        smi = smi.replace(m, m[1].upper())
+                smi = smi.replace("@", "")
                 smi = smi.replace("/C", "C")
                 smi = smi.replace("\\C", "C")
                 smi = smi.replace("/c", "c")
